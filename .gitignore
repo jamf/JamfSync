@@ -1,0 +1,6 @@
+xcuserdata
+build/
+*.xccheckout
+*.gcno
+*.DS_STORE
+*.xcuserstate

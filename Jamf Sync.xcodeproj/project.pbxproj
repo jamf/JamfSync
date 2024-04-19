@@ -1,0 +1,1019 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		840A79012ACB6E8200161D85 /* SaveableItemListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840A79002ACB6E8200161D85 /* SaveableItemListView.swift */; };
+		840A79032ACB75FC00161D85 /* SavableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840A79022ACB75FC00161D85 /* SavableItem.swift */; };
+		840A79072ACC8EFF00161D85 /* FolderInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840A79062ACC8EFF00161D85 /* FolderInstance.swift */; };
+		840A79092ACD9B0A00161D85 /* ConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840A79082ACD9B0A00161D85 /* ConfirmationView.swift */; };
+		841DE9D92BA395900092DBE7 /* Jamf Sync User Guide.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 841DE9D82BA395900092DBE7 /* Jamf Sync User Guide.pdf */; };
+		843BE0F62AEFE6350053431B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 843BE0F52AEFE6350053431B /* Assets.xcassets */; };
+		844CF9D12AC4B96600576E1A /* FolderDp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844CF9D02AC4B96600576E1A /* FolderDp.swift */; };
+		844CF9D32AC4C76A00576E1A /* JamfProInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844CF9D22AC4C76A00576E1A /* JamfProInstance.swift */; };
+		844E40D12B4F46FD003D1940 /* Checksums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844E40D02B4F46FD003D1940 /* Checksums.swift */; };
+		844E40D32B505404003D1940 /* PackageListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844E40D22B505404003D1940 /* PackageListViewModel.swift */; };
+		844E40D52B50A07A003D1940 /* DpFileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844E40D42B50A07A003D1940 /* DpFileViewModel.swift */; };
+		844E40D72B50A26A003D1940 /* DpFilesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844E40D62B50A26A003D1940 /* DpFilesViewModel.swift */; };
+		8463EF2B2AE6D3040028D591 /* FileSharePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8463EF2A2AE6D3040028D591 /* FileSharePasswordView.swift */; };
+		846499CF2B630D7700A8EA7B /* FolderDpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499CE2B630D7700A8EA7B /* FolderDpTests.swift */; };
+		846499D12B631B6A00A8EA7B /* MockFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499D02B631B6A00A8EA7B /* MockFileManager.swift */; };
+		846499D32B64165E00A8EA7B /* TestErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499D22B64165E00A8EA7B /* TestErrors.swift */; };
+		846499D52B64268A00A8EA7B /* DistributionPointTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499D42B64268A00A8EA7B /* DistributionPointTests.swift */; };
+		846499DE2B699F8E00A8EA7B /* MockDistributionPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499DD2B699F8E00A8EA7B /* MockDistributionPoint.swift */; };
+		846499E02B699FB500A8EA7B /* MockJamfProInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499DF2B699FB500A8EA7B /* MockJamfProInstance.swift */; };
+		846499E22B6AA7C300A8EA7B /* FileShareDpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499E12B6AA7C300A8EA7B /* FileShareDpTests.swift */; };
+		846499E42B6B080B00A8EA7B /* SynchronizeTaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499E32B6B080B00A8EA7B /* SynchronizeTaskTests.swift */; };
+		846499E62B6B089200A8EA7B /* MockDistributionPointSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499E52B6B089200A8EA7B /* MockDistributionPointSync.swift */; };
+		846499E82B6BFCA900A8EA7B /* Jcds2DpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499E72B6BFCA900A8EA7B /* Jcds2DpTests.swift */; };
+		8468917E2BCEC4BB00B9FCA4 /* OutputStream_write.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8468917D2BCEC4BB00B9FCA4 /* OutputStream_write.swift */; };
+		84761CA02AFEE259006BBF72 /* FileHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84761C9F2AFEE259006BBF72 /* FileHash.swift */; };
+		848C2D262BC47B3300036999 /* CharacterSet_rfc3986Unreserved.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C2D252BC47B3300036999 /* CharacterSet_rfc3986Unreserved.swift */; };
+		848C2D282BC48A3800036999 /* GeneralCloudDp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C2D272BC48A3800036999 /* GeneralCloudDp.swift */; };
+		849FC3412BD06A43008BAC02 /* VersionInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849FC3402BD06A43008BAC02 /* VersionInfo.swift */; };
+		84AB59C52B20D569007333AD /* CloudSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84AB59C42B20D569007333AD /* CloudSessionDelegate.swift */; };
+		84B967642B74157C00D73F75 /* HelpMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B967632B74157C00D73F75 /* HelpMenu.swift */; };
+		84BA65E32AD057E10058D291 /* SavableItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BA65E22AD057E10058D291 /* SavableItems.swift */; };
+		84BC6DF42AC3122100CF6D39 /* JamfSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6DF32AC3122100CF6D39 /* JamfSyncApp.swift */; };
+		84BC6DF62AC3122100CF6D39 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6DF52AC3122100CF6D39 /* ContentView.swift */; };
+		84BC6DFB2AC3122200CF6D39 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84BC6DFA2AC3122200CF6D39 /* Preview Assets.xcassets */; };
+		84BC6E102AC3122200CF6D39 /* JamfSyncUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E0F2AC3122200CF6D39 /* JamfSyncUITests.swift */; };
+		84BC6E322AC3631400CF6D39 /* Checksum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E272AC3631400CF6D39 /* Checksum.swift */; };
+		84BC6E332AC3631400CF6D39 /* DistributionPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E282AC3631400CF6D39 /* DistributionPoint.swift */; };
+		84BC6E352AC3631400CF6D39 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E2A2AC3631400CF6D39 /* Package.swift */; };
+		84BC6E362AC3631400CF6D39 /* DpFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E2B2AC3631400CF6D39 /* DpFile.swift */; };
+		84BC6E372AC3631400CF6D39 /* FileShareDp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E2C2AC3631400CF6D39 /* FileShareDp.swift */; };
+		84BC6E382AC3631400CF6D39 /* JsonObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E2D2AC3631400CF6D39 /* JsonObjects.swift */; };
+		84BC6E392AC3631400CF6D39 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E2E2AC3631400CF6D39 /* DataModel.swift */; };
+		84BC6E3A2AC3631400CF6D39 /* Jcds2Dp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E2F2AC3631400CF6D39 /* Jcds2Dp.swift */; };
+		84BC6E3B2AC3631400CF6D39 /* DpFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E302AC3631400CF6D39 /* DpFiles.swift */; };
+		84BC6E432AC3659600CF6D39 /* PackageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E402AC3659600CF6D39 /* PackageListView.swift */; };
+		84BC6E452AC37F4100CF6D39 /* SetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E442AC37F4100CF6D39 /* SetupView.swift */; };
+		84BC6E472AC380D200CF6D39 /* JamfProServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E462AC380D200CF6D39 /* JamfProServerView.swift */; };
+		84BC6E492AC380FD00CF6D39 /* FolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E482AC380FD00CF6D39 /* FolderView.swift */; };
+		84BC6E4D2AC38C6200CF6D39 /* FileShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E4A2AC38C6200CF6D39 /* FileShare.swift */; };
+		84BC6E552AC4933500CF6D39 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 84BC6E542AC4933500CF6D39 /* README.md */; };
+		84CCB5D22B4C852F00328291 /* SetupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CCB5D12B4C852F00328291 /* SetupViewModel.swift */; };
+		84CCB5D42B4C946200328291 /* LogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CCB5D32B4C946200328291 /* LogViewModel.swift */; };
+		84CD1BAC2BBB132D008F0DF3 /* Subprocess in Frameworks */ = {isa = PBXBuildFile; productRef = 84CD1BAB2BBB132D008F0DF3 /* Subprocess */; };
+		84D568622BD0722B00C91686 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D568612BD0722B00C91686 /* AboutView.swift */; };
+		84DD58372BC58E0D00E8DA23 /* JamfProPackageApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DD58362BC58E0D00E8DA23 /* JamfProPackageApi.swift */; };
+		84DD58392BC58F2E00E8DA23 /* JamfProPackageClassicApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DD58382BC58F2E00E8DA23 /* JamfProPackageClassicApi.swift */; };
+		84DD583B2BC5C2A700E8DA23 /* URL+isDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DD583A2BC5C2A700E8DA23 /* URL+isDirectory.swift */; };
+		84DD583D2BC5C9A600E8DA23 /* JamfProPackageUApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84DD583C2BC5C9A600E8DA23 /* JamfProPackageUApi.swift */; };
+		84E2AE722AF58CDC00AE8284 /* JamfProPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E2AE712AF58CDC00AE8284 /* JamfProPasswordView.swift */; };
+		84E2AE742AF85DFE00AE8284 /* LogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E2AE732AF85DFE00AE8284 /* LogManager.swift */; };
+		84E2AE762AF85EC700AE8284 /* LogMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E2AE752AF85EC700AE8284 /* LogMessage.swift */; };
+		84E2AE932AF9A09500AE8284 /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E2AE922AF9A09500AE8284 /* LogView.swift */; };
+		84E4898F2B58679600FFFE59 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E4898E2B58679600FFFE59 /* HeaderView.swift */; };
+		84E489912B5867F800FFFE59 /* SourceDestinationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E489902B5867F800FFFE59 /* SourceDestinationView.swift */; };
+		84E489932B58681D00FFFE59 /* LogMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E489922B58681D00FFFE59 /* LogMessageView.swift */; };
+		84E489952B58830A00FFFE59 /* ChecksumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E489942B58830A00FFFE59 /* ChecksumView.swift */; };
+		84E489972B59BBFD00FFFE59 /* PackageAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E489962B59BBFD00FFFE59 /* PackageAnimationView.swift */; };
+		84E489992B5AC80600FFFE59 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E489982B5AC80600FFFE59 /* UserSettings.swift */; };
+		84E4899E2B5C623500FFFE59 /* ArgumentParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E4899D2B5C623500FFFE59 /* ArgumentParser.swift */; };
+		84EBFE9B2B348A77008E502C /* DataPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EBFE9A2B348A77008E502C /* DataPersistence.swift */; };
+		84F258B32B76BF7E00B8F401 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 84F258B22B76BF7E00B8F401 /* LICENSE */; };
+		84F258B52B76C81C00B8F401 /* CommandLineProcessing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F258B42B76C81C00B8F401 /* CommandLineProcessing.swift */; };
+		84F258B72B76E09F00B8F401 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 84F258B62B76E09F00B8F401 /* CHANGELOG.md */; };
+		84F3331D2B48BEEF0037E4E5 /* FileShares.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F3331C2B48BEEF0037E4E5 /* FileShares.swift */; };
+		84FC415E2AD5A5C600DCB033 /* SynchronizeProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FC415D2AD5A5C600DCB033 /* SynchronizeProgressView.swift */; };
+		84FC41602AD5A78C00DCB033 /* View+NSWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FC415F2AD5A78C00DCB033 /* View+NSWindow.swift */; };
+		84FC41622AD7097300DCB033 /* SynchronizationProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FC41612AD7097300DCB033 /* SynchronizationProgress.swift */; };
+		84FC41642AD70BBA00DCB033 /* SynchronizeTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FC41632AD70BBA00DCB033 /* SynchronizeTask.swift */; };
+		84FC41662AD895F400DCB033 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FC41652AD895F400DCB033 /* KeychainHelper.swift */; };
+		84FC416A2AD898B000DCB033 /* Haversack in Frameworks */ = {isa = PBXBuildFile; productRef = 84FC41692AD898B000DCB033 /* Haversack */; };
+		84FC418B2ADD7B1000DCB033 /* StoredSettings.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 84FC41892ADD7B1000DCB033 /* StoredSettings.xcdatamodeld */; };
+		84FC418E2ADD89AD00DCB033 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FC418D2ADD89AD00DCB033 /* DataManager.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		84BC6E022AC3122200CF6D39 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84BC6DE82AC3122100CF6D39 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 84BC6DEF2AC3122100CF6D39;
+			remoteInfo = JamfSync;
+		};
+		84BC6E0C2AC3122200CF6D39 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84BC6DE82AC3122100CF6D39 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 84BC6DEF2AC3122100CF6D39;
+			remoteInfo = JamfSync;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		840A79002ACB6E8200161D85 /* SaveableItemListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveableItemListView.swift; sourceTree = "<group>"; };
+		840A79022ACB75FC00161D85 /* SavableItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavableItem.swift; sourceTree = "<group>"; };
+		840A79062ACC8EFF00161D85 /* FolderInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderInstance.swift; sourceTree = "<group>"; };
+		840A79082ACD9B0A00161D85 /* ConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationView.swift; sourceTree = "<group>"; };
+		841DE9D82BA395900092DBE7 /* Jamf Sync User Guide.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Jamf Sync User Guide.pdf"; sourceTree = "<group>"; };
+		841DE9DA2BA395F00092DBE7 /* User Guide */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "User Guide"; sourceTree = "<group>"; };
+		843BE0F52AEFE6350053431B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		844CF9D02AC4B96600576E1A /* FolderDp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderDp.swift; sourceTree = "<group>"; };
+		844CF9D22AC4C76A00576E1A /* JamfProInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamfProInstance.swift; sourceTree = "<group>"; };
+		844E40D02B4F46FD003D1940 /* Checksums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checksums.swift; sourceTree = "<group>"; };
+		844E40D22B505404003D1940 /* PackageListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageListViewModel.swift; sourceTree = "<group>"; };
+		844E40D42B50A07A003D1940 /* DpFileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DpFileViewModel.swift; sourceTree = "<group>"; };
+		844E40D62B50A26A003D1940 /* DpFilesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DpFilesViewModel.swift; sourceTree = "<group>"; };
+		8463EF2A2AE6D3040028D591 /* FileSharePasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSharePasswordView.swift; sourceTree = "<group>"; };
+		846499CE2B630D7700A8EA7B /* FolderDpTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderDpTests.swift; sourceTree = "<group>"; };
+		846499D02B631B6A00A8EA7B /* MockFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockFileManager.swift; sourceTree = "<group>"; };
+		846499D22B64165E00A8EA7B /* TestErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestErrors.swift; sourceTree = "<group>"; };
+		846499D42B64268A00A8EA7B /* DistributionPointTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributionPointTests.swift; sourceTree = "<group>"; };
+		846499DD2B699F8E00A8EA7B /* MockDistributionPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDistributionPoint.swift; sourceTree = "<group>"; };
+		846499DF2B699FB500A8EA7B /* MockJamfProInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockJamfProInstance.swift; sourceTree = "<group>"; };
+		846499E12B6AA7C300A8EA7B /* FileShareDpTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileShareDpTests.swift; sourceTree = "<group>"; };
+		846499E32B6B080B00A8EA7B /* SynchronizeTaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizeTaskTests.swift; sourceTree = "<group>"; };
+		846499E52B6B089200A8EA7B /* MockDistributionPointSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDistributionPointSync.swift; sourceTree = "<group>"; };
+		846499E72B6BFCA900A8EA7B /* Jcds2DpTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Jcds2DpTests.swift; sourceTree = "<group>"; };
+		8468917D2BCEC4BB00B9FCA4 /* OutputStream_write.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputStream_write.swift; sourceTree = "<group>"; };
+		84761C9F2AFEE259006BBF72 /* FileHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileHash.swift; sourceTree = "<group>"; };
+		848C2D252BC47B3300036999 /* CharacterSet_rfc3986Unreserved.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterSet_rfc3986Unreserved.swift; sourceTree = "<group>"; };
+		848C2D272BC48A3800036999 /* GeneralCloudDp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralCloudDp.swift; sourceTree = "<group>"; };
+		849FC3402BD06A43008BAC02 /* VersionInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionInfo.swift; sourceTree = "<group>"; };
+		84AB59C42B20D569007333AD /* CloudSessionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSessionDelegate.swift; sourceTree = "<group>"; };
+		84B967632B74157C00D73F75 /* HelpMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpMenu.swift; sourceTree = "<group>"; };
+		84BA65E22AD057E10058D291 /* SavableItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavableItems.swift; sourceTree = "<group>"; };
+		84BC6DF02AC3122100CF6D39 /* Jamf Sync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Jamf Sync.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		84BC6DF32AC3122100CF6D39 /* JamfSyncApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamfSyncApp.swift; sourceTree = "<group>"; };
+		84BC6DF52AC3122100CF6D39 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		84BC6DFA2AC3122200CF6D39 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		84BC6DFC2AC3122200CF6D39 /* JamfSync.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = JamfSync.entitlements; sourceTree = "<group>"; };
+		84BC6E012AC3122200CF6D39 /* Jamf SyncTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Jamf SyncTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		84BC6E0B2AC3122200CF6D39 /* Jamf SyncUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Jamf SyncUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		84BC6E0F2AC3122200CF6D39 /* JamfSyncUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamfSyncUITests.swift; sourceTree = "<group>"; };
+		84BC6E272AC3631400CF6D39 /* Checksum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Checksum.swift; sourceTree = "<group>"; };
+		84BC6E282AC3631400CF6D39 /* DistributionPoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DistributionPoint.swift; sourceTree = "<group>"; };
+		84BC6E2A2AC3631400CF6D39 /* Package.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		84BC6E2B2AC3631400CF6D39 /* DpFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DpFile.swift; sourceTree = "<group>"; };
+		84BC6E2C2AC3631400CF6D39 /* FileShareDp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileShareDp.swift; sourceTree = "<group>"; };
+		84BC6E2D2AC3631400CF6D39 /* JsonObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JsonObjects.swift; sourceTree = "<group>"; };
+		84BC6E2E2AC3631400CF6D39 /* DataModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
+		84BC6E2F2AC3631400CF6D39 /* Jcds2Dp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Jcds2Dp.swift; sourceTree = "<group>"; };
+		84BC6E302AC3631400CF6D39 /* DpFiles.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DpFiles.swift; sourceTree = "<group>"; };
+		84BC6E402AC3659600CF6D39 /* PackageListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PackageListView.swift; sourceTree = "<group>"; };
+		84BC6E442AC37F4100CF6D39 /* SetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupView.swift; sourceTree = "<group>"; };
+		84BC6E462AC380D200CF6D39 /* JamfProServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamfProServerView.swift; sourceTree = "<group>"; };
+		84BC6E482AC380FD00CF6D39 /* FolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderView.swift; sourceTree = "<group>"; };
+		84BC6E4A2AC38C6200CF6D39 /* FileShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileShare.swift; sourceTree = "<group>"; };
+		84BC6E542AC4933500CF6D39 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		84CCB5D12B4C852F00328291 /* SetupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupViewModel.swift; sourceTree = "<group>"; };
+		84CCB5D32B4C946200328291 /* LogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewModel.swift; sourceTree = "<group>"; };
+		84D568612BD0722B00C91686 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		84DD58362BC58E0D00E8DA23 /* JamfProPackageApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamfProPackageApi.swift; sourceTree = "<group>"; };
+		84DD58382BC58F2E00E8DA23 /* JamfProPackageClassicApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamfProPackageClassicApi.swift; sourceTree = "<group>"; };
+		84DD583A2BC5C2A700E8DA23 /* URL+isDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+isDirectory.swift"; sourceTree = "<group>"; };
+		84DD583C2BC5C9A600E8DA23 /* JamfProPackageUApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamfProPackageUApi.swift; sourceTree = "<group>"; };
+		84E2AE712AF58CDC00AE8284 /* JamfProPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamfProPasswordView.swift; sourceTree = "<group>"; };
+		84E2AE732AF85DFE00AE8284 /* LogManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogManager.swift; sourceTree = "<group>"; };
+		84E2AE752AF85EC700AE8284 /* LogMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogMessage.swift; sourceTree = "<group>"; };
+		84E2AE922AF9A09500AE8284 /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
+		84E4898E2B58679600FFFE59 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
+		84E489902B5867F800FFFE59 /* SourceDestinationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceDestinationView.swift; sourceTree = "<group>"; };
+		84E489922B58681D00FFFE59 /* LogMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogMessageView.swift; sourceTree = "<group>"; };
+		84E489942B58830A00FFFE59 /* ChecksumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecksumView.swift; sourceTree = "<group>"; };
+		84E489962B59BBFD00FFFE59 /* PackageAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageAnimationView.swift; sourceTree = "<group>"; };
+		84E489982B5AC80600FFFE59 /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		84E4899D2B5C623500FFFE59 /* ArgumentParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArgumentParser.swift; sourceTree = "<group>"; };
+		84EBFE9A2B348A77008E502C /* DataPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPersistence.swift; sourceTree = "<group>"; };
+		84F258B22B76BF7E00B8F401 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		84F258B42B76C81C00B8F401 /* CommandLineProcessing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandLineProcessing.swift; sourceTree = "<group>"; };
+		84F258B62B76E09F00B8F401 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
+		84F3331C2B48BEEF0037E4E5 /* FileShares.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileShares.swift; sourceTree = "<group>"; };
+		84FC415D2AD5A5C600DCB033 /* SynchronizeProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizeProgressView.swift; sourceTree = "<group>"; };
+		84FC415F2AD5A78C00DCB033 /* View+NSWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+NSWindow.swift"; sourceTree = "<group>"; };
+		84FC41612AD7097300DCB033 /* SynchronizationProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizationProgress.swift; sourceTree = "<group>"; };
+		84FC41632AD70BBA00DCB033 /* SynchronizeTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizeTask.swift; sourceTree = "<group>"; };
+		84FC41652AD895F400DCB033 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		84FC418A2ADD7B1000DCB033 /* StoredSettings.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = StoredSettings.xcdatamodel; sourceTree = "<group>"; };
+		84FC418D2ADD89AD00DCB033 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		84BC6DED2AC3122100CF6D39 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				84FC416A2AD898B000DCB033 /* Haversack in Frameworks */,
+				84CD1BAC2BBB132D008F0DF3 /* Subprocess in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84BC6DFE2AC3122200CF6D39 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84BC6E082AC3122200CF6D39 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		846499DC2B699F5E00A8EA7B /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				846499DD2B699F8E00A8EA7B /* MockDistributionPoint.swift */,
+				846499E52B6B089200A8EA7B /* MockDistributionPointSync.swift */,
+				846499D02B631B6A00A8EA7B /* MockFileManager.swift */,
+				846499DF2B699FB500A8EA7B /* MockJamfProInstance.swift */,
+			);
+			path = Mocks;
+			sourceTree = "<group>";
+		};
+		84BC6DE72AC3122100CF6D39 = {
+			isa = PBXGroup;
+			children = (
+				841DE9DA2BA395F00092DBE7 /* User Guide */,
+				84F258B62B76E09F00B8F401 /* CHANGELOG.md */,
+				84F258B22B76BF7E00B8F401 /* LICENSE */,
+				84BC6E542AC4933500CF6D39 /* README.md */,
+				84FC418C2ADD897C00DCB033 /* CoreData */,
+				84BC6DF22AC3122100CF6D39 /* JamfSync */,
+				84BC6E042AC3122200CF6D39 /* JamfSyncTests */,
+				84BC6E0E2AC3122200CF6D39 /* JamfSyncUITests */,
+				84BC6DF12AC3122100CF6D39 /* Products */,
+				84FC41682AD898B000DCB033 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		84BC6DF12AC3122100CF6D39 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				84BC6DF02AC3122100CF6D39 /* Jamf Sync.app */,
+				84BC6E012AC3122200CF6D39 /* Jamf SyncTests.xctest */,
+				84BC6E0B2AC3122200CF6D39 /* Jamf SyncUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		84BC6DF22AC3122100CF6D39 /* JamfSync */ = {
+			isa = PBXGroup;
+			children = (
+				84BC6E1F2AC312AA00CF6D39 /* Model */,
+				84BC6DFC2AC3122200CF6D39 /* JamfSync.entitlements */,
+				84BC6E212AC312F300CF6D39 /* Resources */,
+				84BC6E1E2AC3129900CF6D39 /* UI */,
+				84BC6E202AC312BF00CF6D39 /* Utility */,
+			);
+			path = JamfSync;
+			sourceTree = "<group>";
+		};
+		84BC6DF92AC3122200CF6D39 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				84BC6DFA2AC3122200CF6D39 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		84BC6E042AC3122200CF6D39 /* JamfSyncTests */ = {
+			isa = PBXGroup;
+			children = (
+				846499D42B64268A00A8EA7B /* DistributionPointTests.swift */,
+				846499E12B6AA7C300A8EA7B /* FileShareDpTests.swift */,
+				846499CE2B630D7700A8EA7B /* FolderDpTests.swift */,
+				846499E72B6BFCA900A8EA7B /* Jcds2DpTests.swift */,
+				846499DC2B699F5E00A8EA7B /* Mocks */,
+				846499E32B6B080B00A8EA7B /* SynchronizeTaskTests.swift */,
+				846499D22B64165E00A8EA7B /* TestErrors.swift */,
+			);
+			path = JamfSyncTests;
+			sourceTree = "<group>";
+		};
+		84BC6E0E2AC3122200CF6D39 /* JamfSyncUITests */ = {
+			isa = PBXGroup;
+			children = (
+				84BC6E0F2AC3122200CF6D39 /* JamfSyncUITests.swift */,
+			);
+			path = JamfSyncUITests;
+			sourceTree = "<group>";
+		};
+		84BC6E1E2AC3129900CF6D39 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				84D568612BD0722B00C91686 /* AboutView.swift */,
+				84E489942B58830A00FFFE59 /* ChecksumView.swift */,
+				840A79082ACD9B0A00161D85 /* ConfirmationView.swift */,
+				84BC6DF52AC3122100CF6D39 /* ContentView.swift */,
+				8463EF2A2AE6D3040028D591 /* FileSharePasswordView.swift */,
+				84BC6E482AC380FD00CF6D39 /* FolderView.swift */,
+				84E4898E2B58679600FFFE59 /* HeaderView.swift */,
+				84B967632B74157C00D73F75 /* HelpMenu.swift */,
+				84E2AE712AF58CDC00AE8284 /* JamfProPasswordView.swift */,
+				84BC6E462AC380D200CF6D39 /* JamfProServerView.swift */,
+				84BC6DF32AC3122100CF6D39 /* JamfSyncApp.swift */,
+				84E489922B58681D00FFFE59 /* LogMessageView.swift */,
+				84E2AE922AF9A09500AE8284 /* LogView.swift */,
+				84E489962B59BBFD00FFFE59 /* PackageAnimationView.swift */,
+				84BC6E402AC3659600CF6D39 /* PackageListView.swift */,
+				840A79002ACB6E8200161D85 /* SaveableItemListView.swift */,
+				84BC6E442AC37F4100CF6D39 /* SetupView.swift */,
+				84E489902B5867F800FFFE59 /* SourceDestinationView.swift */,
+				84FC415D2AD5A5C600DCB033 /* SynchronizeProgressView.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		84BC6E1F2AC312AA00CF6D39 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				84BC6E272AC3631400CF6D39 /* Checksum.swift */,
+				844E40D02B4F46FD003D1940 /* Checksums.swift */,
+				84BC6E2E2AC3631400CF6D39 /* DataModel.swift */,
+				84EBFE9A2B348A77008E502C /* DataPersistence.swift */,
+				84BC6E282AC3631400CF6D39 /* DistributionPoint.swift */,
+				84BC6E2B2AC3631400CF6D39 /* DpFile.swift */,
+				84BC6E302AC3631400CF6D39 /* DpFiles.swift */,
+				84BC6E2C2AC3631400CF6D39 /* FileShareDp.swift */,
+				844CF9D02AC4B96600576E1A /* FolderDp.swift */,
+				840A79062ACC8EFF00161D85 /* FolderInstance.swift */,
+				848C2D272BC48A3800036999 /* GeneralCloudDp.swift */,
+				844CF9D22AC4C76A00576E1A /* JamfProInstance.swift */,
+				84DD58362BC58E0D00E8DA23 /* JamfProPackageApi.swift */,
+				84DD58382BC58F2E00E8DA23 /* JamfProPackageClassicApi.swift */,
+				84DD583C2BC5C9A600E8DA23 /* JamfProPackageUApi.swift */,
+				84BC6E2F2AC3631400CF6D39 /* Jcds2Dp.swift */,
+				84BC6E2D2AC3631400CF6D39 /* JsonObjects.swift */,
+				84E2AE732AF85DFE00AE8284 /* LogManager.swift */,
+				84E2AE752AF85EC700AE8284 /* LogMessage.swift */,
+				84BC6E2A2AC3631400CF6D39 /* Package.swift */,
+				840A79022ACB75FC00161D85 /* SavableItem.swift */,
+				84BA65E22AD057E10058D291 /* SavableItems.swift */,
+				84FC41612AD7097300DCB033 /* SynchronizationProgress.swift */,
+				84FC41632AD70BBA00DCB033 /* SynchronizeTask.swift */,
+				84CCB5CE2B4C83AC00328291 /* ViewModels */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		84BC6E202AC312BF00CF6D39 /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				84E4899D2B5C623500FFFE59 /* ArgumentParser.swift */,
+				848C2D252BC47B3300036999 /* CharacterSet_rfc3986Unreserved.swift */,
+				84AB59C42B20D569007333AD /* CloudSessionDelegate.swift */,
+				84F258B42B76C81C00B8F401 /* CommandLineProcessing.swift */,
+				84761C9F2AFEE259006BBF72 /* FileHash.swift */,
+				84BC6E4A2AC38C6200CF6D39 /* FileShare.swift */,
+				84F3331C2B48BEEF0037E4E5 /* FileShares.swift */,
+				84FC41652AD895F400DCB033 /* KeychainHelper.swift */,
+				8468917D2BCEC4BB00B9FCA4 /* OutputStream_write.swift */,
+				84DD583A2BC5C2A700E8DA23 /* URL+isDirectory.swift */,
+				84E489982B5AC80600FFFE59 /* UserSettings.swift */,
+				84FC415F2AD5A78C00DCB033 /* View+NSWindow.swift */,
+				849FC3402BD06A43008BAC02 /* VersionInfo.swift */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
+		84BC6E212AC312F300CF6D39 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				841DE9D82BA395900092DBE7 /* Jamf Sync User Guide.pdf */,
+				843BE0F52AEFE6350053431B /* Assets.xcassets */,
+				84BC6DF92AC3122200CF6D39 /* Preview Content */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		84CCB5CE2B4C83AC00328291 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				84CCB5D32B4C946200328291 /* LogViewModel.swift */,
+				84CCB5D12B4C852F00328291 /* SetupViewModel.swift */,
+				844E40D22B505404003D1940 /* PackageListViewModel.swift */,
+				844E40D42B50A07A003D1940 /* DpFileViewModel.swift */,
+				844E40D62B50A26A003D1940 /* DpFilesViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		84FC41682AD898B000DCB033 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		84FC418C2ADD897C00DCB033 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				84FC41892ADD7B1000DCB033 /* StoredSettings.xcdatamodeld */,
+				84FC418D2ADD89AD00DCB033 /* DataManager.swift */,
+			);
+			path = CoreData;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		84BC6DEF2AC3122100CF6D39 /* Jamf Sync */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 84BC6E152AC3122200CF6D39 /* Build configuration list for PBXNativeTarget "Jamf Sync" */;
+			buildPhases = (
+				84BC6DEC2AC3122100CF6D39 /* Sources */,
+				84BC6DED2AC3122100CF6D39 /* Frameworks */,
+				84BC6DEE2AC3122100CF6D39 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Jamf Sync";
+			packageProductDependencies = (
+				84FC41692AD898B000DCB033 /* Haversack */,
+				84CD1BAB2BBB132D008F0DF3 /* Subprocess */,
+			);
+			productName = JamfSync;
+			productReference = 84BC6DF02AC3122100CF6D39 /* Jamf Sync.app */;
+			productType = "com.apple.product-type.application";
+		};
+		84BC6E002AC3122200CF6D39 /* Jamf SyncTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 84BC6E182AC3122200CF6D39 /* Build configuration list for PBXNativeTarget "Jamf SyncTests" */;
+			buildPhases = (
+				84BC6DFD2AC3122200CF6D39 /* Sources */,
+				84BC6DFE2AC3122200CF6D39 /* Frameworks */,
+				84BC6DFF2AC3122200CF6D39 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				84BC6E032AC3122200CF6D39 /* PBXTargetDependency */,
+			);
+			name = "Jamf SyncTests";
+			productName = JamfSyncTests;
+			productReference = 84BC6E012AC3122200CF6D39 /* Jamf SyncTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		84BC6E0A2AC3122200CF6D39 /* Jamf SyncUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 84BC6E1B2AC3122200CF6D39 /* Build configuration list for PBXNativeTarget "Jamf SyncUITests" */;
+			buildPhases = (
+				84BC6E072AC3122200CF6D39 /* Sources */,
+				84BC6E082AC3122200CF6D39 /* Frameworks */,
+				84BC6E092AC3122200CF6D39 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				84BC6E0D2AC3122200CF6D39 /* PBXTargetDependency */,
+			);
+			name = "Jamf SyncUITests";
+			productName = JamfSyncUITests;
+			productReference = 84BC6E0B2AC3122200CF6D39 /* Jamf SyncUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		84BC6DE82AC3122100CF6D39 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1510;
+				TargetAttributes = {
+					84BC6DEF2AC3122100CF6D39 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					84BC6E002AC3122200CF6D39 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = 84BC6DEF2AC3122100CF6D39;
+					};
+					84BC6E0A2AC3122200CF6D39 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = 84BC6DEF2AC3122100CF6D39;
+					};
+				};
+			};
+			buildConfigurationList = 84BC6DEB2AC3122100CF6D39 /* Build configuration list for PBXProject "Jamf Sync" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 84BC6DE72AC3122100CF6D39;
+			packageReferences = (
+				84FC41672AD896AE00DCB033 /* XCRemoteSwiftPackageReference "Haversack" */,
+				84CD1BAA2BBAF573008F0DF3 /* XCRemoteSwiftPackageReference "Subprocess" */,
+			);
+			productRefGroup = 84BC6DF12AC3122100CF6D39 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				84BC6DEF2AC3122100CF6D39 /* Jamf Sync */,
+				84BC6E002AC3122200CF6D39 /* Jamf SyncTests */,
+				84BC6E0A2AC3122200CF6D39 /* Jamf SyncUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		84BC6DEE2AC3122100CF6D39 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				841DE9D92BA395900092DBE7 /* Jamf Sync User Guide.pdf in Resources */,
+				84BC6DFB2AC3122200CF6D39 /* Preview Assets.xcassets in Resources */,
+				84F258B72B76E09F00B8F401 /* CHANGELOG.md in Resources */,
+				84BC6E552AC4933500CF6D39 /* README.md in Resources */,
+				84F258B32B76BF7E00B8F401 /* LICENSE in Resources */,
+				843BE0F62AEFE6350053431B /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84BC6DFF2AC3122200CF6D39 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84BC6E092AC3122200CF6D39 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		84BC6DEC2AC3122100CF6D39 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				84FC41622AD7097300DCB033 /* SynchronizationProgress.swift in Sources */,
+				844CF9D12AC4B96600576E1A /* FolderDp.swift in Sources */,
+				84F258B52B76C81C00B8F401 /* CommandLineProcessing.swift in Sources */,
+				84BC6E322AC3631400CF6D39 /* Checksum.swift in Sources */,
+				84BC6E452AC37F4100CF6D39 /* SetupView.swift in Sources */,
+				844E40D12B4F46FD003D1940 /* Checksums.swift in Sources */,
+				84CCB5D22B4C852F00328291 /* SetupViewModel.swift in Sources */,
+				84CCB5D42B4C946200328291 /* LogViewModel.swift in Sources */,
+				848C2D282BC48A3800036999 /* GeneralCloudDp.swift in Sources */,
+				84DD58392BC58F2E00E8DA23 /* JamfProPackageClassicApi.swift in Sources */,
+				84E2AE762AF85EC700AE8284 /* LogMessage.swift in Sources */,
+				840A79072ACC8EFF00161D85 /* FolderInstance.swift in Sources */,
+				844E40D52B50A07A003D1940 /* DpFileViewModel.swift in Sources */,
+				84FC41642AD70BBA00DCB033 /* SynchronizeTask.swift in Sources */,
+				840A79092ACD9B0A00161D85 /* ConfirmationView.swift in Sources */,
+				84E489912B5867F800FFFE59 /* SourceDestinationView.swift in Sources */,
+				8468917E2BCEC4BB00B9FCA4 /* OutputStream_write.swift in Sources */,
+				84FC418E2ADD89AD00DCB033 /* DataManager.swift in Sources */,
+				840A79012ACB6E8200161D85 /* SaveableItemListView.swift in Sources */,
+				84BC6E492AC380FD00CF6D39 /* FolderView.swift in Sources */,
+				849FC3412BD06A43008BAC02 /* VersionInfo.swift in Sources */,
+				84E489992B5AC80600FFFE59 /* UserSettings.swift in Sources */,
+				84BC6E472AC380D200CF6D39 /* JamfProServerView.swift in Sources */,
+				84E489932B58681D00FFFE59 /* LogMessageView.swift in Sources */,
+				84DD58372BC58E0D00E8DA23 /* JamfProPackageApi.swift in Sources */,
+				84DD583B2BC5C2A700E8DA23 /* URL+isDirectory.swift in Sources */,
+				84BC6E4D2AC38C6200CF6D39 /* FileShare.swift in Sources */,
+				84BA65E32AD057E10058D291 /* SavableItems.swift in Sources */,
+				84BC6DF62AC3122100CF6D39 /* ContentView.swift in Sources */,
+				84E2AE722AF58CDC00AE8284 /* JamfProPasswordView.swift in Sources */,
+				84BC6E3B2AC3631400CF6D39 /* DpFiles.swift in Sources */,
+				84E4898F2B58679600FFFE59 /* HeaderView.swift in Sources */,
+				84FC415E2AD5A5C600DCB033 /* SynchronizeProgressView.swift in Sources */,
+				84E489952B58830A00FFFE59 /* ChecksumView.swift in Sources */,
+				8463EF2B2AE6D3040028D591 /* FileSharePasswordView.swift in Sources */,
+				84BC6E352AC3631400CF6D39 /* Package.swift in Sources */,
+				84BC6E392AC3631400CF6D39 /* DataModel.swift in Sources */,
+				84E2AE932AF9A09500AE8284 /* LogView.swift in Sources */,
+				84DD583D2BC5C9A600E8DA23 /* JamfProPackageUApi.swift in Sources */,
+				84E489972B59BBFD00FFFE59 /* PackageAnimationView.swift in Sources */,
+				84EBFE9B2B348A77008E502C /* DataPersistence.swift in Sources */,
+				84BC6E382AC3631400CF6D39 /* JsonObjects.swift in Sources */,
+				84BC6E432AC3659600CF6D39 /* PackageListView.swift in Sources */,
+				84FC41602AD5A78C00DCB033 /* View+NSWindow.swift in Sources */,
+				84E2AE742AF85DFE00AE8284 /* LogManager.swift in Sources */,
+				84E4899E2B5C623500FFFE59 /* ArgumentParser.swift in Sources */,
+				84F3331D2B48BEEF0037E4E5 /* FileShares.swift in Sources */,
+				84BC6E3A2AC3631400CF6D39 /* Jcds2Dp.swift in Sources */,
+				844CF9D32AC4C76A00576E1A /* JamfProInstance.swift in Sources */,
+				84761CA02AFEE259006BBF72 /* FileHash.swift in Sources */,
+				84BC6E332AC3631400CF6D39 /* DistributionPoint.swift in Sources */,
+				844E40D72B50A26A003D1940 /* DpFilesViewModel.swift in Sources */,
+				84FC418B2ADD7B1000DCB033 /* StoredSettings.xcdatamodeld in Sources */,
+				84BC6DF42AC3122100CF6D39 /* JamfSyncApp.swift in Sources */,
+				84AB59C52B20D569007333AD /* CloudSessionDelegate.swift in Sources */,
+				84D568622BD0722B00C91686 /* AboutView.swift in Sources */,
+				844E40D32B505404003D1940 /* PackageListViewModel.swift in Sources */,
+				84FC41662AD895F400DCB033 /* KeychainHelper.swift in Sources */,
+				840A79032ACB75FC00161D85 /* SavableItem.swift in Sources */,
+				84B967642B74157C00D73F75 /* HelpMenu.swift in Sources */,
+				84BC6E372AC3631400CF6D39 /* FileShareDp.swift in Sources */,
+				84BC6E362AC3631400CF6D39 /* DpFile.swift in Sources */,
+				848C2D262BC47B3300036999 /* CharacterSet_rfc3986Unreserved.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84BC6DFD2AC3122200CF6D39 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				846499E02B699FB500A8EA7B /* MockJamfProInstance.swift in Sources */,
+				846499DE2B699F8E00A8EA7B /* MockDistributionPoint.swift in Sources */,
+				846499D52B64268A00A8EA7B /* DistributionPointTests.swift in Sources */,
+				846499E42B6B080B00A8EA7B /* SynchronizeTaskTests.swift in Sources */,
+				846499E82B6BFCA900A8EA7B /* Jcds2DpTests.swift in Sources */,
+				846499E22B6AA7C300A8EA7B /* FileShareDpTests.swift in Sources */,
+				846499D32B64165E00A8EA7B /* TestErrors.swift in Sources */,
+				846499D12B631B6A00A8EA7B /* MockFileManager.swift in Sources */,
+				846499CF2B630D7700A8EA7B /* FolderDpTests.swift in Sources */,
+				846499E62B6B089200A8EA7B /* MockDistributionPointSync.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84BC6E072AC3122200CF6D39 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				84BC6E102AC3122200CF6D39 /* JamfSyncUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		84BC6E032AC3122200CF6D39 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 84BC6DEF2AC3122100CF6D39 /* Jamf Sync */;
+			targetProxy = 84BC6E022AC3122200CF6D39 /* PBXContainerItemProxy */;
+		};
+		84BC6E0D2AC3122200CF6D39 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 84BC6DEF2AC3122100CF6D39 /* Jamf Sync */;
+			targetProxy = 84BC6E0C2AC3122200CF6D39 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		84BC6E132AC3122200CF6D39 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.6;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		84BC6E142AC3122200CF6D39 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.6;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		84BC6E162AC3122200CF6D39 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = JamfSync/JamfSync.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_ASSET_PATHS = "\"JamfSync/Resources/Preview Content\"";
+				DEVELOPMENT_TEAM = 483DWKW443;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Jamf Sync";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.jamfsync;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		84BC6E172AC3122200CF6D39 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = JamfSync/JamfSync.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_ASSET_PATHS = "\"JamfSync/Resources/Preview Content\"";
+				DEVELOPMENT_TEAM = 483DWKW443;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Jamf Sync";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.jamfsync;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		84BC6E192AC3122200CF6D39 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 483DWKW443;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamfsoftware.JamfSyncTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Jamf Sync.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Jamf Sync";
+			};
+			name = Debug;
+		};
+		84BC6E1A2AC3122200CF6D39 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 483DWKW443;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamfsoftware.JamfSyncTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Jamf Sync.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Jamf Sync";
+			};
+			name = Release;
+		};
+		84BC6E1C2AC3122200CF6D39 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 483DWKW443;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamfsoftware.JamfSyncUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "Jamf Sync";
+			};
+			name = Debug;
+		};
+		84BC6E1D2AC3122200CF6D39 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 483DWKW443;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamfsoftware.JamfSyncUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "Jamf Sync";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		84BC6DEB2AC3122100CF6D39 /* Build configuration list for PBXProject "Jamf Sync" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				84BC6E132AC3122200CF6D39 /* Debug */,
+				84BC6E142AC3122200CF6D39 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		84BC6E152AC3122200CF6D39 /* Build configuration list for PBXNativeTarget "Jamf Sync" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				84BC6E162AC3122200CF6D39 /* Debug */,
+				84BC6E172AC3122200CF6D39 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		84BC6E182AC3122200CF6D39 /* Build configuration list for PBXNativeTarget "Jamf SyncTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				84BC6E192AC3122200CF6D39 /* Debug */,
+				84BC6E1A2AC3122200CF6D39 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		84BC6E1B2AC3122200CF6D39 /* Build configuration list for PBXNativeTarget "Jamf SyncUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				84BC6E1C2AC3122200CF6D39 /* Debug */,
+				84BC6E1D2AC3122200CF6D39 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		84CD1BAA2BBAF573008F0DF3 /* XCRemoteSwiftPackageReference "Subprocess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jamf/Subprocess";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.2;
+			};
+		};
+		84FC41672AD896AE00DCB033 /* XCRemoteSwiftPackageReference "Haversack" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jamf/Haversack";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		84CD1BAB2BBB132D008F0DF3 /* Subprocess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 84CD1BAA2BBAF573008F0DF3 /* XCRemoteSwiftPackageReference "Subprocess" */;
+			productName = Subprocess;
+		};
+		84FC41692AD898B000DCB033 /* Haversack */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 84FC41672AD896AE00DCB033 /* XCRemoteSwiftPackageReference "Haversack" */;
+			productName = Haversack;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		84FC41892ADD7B1000DCB033 /* StoredSettings.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				84FC418A2ADD7B1000DCB033 /* StoredSettings.xcdatamodel */,
+			);
+			currentVersion = 84FC418A2ADD7B1000DCB033 /* StoredSettings.xcdatamodel */;
+			path = StoredSettings.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 84BC6DE82AC3122100CF6D39 /* Project object */;
+}

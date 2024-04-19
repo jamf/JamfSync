@@ -1,0 +1,33 @@
+{
+  "originHash" : "e3f55a0c4b0ad40659ad3d728fe1ffe065c6d7c7a42f5b28fd5b59f970873c53",
+  "pins" : [
+    {
+      "identity" : "haversack",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jamf/Haversack",
+      "state" : {
+        "revision" : "4d58a33d989d5ed318cc0ccc88f9ad6d064fbc68",
+        "version" : "1.1.1"
+      }
+    },
+    {
+      "identity" : "subprocess",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jamf/Subprocess",
+      "state" : {
+        "revision" : "2fdaccadfe68bc80f53cfc2d5d2d2363a8d6a5a6",
+        "version" : "3.0.2"
+      }
+    },
+    {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections",
+      "state" : {
+        "revision" : "94cf62b3ba8d4bed62680a282d4c25f9c63c2efb",
+        "version" : "1.1.0"
+      }
+    }
+  ],
+  "version" : 3
+}
