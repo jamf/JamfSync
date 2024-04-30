@@ -134,6 +134,7 @@
 		846499E52B6B089200A8EA7B /* MockDistributionPointSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDistributionPointSync.swift; sourceTree = "<group>"; };
 		846499E72B6BFCA900A8EA7B /* Jcds2DpTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Jcds2DpTests.swift; sourceTree = "<group>"; };
 		8468917D2BCEC4BB00B9FCA4 /* OutputStream_write.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputStream_write.swift; sourceTree = "<group>"; };
+		847298EE2BDC5566002D4652 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		84761C9F2AFEE259006BBF72 /* FileHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileHash.swift; sourceTree = "<group>"; };
 		848C2D252BC47B3300036999 /* CharacterSet_rfc3986Unreserved.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterSet_rfc3986Unreserved.swift; sourceTree = "<group>"; };
 		848C2D272BC48A3800036999 /* GeneralCloudDp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralCloudDp.swift; sourceTree = "<group>"; };
@@ -263,6 +264,7 @@
 		84BC6DF22AC3122100CF6D39 /* JamfSync */ = {
 			isa = PBXGroup;
 			children = (
+				847298EE2BDC5566002D4652 /* Info.plist */,
 				84BC6E1F2AC312AA00CF6D39 /* Model */,
 				84BC6DFC2AC3122200CF6D39 /* JamfSync.entitlements */,
 				84BC6E212AC312F300CF6D39 /* Resources */,
@@ -801,7 +803,8 @@
 				DEVELOPMENT_TEAM = 483DWKW443;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = JamfSync/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Jamf Sync";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -832,7 +835,8 @@
 				DEVELOPMENT_TEAM = 483DWKW443;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = JamfSync/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Jamf Sync";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
