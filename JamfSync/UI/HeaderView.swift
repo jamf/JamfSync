@@ -79,9 +79,31 @@ struct HeaderView: View {
 
     func startSynchronize(deleteFiles: Bool, deletePackages: Bool) async {
         if let srcDp = dataModel.findDp(id: dataModel.selectedSrcDpId), let dstDp = dataModel.findDp(id: dataModel.selectedDstDpId) {
-            SynchronizeProgressView(srcDp: srcDp, dstDp: dstDp, deleteFiles: deleteFiles, deletePackages: deletePackages).openInNewWindow { window in
+            SynchronizeProgressView(srcDp: srcDp, dstDp: dstDp, deleteFiles: deleteFiles, deletePackages: deletePackages, processToExecute: { (synchronizeTask, deleteFiles, deletePackages, progress, synchronizationProgressView) in
+                    synchronize(srcDp: srcDp, dstDp: dstDp, synchronizeTask: synchronizeTask, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, synchronizeProgressView: synchronizationProgressView) })
+                .openInNewWindow { window in
                 window.title = "Synchronization Progress"
             }
+        }
+    }
+
+    func synchronize(srcDp: DistributionPoint?, dstDp: DistributionPoint, synchronizeTask: SynchronizeTask, deleteFiles: Bool, deletePackages: Bool, progress: SynchronizationProgress, synchronizeProgressView: SynchronizeProgressView) {
+        Task {
+            var reloadFiles = false
+            DataModel.shared.cancelUpdateListViewModels()
+            DataModel.shared.synchronizationInProgress = true
+            do {
+                guard let srcDp else { throw DistributionPointError.programError }
+                reloadFiles = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: DataModel.shared.selectedDpFilesFromSelectionIds(packageListViewModel: DataModel.shared.srcPackageListViewModel), jamfProInstance: DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId), forceSync: DataModel.shared.forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+            } catch {
+                LogManager.shared.logMessage(message: "Failed to synchronize \(srcDp?.name ?? "nil") to \(dstDp.name): \(error)", level: .error)
+            }
+            DataModel.shared.synchronizationInProgress = false
+            // Wait a second for the progress bar to catch up and then close
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                synchronizeProgressView.dismiss()
+                DataModel.shared.updateListViewModels(reload: reloadFiles ? .source : .none)
+            })
         }
     }
 
@@ -92,7 +114,7 @@ struct HeaderView: View {
     }
 
     func promptForDeletion() -> Bool {
-        if dataModel.selectedDpFiles.count == 0 {
+        if dataModel.srcPackageListViewModel.selectedDpFiles.count == 0 {
             if let srcDp = dataModel.findDp(id: dataModel.selectedSrcDpId), let dstDp = dataModel.findDp(id: dataModel.selectedDstDpId) {
                 // If there are any packages on the destination Jamf Pro server that would be removed, then prompt
                 if let jamfProInstance = DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId) {

@@ -10,7 +10,7 @@ class SynchronizeTask {
     /// Loops through the files to synchronize to calculate the total size of files to be transferred.
     /// - Parameters:
     ///     - srcDp: The destination distribution point to copy the files from
-    ///     - dstDp: The destination distribution point to copy the files to\
+    ///     - dstDp: The destination distribution point to copy the files to
     ///     - selectedItems: The selected items to synchronize. If the selection list is empty, it will synchronize all files from the source distribution point
     ///     - jamfProInstance: The Jamf Pro instance of the destination distribution point, if it is associated with one
     ///     - forceSync: Set to true if it should copy files even if they are the same on both the source and destination

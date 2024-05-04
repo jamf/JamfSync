@@ -5,8 +5,6 @@
 import Foundation
 
 class SynchronizationProgress: ObservableObject {
-    var srcDp: DistributionPoint?
-    var dstDp: DistributionPoint?
     var totalSize: Int64?
     @Published var operation: String?
     @Published var currentFile: DpFile?

@@ -7,6 +7,9 @@ import Foundation
 class PackageListViewModel: ObservableObject {
     @Published var dpFiles = DpFilesViewModel()
     @Published var doChecksumCalculation = false
+    @Published var selectedDpFiles: Set<DpFile.ID> = []
+    @Published var shouldPresentConfirmationSheet = false
+    @Published var canceled = false
     var isSrc: Bool
     private var updateTask: Task<Void, Error>?
     static let needToSortPackagesNotification = "com.jamfsoftware.jamfsync.needToSortPackages"
@@ -24,14 +27,14 @@ class PackageListViewModel: ObservableObject {
         let dataModel = DataModel.shared
         let selectedSrcDp = dataModel.findDp(id: dataModel.selectedSrcDpId)
         let selectedDstDp = dataModel.findDp(id: dataModel.selectedDstDpId)
-        let dp = determineDpForThisPackageList(srcDp: selectedSrcDp, dstDp: selectedDstDp)
+        let dp = retrieveSelectedDp()
         if !checksumUpdateInProgress, let dp {
             await updateDpFiles(dp: dp, reload: reload)
         }
 
         updateTask = Task { @MainActor in
             dpFiles.removeAll()
-            dataModel.selectedDpFiles.removeAll()
+            selectedDpFiles.removeAll()
             
             if let dp {
                 for dpFile in dp.dpFiles.files {
@@ -41,7 +44,7 @@ class PackageListViewModel: ObservableObject {
                 }
             }
 
-            let packages = packagesForSelectedDps(srcDp: selectedSrcDp, dstDp: selectedDstDp)
+            let packages = packagesForSelectedDps(dp: dp)
             dpFiles.addMissingPackages(packages: packages, isSrc: isSrc, srcDp: selectedSrcDp, dstDp: selectedDstDp)
             updateTask = nil
             NotificationCenter.default.post(name: Notification.Name(PackageListViewModel.needToSortPackagesNotification), object: self)
@@ -64,6 +67,27 @@ class PackageListViewModel: ObservableObject {
     }
 
     func showCalcChecksumsButton() -> Bool {
+        let selectedDp = retrieveSelectedDp()
+        guard let selectedDp else { return false }
+
+        return selectedDp.showCalcChecksumsButton()
+    }
+
+    func enableFileAddButton() -> Bool {
+        let selectedDp = retrieveSelectedDp()
+        guard let selectedDp, selectedDp.id != DataModel.noSelection else { return false }
+
+        return true
+    }
+
+    func enableFileDeleteButton(selectedDpFiles: Set<DpFile.ID>) -> Bool {
+        let selectedDp = retrieveSelectedDp()
+        guard let selectedDp, selectedDp.id != DataModel.noSelection, selectedDpFiles.count > 0 else { return false }
+
+        return true
+    }
+
+    func retrieveSelectedDp() -> DistributionPoint? {
         let dataModel = DataModel.shared
         let selectedDp: DistributionPoint?
         if isSrc {
@@ -72,9 +96,7 @@ class PackageListViewModel: ObservableObject {
             selectedDp = dataModel.findDp(id: dataModel.selectedDstDpId)
         }
 
-        guard let selectedDp else { return false }
-
-        return selectedDp.showCalcChecksumsButton()
+        return selectedDp
     }
 
     func cancelUpdate() {
@@ -118,6 +140,16 @@ class PackageListViewModel: ObservableObject {
         return false
     }
 
+    func deleteSelectedFilesFromDp() {
+        let selectedDpFiles = DataModel.shared.selectedDpFilesFromSelectionIds(packageListViewModel: self)
+        for dpFile in selectedDpFiles {
+            // TODO: Finish this
+            print("TODO: Delete file \(dpFile.name)")
+        }
+    }
+
+    // MARK: - Private functions
+
     private func determineState(srcDp: DistributionPoint?, dstDp: DistributionPoint?, dpFile: DpFile) -> FileState {
         guard let srcDp, srcDp.id != DataModel.noSelection, let dstDp, dstDp.id != DataModel.noSelection else { return .undefined }
         if isSrc {
@@ -152,14 +184,10 @@ class PackageListViewModel: ObservableObject {
         }
     }
 
-    private func packagesForSelectedDps(srcDp: DistributionPoint?, dstDp: DistributionPoint?) -> [Package]? {
+    private func packagesForSelectedDps(dp: DistributionPoint?) -> [Package]? {
+        guard let dp else { return nil }
         let dataModel = DataModel.shared
-        var savableItem: SavableItem?
-        if !isSrc, let dstDp, dstDp.id != DataModel.noSelection {
-            savableItem = dataModel.savableItems.findSavableItemWithDpId(id: dstDp.id)
-        } else if isSrc, let srcDp, srcDp.id != DataModel.noSelection {
-            savableItem = dataModel.savableItems.findSavableItemWithDpId(id: srcDp.id)
-        }
+        var savableItem = dataModel.savableItems.findSavableItemWithDpId(id: dp.id)
         return savableItem?.jamfProPackages()
     }
 }

@@ -30,7 +30,6 @@ class DataModel: ObservableObject {
     @Published var dpsForDestination: [DistributionPoint] = []
     @Published var selectedSrcDpId = DataModel.noSelection
     @Published var selectedDstDpId = DataModel.noSelection
-    @Published var selectedDpFiles: Set<DpFile.ID> = []
     @Published var forceSync = false
     @Published var showSpinner = false
     @Published var shouldPromptForDpPassword = false
@@ -175,28 +174,19 @@ class DataModel: ObservableObject {
         return synchronizationInProgress || selectedSrcDpId == DataModel.noSelection || selectedDstDpId == DataModel.noSelection || selectedSrcDpId == selectedDstDpId
     }
 
-    func adjustSelectedItems() {
-        var idsToAdd: [UUID] = []
-        var idsToRemove: [UUID] = []
-        for id in selectedDpFiles {
-            if let dstFile = dstPackageListViewModel.dpFiles.findDpFileViewModel(id: id) {
-                if let srcFile = srcPackageListViewModel.dpFiles.findDpFile(name: dstFile.dpFile.name) {
-                    idsToAdd.append(srcFile.id)
-                }
-                idsToRemove.append(dstFile.id)
-            }
-        }
-        for id in idsToAdd {
-            selectedDpFiles.insert(id)
-        }
-        for id in idsToRemove {
-            selectedDpFiles.remove(id)
-        }
-    }
-
     func verifySelectedItemsStillExist() {
         verifySrcSelectedItemsStillExist()
         verifyDstSelectedItemsStillExist()
+    }
+
+    func selectedDpFilesFromSelectionIds(packageListViewModel: PackageListViewModel) -> [DpFile] {
+        var selectedFiles: [DpFile] = []
+        for id in packageListViewModel.selectedDpFiles {
+            if let viewModel = packageListViewModel.dpFiles.findDpFileViewModel(id: id) {
+                selectedFiles.append(viewModel.dpFile)
+            }
+        }
+        return selectedFiles
     }
 
     // MARK: Private functions

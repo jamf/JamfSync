@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2024-05-6
+### Features
+- Added buttons below the source and destination distribution point to allow local files to the distribution point, or to remove files from the distribution point.
+
 ## [1.2.0] - 2024-04-16
 ### Features
 - Added the ability to use the v1/packages endpoint on Jamf Pro version 11.5 and above, which includes the ablity to upload files to any cloud instance that Jamf Pro supports. It shows up as a distribution point called "Cloud", but only for the destination since there isn't a way to download those files at this time.

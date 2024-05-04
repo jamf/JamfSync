@@ -5,14 +5,15 @@
 import SwiftUI
 
 struct SynchronizeProgressView: View {
-    @Environment(\.dismiss) private var dismiss
-    var srcDp: DistributionPoint
+    @Environment(\.dismiss) var dismiss
+    var srcDp: DistributionPoint?
     var dstDp: DistributionPoint
     var deleteFiles: Bool
     var deletePackages: Bool
     @StateObject var progress = SynchronizationProgress()
     @State var shouldPresentConfirmationSheet = false
     let synchronizeTask = SynchronizeTask()
+    var processToExecute: (SynchronizeTask, Bool, Bool, SynchronizationProgress, SynchronizeProgressView)->Void = {_,_,_,_,_ in }
 
     // For CrappyButReliableAnimation
     let timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
@@ -22,7 +23,7 @@ struct SynchronizeProgressView: View {
     var body: some View {
         VStack {
             HStack {
-                Text("\(srcDp.selectionName())")
+                Text("\(srcDp?.selectionName() ?? "Local Files")")
                     .padding()
 
                 BackAndForthAnimation(leftOffset: $leftOffset, rightOffset: $rightOffset)
@@ -71,35 +72,8 @@ struct SynchronizeProgressView: View {
         }
         .frame(minWidth: 600)
         .onAppear {
-            progress.srcDp = srcDp
-            progress.dstDp = dstDp
-            Task {
-                var reloadFiles = false
-                DataModel.shared.cancelUpdateListViewModels()
-                DataModel.shared.synchronizationInProgress = true
-                do {
-                    reloadFiles = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedIdsFromViewModelIds(srcIds: DataModel.shared.selectedDpFiles), jamfProInstance: DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId), forceSync: DataModel.shared.forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
-                } catch {
-                    LogManager.shared.logMessage(message: "Failed to synchronize \(srcDp) to \(dstDp): \(error)", level: .error)
-                }
-                DataModel.shared.synchronizationInProgress = false
-                // Wait a second for the progress bar to catch up and then close
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
-                    dismiss()
-                    DataModel.shared.updateListViewModels(reload: reloadFiles ? .source : .none)
-                })
-            }
+            processToExecute(synchronizeTask, deleteFiles, deletePackages, progress, self)
         }
-    }
-
-    func selectedIdsFromViewModelIds(srcIds: Set<DpFile.ID>) -> [DpFile] {
-        var selectedFiles: [DpFile] = []
-        for id in srcIds {
-            if let viewModel = DataModel.shared.srcPackageListViewModel.dpFiles.findDpFileViewModel(id: id) {
-                selectedFiles.append(viewModel.dpFile)
-            }
-        }
-        return selectedFiles
     }
 }
 
