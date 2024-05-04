@@ -141,10 +141,22 @@ class PackageListViewModel: ObservableObject {
     }
 
     func deleteSelectedFilesFromDp() {
-        let selectedDpFiles = DataModel.shared.selectedDpFilesFromSelectionIds(packageListViewModel: self)
-        for dpFile in selectedDpFiles {
-            // TODO: Finish this
-            print("TODO: Delete file \(dpFile.name)")
+        guard let selectedDp = retrieveSelectedDp() else {
+            LogManager.shared.logMessage(message: "Failed to retrieve the distribution point", level: .error)
+            return
+        }
+        Task {
+            let progress = SynchronizationProgress()
+            let selectedDpFiles = DataModel.shared.selectedDpFilesFromSelectionIds(packageListViewModel: self)
+            for dpFile in selectedDpFiles {
+                do {
+                    try await selectedDp.deleteFile(file: dpFile, progress: progress)
+                    LogManager.shared.logMessage(message: "Deleted \(dpFile.name) from \(selectedDp.selectionName())", level: .info)
+                } catch {
+                    LogManager.shared.logMessage(message: "Failed to deleted \(dpFile.name) from \(selectedDp.selectionName()): \(error)", level: .error)
+                }
+            }
+            DataModel.shared.updateListViewModels(reload: isSrc ? .source : .destination)
         }
     }
 
