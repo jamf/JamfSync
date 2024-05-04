@@ -203,12 +203,8 @@ class DistributionPoint: Identifiable {
     ///     - forceSync: Set to true if it should copy files even if they are the same on both the source and destination
     ///     - progress: The progress object that should be updated as the synchronization progresses.
     func copyFiles(selectedItems: [DpFile], dstDp: DistributionPoint, jamfProInstance: JamfProInstance?, forceSync: Bool, progress: SynchronizationProgress) async throws {
-        var downloadMultiple: Int64 = 1
-        if willDownloadFiles() {
-            downloadMultiple = 2
-        }
         let filesToSync = filesToSynchronize(selectedItems: selectedItems, dstDp: dstDp, forceSync: forceSync)
-        try await copyFilesToDst(sourceName: selectionName(), filesToSync: filesToSync, downloadMultiple: downloadMultiple, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: forceSync, progress: progress)
+        try await copyFilesToDst(sourceName: selectionName(), willDownloadFiles: willDownloadFiles(), filesToSync: filesToSync, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: forceSync, progress: progress)
     }
 
     /// Loops through the files to synchronize to calculate the total size of files to be transferred.
@@ -220,7 +216,7 @@ class DistributionPoint: Identifiable {
     /// - Returns: Returns true if all files were copied, otherwise false
     func transferLocalFiles(fileUrls: [URL], dstDp: DistributionPoint, jamfProInstance: JamfProInstance?, progress: SynchronizationProgress) async throws {
         let dpFiles = convertFileUrlsToDpFiles(fileUrls: fileUrls)
-        try await copyFilesToDst(sourceName: "Selected local files", filesToSync: dpFiles, downloadMultiple: 1, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: true, progress: progress)
+        try await copyFilesToDst(sourceName: "Selected local files", willDownloadFiles: false, filesToSync: dpFiles, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: true, progress: progress)
     }
 
     /// Removes files from this destination distribution point that are not on thie source distribution point.
@@ -317,11 +313,15 @@ class DistributionPoint: Identifiable {
 
     // MARK: - Private functions
 
-    private func copyFilesToDst(sourceName: String, filesToSync: [DpFile], downloadMultiple: Int64, dstDp: DistributionPoint, jamfProInstance: JamfProInstance?, forceSync: Bool, progress: SynchronizationProgress) async throws {
+    private func copyFilesToDst(sourceName: String, willDownloadFiles: Bool, filesToSync: [DpFile], dstDp: DistributionPoint, jamfProInstance: JamfProInstance?, forceSync: Bool, progress: SynchronizationProgress) async throws {
         isCanceled = false
         filesWereZipped = false
         var someFileSucceeded = false
         var someFilesFailed = false
+        var downloadMultiple: Int64 = 1
+        if willDownloadFiles {
+            downloadMultiple = 2
+        }
         progress.totalSize = calculateTotalTransferSize(filesToSync: filesToSync) * downloadMultiple
         var currentTotalSizeTransferred: Int64 = 0
         var lastFile: DpFile?
@@ -335,7 +335,7 @@ class DistributionPoint: Identifiable {
                 lastFileTansferred = false
                 var localFileUrl: URL?
                 if isCanceled { break }
-                if willDownloadFiles() {
+                if willDownloadFiles {
                     Task { @MainActor in
                         progress.operation = "Downloading"
                     }

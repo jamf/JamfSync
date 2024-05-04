@@ -188,7 +188,6 @@ struct PackageListView: View {
 
     func transferFiles(fileUrls: [URL], dstDp: DistributionPoint, synchronizeTask: SynchronizeTask, progress: SynchronizationProgress, synchronizeProgressView: SynchronizeProgressView) {
         Task {
-            var reloadFiles = false
             DataModel.shared.cancelUpdateListViewModels()
             DataModel.shared.synchronizationInProgress = true
             do {
@@ -200,7 +199,7 @@ struct PackageListView: View {
             // Wait a second for the progress bar to catch up and then close
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
                 synchronizeProgressView.dismiss()
-                DataModel.shared.updateListViewModels(reload: reloadFiles ? .source : .none)
+                DataModel.shared.updateListViewModels(reload: .none)
             })
         }
     }
