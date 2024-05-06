@@ -29,6 +29,9 @@ class PackageListViewModel: ObservableObject {
         let selectedDstDp = dataModel.findDp(id: dataModel.selectedDstDpId)
         let dp = retrieveSelectedDp()
         if !checksumUpdateInProgress, let dp {
+            if reload, let jamfProInstanceId = dp.jamfProInstanceId, let jamfProInstance = dp.findJamfProInstance(id: jamfProInstanceId) {
+                try await jamfProInstance.loadPackages()
+            }
             await updateDpFiles(dp: dp, reload: reload)
         }
 
@@ -140,17 +143,28 @@ class PackageListViewModel: ObservableObject {
         return false
     }
 
-    func deleteSelectedFilesFromDp() {
+    func deleteSelectedFilesFromDp(packagesToo: Bool) {
         guard let selectedDp = retrieveSelectedDp() else {
             LogManager.shared.logMessage(message: "Failed to retrieve the distribution point", level: .error)
             return
         }
         Task {
+            var jamfProInstance: JamfProInstance?
+            if let jamfProInstanceId = selectedDp.jamfProInstanceId, let instance = selectedDp.findJamfProInstance(id: jamfProInstanceId) {
+                jamfProInstance = instance
+            }
+
             let progress = SynchronizationProgress()
             let selectedDpFiles = DataModel.shared.selectedDpFilesFromSelectionIds(packageListViewModel: self)
             for dpFile in selectedDpFiles {
                 do {
-                    try await selectedDp.deleteFile(file: dpFile, progress: progress)
+                    if let jamfProInstance, let packageApi = jamfProInstance.packageApi, selectedDp.deleteByRemovingPackage {
+                        if let package = jamfProInstance.findPackage(name: dpFile.name), let jamfProId = package.jamfProId {
+                            try await packageApi.deletePackage(packageId: jamfProId, jamfProInstance: jamfProInstance)
+                        }
+                    } else {
+                        try await selectedDp.deleteFile(file: dpFile, progress: progress)
+                    }
                     LogManager.shared.logMessage(message: "Deleted \(dpFile.name) from \(selectedDp.selectionName())", level: .info)
                 } catch {
                     LogManager.shared.logMessage(message: "Failed to deleted \(dpFile.name) from \(selectedDp.selectionName()): \(error)", level: .error)
@@ -199,7 +213,7 @@ class PackageListViewModel: ObservableObject {
     private func packagesForSelectedDps(dp: DistributionPoint?) -> [Package]? {
         guard let dp else { return nil }
         let dataModel = DataModel.shared
-        var savableItem = dataModel.savableItems.findSavableItemWithDpId(id: dp.id)
+        let savableItem = dataModel.savableItems.findSavableItemWithDpId(id: dp.id)
         return savableItem?.jamfProPackages()
     }
 }

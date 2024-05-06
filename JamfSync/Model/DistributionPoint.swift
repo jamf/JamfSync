@@ -78,6 +78,12 @@ class DistributionPoint: Identifiable {
     /// If files were zipped, this will be true, indicating that we need to refresh the file list
     var filesWereZipped = false
 
+    /// Inidates whether the distribution point will download files before transferring them. This should be overridden by any distribution points that require downloading first.
+    var willDownloadFiles = false
+
+    /// Indicates if a file will be deleted by removing it from the corresponding package from the Jamf Pro server
+    var deleteByRemovingPackage = false
+
     /// Initialize the class.
     ///
     /// - Parameters:
@@ -133,12 +139,6 @@ class DistributionPoint: Identifiable {
         if let jamfProInstanceId, let jamfProInstance = findJamfProInstance(id: jamfProInstanceId) {
             jamfProInstance.cancel()
         }
-    }
-
-    /// Inidates whether the distribution point will download files before transferring them. This should be overridden by any distribution points that require downloading first.
-    /// - Returns: Returns true if downloading of files will need to happen when transferring or false if not.
-    func willDownloadFiles() -> Bool {
-        return false
     }
 
     /// Downloads a file so it can be used.
@@ -204,7 +204,7 @@ class DistributionPoint: Identifiable {
     ///     - progress: The progress object that should be updated as the synchronization progresses.
     func copyFiles(selectedItems: [DpFile], dstDp: DistributionPoint, jamfProInstance: JamfProInstance?, forceSync: Bool, progress: SynchronizationProgress) async throws {
         let filesToSync = filesToSynchronize(selectedItems: selectedItems, dstDp: dstDp, forceSync: forceSync)
-        try await copyFilesToDst(sourceName: selectionName(), willDownloadFiles: willDownloadFiles(), filesToSync: filesToSync, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: forceSync, progress: progress)
+        try await copyFilesToDst(sourceName: selectionName(), willDownloadFiles: willDownloadFiles, filesToSync: filesToSync, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: forceSync, progress: progress)
     }
 
     /// Loops through the files to synchronize to calculate the total size of files to be transferred.

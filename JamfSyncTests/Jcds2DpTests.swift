@@ -237,13 +237,4 @@ final class Jcds2DpTests: XCTestCase {
         wait(for: [expectationCompleted], timeout: 5)
         XCTAssertFalse(jcds2Dp.filesLoaded)
     }
-    // MARK: - willDownloadFiles tests
-
-    func test_willDownloadFiles() throws {
-        // When
-        let result = jcds2Dp.willDownloadFiles()
-
-        // Then
-        XCTAssertTrue(result)
-    }
 }

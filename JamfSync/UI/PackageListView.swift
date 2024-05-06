@@ -128,12 +128,33 @@ struct PackageListView: View {
                     .disabled(!packageListViewModel.enableFileDeleteButton(selectedDpFiles: packageListViewModel.selectedDpFiles))
                     .help("Remove selected file(s)")
                     .padding([.bottom, .trailing])
-                    .sheet(isPresented: $packageListViewModel.shouldPresentConfirmationSheet) {
-                        if !packageListViewModel.canceled {
-                            packageListViewModel.deleteSelectedFilesFromDp()
+                    .alert("Are you sure you want to delete the \(packageListViewModel.selectedDpFiles.count) selected items?", isPresented: $packageListViewModel.shouldPresentConfirmationSheet) {
+                        HStack {
+                            if let dp = packageListViewModel.retrieveSelectedDp() {
+                                if let jamfProInstanceId = dp.jamfProInstanceId, let jamfProInstance = dataModel.findJamfProInstance(id: jamfProInstanceId) {
+                                    Button("Files and associated packages", role: .destructive) {
+                                        Task {
+                                            packageListViewModel.deleteSelectedFilesFromDp(packagesToo: true)
+                                        }
+                                    }
+                                    if !dp.deleteByRemovingPackage {
+                                        Button("Files only", role: .destructive) {
+                                            Task {
+                                                packageListViewModel.deleteSelectedFilesFromDp(packagesToo: false)
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    Button("Yes", role: .destructive) {
+                                        Task {
+                                            packageListViewModel.deleteSelectedFilesFromDp(packagesToo: false)
+                                        }
+                                    }
+                                }
+                            }
+                            Button("Cancel", role: .cancel) {
+                            }
                         }
-                    } content: {
-                        ConfirmationView(promptMessage: "Are you sure you want to delete the selected \(packageListViewModel.selectedDpFiles.count) items?", includeCancelButton: true, canceled: $packageListViewModel.canceled)
                     }
                 }
             }

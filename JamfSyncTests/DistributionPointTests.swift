@@ -123,16 +123,6 @@ final class DistributionPointTests: XCTestCase {
         XCTAssertTrue(destinationDp.isCanceled)
     }
 
-    // MARK: - willDownloadFiles tests
-
-    func test_willDownloadFiles() throws {
-        // When
-        let result = dp.willDownloadFiles()
-
-        // Then
-        XCTAssertFalse(result)
-    }
-
     // MARK: - downloadFile tests
 
     func test_downloadFile() throws {
@@ -293,7 +283,7 @@ final class DistributionPointTests: XCTestCase {
         // Given
         let selectedItems: [DpFile] = []
         let srcDp = MockDistributionPoint(name: "TestSrcDp", fileManager: mockFileManager)
-        srcDp.willDownloadFilesValue = true
+        srcDp.willDownloadFiles = true
         addTestSrcFiles(dp: srcDp)
         let dstDp = MockDistributionPoint(name: "TestDstDp", fileManager: mockFileManager)
         let synchronizationProgress = SynchronizationProgress()

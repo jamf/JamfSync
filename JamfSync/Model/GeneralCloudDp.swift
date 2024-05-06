@@ -19,6 +19,8 @@ class GeneralCloudDp: DistributionPoint {
         self.jamfProInstanceId = jamfProInstanceId
         self.jamfProInstanceName = jamfProInstanceName
         self.updatePackageInfoBeforeTransfer = true
+        self.willDownloadFiles = true
+        self.deleteByRemovingPackage = true
     }
 
     override func retrieveFileList() async throws {
@@ -31,10 +33,6 @@ class GeneralCloudDp: DistributionPoint {
         }
 
         filesLoaded = true
-    }
-
-    override func willDownloadFiles() -> Bool {
-        return true
     }
 
     override func downloadFile(file: DpFile, progress: SynchronizationProgress) async throws -> URL? {
@@ -118,6 +116,8 @@ class GeneralCloudDp: DistributionPoint {
             switch(httpResponse.statusCode) {
             case 200...299:
                 LogManager.shared.logMessage(message: "Successfully uploaded \(fileUrl.lastPathComponent)", level: .verbose)
+            case 413:
+                throw ServerCommunicationError.contentTooLarge
             default:
                 throw ServerCommunicationError.dataRequestFailed(statusCode: httpResponse.statusCode)
             }

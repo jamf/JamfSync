@@ -11,6 +11,7 @@ enum ServerCommunicationError: Error {
     case parsingError
     case badPackageData
     case forbidden
+    case contentTooLarge
     case invalidCredentials
     case couldNotAccessServer
     case dataRequestFailed(statusCode: Int)
@@ -111,8 +112,7 @@ class JamfProInstance: SavableItem {
         guard !usernameOrClientId.isEmpty, !passwordOrClientSecret.isEmpty else { return }
         jamfProVersion = try? await retrieveJamfProVersion()
         await determinePackageApi()
-        guard let packageApi else { throw DistributionPointError.programError }
-        packages = try await packageApi.loadPackages(jamfProInstance: self)
+        try await loadPackages()
         try await loadCloudDp()
         try await loadFileShares()
     }
@@ -232,6 +232,13 @@ class JamfProInstance: SavableItem {
             // If it fails for any reason, just assume it's not available in the keychain. The user will need to go in and edit the password.
             LogManager.shared.logMessage(message: "Failed to get a keychain item \(serviceName): \(error)", level: .verbose)
         }
+    }
+
+    /// Loads or reloads packages
+    func loadPackages() async throws {
+        guard let packageApi else { throw DistributionPointError.programError }
+        packages.removeAll()
+        packages = try await packageApi.loadPackages(jamfProInstance: self)
     }
 
     /// Checks to see which packages on the Jamf Pro server are not in the source DP

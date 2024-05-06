@@ -18,6 +18,7 @@ class Jcds2Dp: DistributionPoint {
         super.init(name: "JCDS")
         self.jamfProInstanceId = jamfProInstanceId
         self.jamfProInstanceName = jamfProInstanceName
+        self.willDownloadFiles = true
     }
 
     override func retrieveFileList() async throws {
@@ -58,10 +59,6 @@ class Jcds2Dp: DistributionPoint {
         }
 
         filesLoaded = true
-    }
-
-    override func willDownloadFiles() -> Bool {
-        return true
     }
 
     override func downloadFile(file: DpFile, progress: SynchronizationProgress) async throws -> URL? {
