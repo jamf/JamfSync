@@ -246,7 +246,9 @@ class Jcds2Dp: DistributionPoint {
         let (signedHeaders, signatureProvided) = try awsSignatureV4(uploadData: uploadData, httpMethod: "PUT", requestHeaders: request.allHTTPHeaderFields ?? [:], date: requestTimeStamp, key: key, hashedPayload: "", contentType: contentType, currentDate: currentDate)
         
         request.addValue("AWS4-HMAC-SHA256 Credential=\(String(describing: accessKeyID))/\(requestTimeStamp.prefix(8))/\(region)/s3/aws4_request,SignedHeaders=\(signedHeaders),Signature=\(signatureProvided)", forHTTPHeaderField: "Authorization")
-        
+
+        request.timeoutInterval = JamfProInstance.uploadTimeoutValue
+
         return request
     }
     

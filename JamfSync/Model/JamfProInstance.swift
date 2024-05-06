@@ -36,6 +36,8 @@ class JamfProInstance: SavableItem {
     var urlSession = URLSession(configuration: URLSessionConfiguration.default)
     var jamfProVersion: String?
     static let iconName = "icloud"
+    static let normalTimeoutValue = 60.0
+    static let uploadTimeoutValue = 3600.0
 
     init(name: String = "", url: URL? = nil, useClientApi: Bool = false, usernameOrClientId: String = "", passwordOrClientSecret: String = "") {
         self.url = url
@@ -192,7 +194,7 @@ class JamfProInstance: SavableItem {
     ///     - httpMethod: The method to use (GET, POST, etc.)
     ///     - httpBody: The body data, if needed, otherwise nil.
     /// - Returns: Returns a tuple with the data retruned and the URLResponse.
-    func dataRequest(url: URL, httpMethod: String, httpBody: Data? = nil, contentType: String = "application/json", acceptType: String? = nil, throwHttpError: Bool = true) async throws -> (data: Data?, response: URLResponse?) {
+    func dataRequest(url: URL, httpMethod: String, httpBody: Data? = nil, contentType: String = "application/json", acceptType: String? = nil, throwHttpError: Bool = true, timeout: Double = JamfProInstance.normalTimeoutValue) async throws -> (data: Data?, response: URLResponse?) {
         try await retrieveToken(username: usernameOrClientId, password: passwordOrClientSecret)
         guard let token else { throw ServerCommunicationError.noToken }
 
@@ -204,7 +206,7 @@ class JamfProInstance: SavableItem {
 
         var request = URLRequest(url: url)
         request.httpMethod = httpMethod
-        request.timeoutInterval = 60
+        request.timeoutInterval = timeout
         request.httpBody = httpBody
         request.allHTTPHeaderFields = headers
 
@@ -318,7 +320,7 @@ class JamfProInstance: SavableItem {
             request.httpBody = clientString.data(using: .utf8)
         }
         request.httpMethod = "POST"
-        request.timeoutInterval = 60
+        request.timeoutInterval = JamfProInstance.normalTimeoutValue
         request.allHTTPHeaderFields = headers
 
         let response: (data: Data?, response: URLResponse?) = try await urlSession.data(for: request)

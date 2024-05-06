@@ -161,7 +161,7 @@ class GeneralCloudDp: DistributionPoint {
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.timeoutInterval = 60
+        request.timeoutInterval = JamfProInstance.uploadTimeoutValue
         request.allHTTPHeaderFields = [
             "Authorization": "Bearer \(token)",
             "Content-Type": "multipart/form-data; boundary=\(boundary)",

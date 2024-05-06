@@ -37,7 +37,7 @@ class MockJamfProInstance: JamfProInstance {
         deletePackagesNotOnSourceCalled = true
     }
 
-    override func dataRequest(url: URL, httpMethod: String, httpBody: Data? = nil, contentType: String = "application/json", acceptType: String? = nil, throwHttpError: Bool = true) async throws -> (data: Data?, response: URLResponse?) {
+    override func dataRequest(url: URL, httpMethod: String, httpBody: Data? = nil, contentType: String = "application/json", acceptType: String? = nil, throwHttpError: Bool = true, timeout: Double = JamfProInstance.normalTimeoutValue) async throws -> (data: Data?, response: URLResponse?) {
         if let requestResponse = findRequestResponse(url: url, httpMethod: httpMethod, httpBody: httpBody, contentType: contentType) {
             if let error = requestResponse.error {
                 throw error
