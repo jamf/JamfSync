@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added buttons below the source and destination distribution point to allow local files to the distribution point, or to remove files from the distribution point.
 ### Bug fixes
 - Changed the timeout for uploads to an hour to see if that solves some of the issues people are seeing with large uploads.
-- Fixed an issue with the "Cloud" DP type where the file progress wasn't qute right.
+- Fixed an issue with the "Cloud" DP type where the file progress wasn't quite right.
 
 ## [1.2.0] - 2024-04-16
 ### Features
