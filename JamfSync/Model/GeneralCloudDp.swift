@@ -12,6 +12,7 @@ class GeneralCloudDp: DistributionPoint {
     var urlSession: URLSession?
     var downloadTask: URLSessionDownloadTask?
     var dispatchGroup: DispatchGroup?
+    static let overheadPerFile = 112
 
     init(jamfProInstanceId: UUID? = nil, jamfProInstanceName: String? = nil) {
         super.init(name: "Cloud")
@@ -98,6 +99,7 @@ class GeneralCloudDp: DistributionPoint {
         guard let url = jamfProInstance.url else { throw ServerCommunicationError.noJamfProUrl }
 
         let boundary = createBoundary()
+        progress.overheadSizePerFile = GeneralCloudDp.overheadPerFile + (boundary.count * 2) + fileUrl.lastPathComponent.count
         let tempFileName = try prepareFileForMultipartUpload(fileUrl: fileUrl, boundary: boundary)
         defer {
             try? FileManager.default.removeItem(at: tempFileName)

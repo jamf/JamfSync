@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.0] - 2024-05-6
 ### Features
 - Added buttons below the source and destination distribution point to allow local files to the distribution point, or to remove files from the distribution point.
+### Bug fixes
+- Fixed an issue with the "Cloud" DP type where the file progress wasn't qute right.
 
 ## [1.2.0] - 2024-04-16
 ### Features

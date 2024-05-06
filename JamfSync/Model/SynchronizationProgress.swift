@@ -10,6 +10,7 @@ class SynchronizationProgress: ObservableObject {
     @Published var currentFile: DpFile?
     @Published var currentTotalSizeTransferred: Int64 = 0
     @Published var currentFileSizeTransferred: Int64?
+    var overheadSizePerFile: Int = 0
     var printToConsole = false
     var showProgressOnConsole = false
     var printToConsoleInterval: TimeInterval = 1.0
@@ -61,8 +62,11 @@ class SynchronizationProgress: ObservableObject {
     }
 
     func fileProgress() -> Double? {
-        if let currentFileSizeTransferred, let currentFile, let size = currentFile.size, size > 0 {
-            return Double(currentFileSizeTransferred) / Double(size)
+        if let currentFileSizeTransferred, let currentFile {
+            let size = (currentFile.size ?? 0) + Int64(overheadSizePerFile)
+            if size > 0 {
+                return Double(currentFileSizeTransferred) / Double(size)
+            }
         }
         return nil
     }
