@@ -113,7 +113,7 @@ class GeneralCloudDp: DistributionPoint {
 
         let request = try createUploadRequest(url: packageUrl, fileUrl: tempFileName, boundary: boundary, jamfProInstance: jamfProInstance)
 
-        let (_, response) = try await urlSession.upload(for: request, fromFile: tempFileName, delegate: sessionDelegate)
+        let (responseData, response) = try await urlSession.upload(for: request, fromFile: tempFileName, delegate: sessionDelegate)
         if let httpResponse = response as? HTTPURLResponse {
             switch(httpResponse.statusCode) {
             case 200...299:
@@ -121,7 +121,8 @@ class GeneralCloudDp: DistributionPoint {
             case 413:
                 throw ServerCommunicationError.contentTooLarge
             default:
-                throw ServerCommunicationError.dataRequestFailed(statusCode: httpResponse.statusCode)
+                let responseDataString = String(data: responseData, encoding: .utf8)
+                throw ServerCommunicationError.dataRequestFailed(statusCode: httpResponse.statusCode, message: responseDataString)
             }
         }
     }

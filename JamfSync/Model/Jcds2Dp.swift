@@ -223,11 +223,24 @@ class Jcds2Dp: DistributionPoint {
             case 200...299:
                 LogManager.shared.logMessage(message: "Successfully uploaded \(file.name)", level: .verbose)
             default:
-                LogManager.shared.logMessage(message: "Failed to upload \(file.name) with response code \(String(httpResponse.statusCode))", level: .error)
+                let message = parseErrorData(data: responseData)
+                throw ServerCommunicationError.dataRequestFailed(statusCode: httpResponse.statusCode, message: message)
             }
         }
     }
-    
+
+    private func parseErrorData(data: Data) -> String? {
+        var message: String?
+        let xmlParser = XMLParser(data: data)
+        let xmlErrorParser = XmlErrorParser()
+        xmlParser.delegate = xmlErrorParser
+        xmlParser.parse()
+        if xmlParser.parserError == nil {
+            message = "\(xmlErrorParser.code ?? ""): \(xmlErrorParser.message ?? "") - max allowed size = \(xmlErrorParser.maxAllowedSize ?? "")"
+        }
+        return message
+    }
+
     private func createAwsUploadRequest(uploadData: JsonInitiateUpload, jcdsServerUrl: URL, key: String, contentType: String, currentDate: String, requestTimeStamp: String) throws -> URLRequest {
         
         var request = URLRequest(url: jcdsServerUrl, cachePolicy: .reloadIgnoringLocalCacheData)

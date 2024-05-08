@@ -11,6 +11,8 @@
 		840A79032ACB75FC00161D85 /* SavableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840A79022ACB75FC00161D85 /* SavableItem.swift */; };
 		840A79072ACC8EFF00161D85 /* FolderInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840A79062ACC8EFF00161D85 /* FolderInstance.swift */; };
 		840A79092ACD9B0A00161D85 /* ConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840A79082ACD9B0A00161D85 /* ConfirmationView.swift */; };
+		8412279F2BEADBB20097B83E /* XmlErrorParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8412279E2BEADBB20097B83E /* XmlErrorParser.swift */; };
+		841227A12BEADD6E0097B83E /* XmlErrorParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841227A02BEADD6E0097B83E /* XmlErrorParserTests.swift */; };
 		841DE9D92BA395900092DBE7 /* Jamf Sync User Guide.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 841DE9D82BA395900092DBE7 /* Jamf Sync User Guide.pdf */; };
 		843BE0F62AEFE6350053431B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 843BE0F52AEFE6350053431B /* Assets.xcassets */; };
 		844CF9D12AC4B96600576E1A /* FolderDp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844CF9D02AC4B96600576E1A /* FolderDp.swift */; };
@@ -113,6 +115,8 @@
 		840A79022ACB75FC00161D85 /* SavableItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavableItem.swift; sourceTree = "<group>"; };
 		840A79062ACC8EFF00161D85 /* FolderInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderInstance.swift; sourceTree = "<group>"; };
 		840A79082ACD9B0A00161D85 /* ConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationView.swift; sourceTree = "<group>"; };
+		8412279E2BEADBB20097B83E /* XmlErrorParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XmlErrorParser.swift; sourceTree = "<group>"; };
+		841227A02BEADD6E0097B83E /* XmlErrorParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XmlErrorParserTests.swift; sourceTree = "<group>"; };
 		841DE9D82BA395900092DBE7 /* Jamf Sync User Guide.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Jamf Sync User Guide.pdf"; sourceTree = "<group>"; };
 		841DE9DA2BA395F00092DBE7 /* User Guide */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "User Guide"; sourceTree = "<group>"; };
 		843BE0F52AEFE6350053431B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -292,6 +296,7 @@
 				846499DC2B699F5E00A8EA7B /* Mocks */,
 				846499E32B6B080B00A8EA7B /* SynchronizeTaskTests.swift */,
 				846499D22B64165E00A8EA7B /* TestErrors.swift */,
+				841227A02BEADD6E0097B83E /* XmlErrorParserTests.swift */,
 			);
 			path = JamfSyncTests;
 			sourceTree = "<group>";
@@ -378,6 +383,7 @@
 				84E489982B5AC80600FFFE59 /* UserSettings.swift */,
 				84FC415F2AD5A78C00DCB033 /* View+NSWindow.swift */,
 				849FC3402BD06A43008BAC02 /* VersionInfo.swift */,
+				8412279E2BEADBB20097B83E /* XmlErrorParser.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -585,6 +591,7 @@
 				849FC3412BD06A43008BAC02 /* VersionInfo.swift in Sources */,
 				84E489992B5AC80600FFFE59 /* UserSettings.swift in Sources */,
 				84BC6E472AC380D200CF6D39 /* JamfProServerView.swift in Sources */,
+				8412279F2BEADBB20097B83E /* XmlErrorParser.swift in Sources */,
 				84E489932B58681D00FFFE59 /* LogMessageView.swift in Sources */,
 				84DD58372BC58E0D00E8DA23 /* JamfProPackageApi.swift in Sources */,
 				84DD583B2BC5C2A700E8DA23 /* URL+isDirectory.swift in Sources */,
@@ -632,6 +639,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				841227A12BEADD6E0097B83E /* XmlErrorParserTests.swift in Sources */,
 				846499E02B699FB500A8EA7B /* MockJamfProInstance.swift in Sources */,
 				846499DE2B699F8E00A8EA7B /* MockDistributionPoint.swift in Sources */,
 				846499D52B64268A00A8EA7B /* DistributionPointTests.swift in Sources */,
