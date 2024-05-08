@@ -358,7 +358,7 @@ class Jcds2Dp: DistributionPoint {
     private func contentType(filename: String) -> String? {
         let ext = URL(fileURLWithPath: filename).pathExtension
         switch ext {
-        case "pkg":
+        case "pkg", "mpkg":
             return "application/x-newton-compatible-pkg"
         case "dmg":
             return "application/octet-stream"

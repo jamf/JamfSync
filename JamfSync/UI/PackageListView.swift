@@ -105,7 +105,7 @@ struct PackageListView: View {
                     Button {
                         let panel = NSOpenPanel()
                         panel.allowsMultipleSelection = true
-                        panel.allowedFileTypes = ["pkg", "dmg"]
+                        panel.allowedFileTypes = ["pkg", "dmg", "mpkg"]
                         panel.canChooseDirectories = false
                         panel.canChooseFiles = true
                         if panel.runModal() == .OK {
