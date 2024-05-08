@@ -4,9 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.0] - 2024-05-06
+## [1.3.0] - 2024-05-08
 ### Features
 - Added buttons below the source and destination distribution point to allow local files to the distribution point, or to remove files from the distribution point.
+- Added the ability to copy selected log messages to the clipboard.
+- Added support for mpkg files.
 ### Bug fixes
 - Changed the timeout for uploads to an hour to solve an issue with large uploads.
 - Fixed an issue with the "Cloud" DP type where the file progress wasn't quite right.

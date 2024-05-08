@@ -410,11 +410,11 @@ class DistributionPoint: Identifiable {
 
     private func isAcceptableForDp(url: URL) -> Bool {
         guard url.pathExtension != "dmg" else { return true } // Include .dmg files
-        guard !url.lastPathComponent.hasSuffix(".pkg.zip") else { return true } // Include zip files that have ".pkg.zip"
-        guard url.pathExtension == "pkg" else { return false } // Exclude if not ".pkg"
+        guard !url.lastPathComponent.hasSuffix(".pkg.zip") && !url.lastPathComponent.hasSuffix(".mpkg.zip") else { return true } // Include zip files that have ".pkg.zip" or ".mpkg.zip"
+        guard url.pathExtension == "pkg" || url.pathExtension == "mpkg" else { return false } // Exclude if not ".pkg" or ".mpkg"
         guard isFluffy(url: url) else { return true } // Include flat .pkg files (not directories)
         let urlForZipFile = url.appendingPathExtension("zip")
-        guard !fileManager.fileExists(atPath: urlForZipFile.path) else { return false } // Exclude fluffy .pkg files that have a corresponding zip file
+        guard !fileManager.fileExists(atPath: urlForZipFile.path) else { return false } // Exclude fluffy package files that have a corresponding zip file
         return true // Include when it's a fluffy package without a corresponding zip file
     }
 
