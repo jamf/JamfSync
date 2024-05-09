@@ -18,6 +18,7 @@ class Jcds2Dp: DistributionPoint {
         super.init(name: "JCDS")
         self.jamfProInstanceId = jamfProInstanceId
         self.jamfProInstanceName = jamfProInstanceName
+        self.willDownloadFiles = true
     }
 
     override func retrieveFileList() async throws {
@@ -58,10 +59,6 @@ class Jcds2Dp: DistributionPoint {
         }
 
         filesLoaded = true
-    }
-
-    override func willDownloadFiles() -> Bool {
-        return true
     }
 
     override func downloadFile(file: DpFile, progress: SynchronizationProgress) async throws -> URL? {
@@ -226,11 +223,24 @@ class Jcds2Dp: DistributionPoint {
             case 200...299:
                 LogManager.shared.logMessage(message: "Successfully uploaded \(file.name)", level: .verbose)
             default:
-                LogManager.shared.logMessage(message: "Failed to upload \(file.name) with response code \(String(httpResponse.statusCode))", level: .error)
+                let message = parseErrorData(data: responseData)
+                throw ServerCommunicationError.dataRequestFailed(statusCode: httpResponse.statusCode, message: message)
             }
         }
     }
-    
+
+    private func parseErrorData(data: Data) -> String? {
+        var message: String?
+        let xmlParser = XMLParser(data: data)
+        let xmlErrorParser = XmlErrorParser()
+        xmlParser.delegate = xmlErrorParser
+        xmlParser.parse()
+        if xmlParser.parserError == nil {
+            message = "\(xmlErrorParser.code ?? ""): \(xmlErrorParser.message ?? "") - max allowed size = \(xmlErrorParser.maxAllowedSize ?? "")"
+        }
+        return message
+    }
+
     private func createAwsUploadRequest(uploadData: JsonInitiateUpload, jcdsServerUrl: URL, key: String, contentType: String, currentDate: String, requestTimeStamp: String) throws -> URLRequest {
         
         var request = URLRequest(url: jcdsServerUrl, cachePolicy: .reloadIgnoringLocalCacheData)
@@ -249,7 +259,9 @@ class Jcds2Dp: DistributionPoint {
         let (signedHeaders, signatureProvided) = try awsSignatureV4(uploadData: uploadData, httpMethod: "PUT", requestHeaders: request.allHTTPHeaderFields ?? [:], date: requestTimeStamp, key: key, hashedPayload: "", contentType: contentType, currentDate: currentDate)
         
         request.addValue("AWS4-HMAC-SHA256 Credential=\(String(describing: accessKeyID))/\(requestTimeStamp.prefix(8))/\(region)/s3/aws4_request,SignedHeaders=\(signedHeaders),Signature=\(signatureProvided)", forHTTPHeaderField: "Authorization")
-        
+
+        request.timeoutInterval = JamfProInstance.uploadTimeoutValue
+
         return request
     }
     
@@ -346,7 +358,7 @@ class Jcds2Dp: DistributionPoint {
     private func contentType(filename: String) -> String? {
         let ext = URL(fileURLWithPath: filename).pathExtension
         switch ext {
-        case "pkg":
+        case "pkg", "mpkg":
             return "application/x-newton-compatible-pkg"
         case "dmg":
             return "application/octet-stream"

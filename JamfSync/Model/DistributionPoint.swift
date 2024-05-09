@@ -78,6 +78,12 @@ class DistributionPoint: Identifiable {
     /// If files were zipped, this will be true, indicating that we need to refresh the file list
     var filesWereZipped = false
 
+    /// Inidates whether the distribution point will download files before transferring them. This should be overridden by any distribution points that require downloading first.
+    var willDownloadFiles = false
+
+    /// Indicates if a file will be deleted by removing it from the corresponding package from the Jamf Pro server
+    var deleteByRemovingPackage = false
+
     /// Initialize the class.
     ///
     /// - Parameters:
@@ -133,12 +139,6 @@ class DistributionPoint: Identifiable {
         if let jamfProInstanceId, let jamfProInstance = findJamfProInstance(id: jamfProInstanceId) {
             jamfProInstance.cancel()
         }
-    }
-
-    /// Inidates whether the distribution point will download files before transferring them. This should be overridden by any distribution points that require downloading first.
-    /// - Returns: Returns true if downloading of files will need to happen when transferring or false if not.
-    func willDownloadFiles() -> Bool {
-        return false
     }
 
     /// Downloads a file so it can be used.
@@ -203,90 +203,19 @@ class DistributionPoint: Identifiable {
     ///     - forceSync: Set to true if it should copy files even if they are the same on both the source and destination
     ///     - progress: The progress object that should be updated as the synchronization progresses.
     func copyFiles(selectedItems: [DpFile], dstDp: DistributionPoint, jamfProInstance: JamfProInstance?, forceSync: Bool, progress: SynchronizationProgress) async throws {
-        isCanceled = false
-        filesWereZipped = false
-        var someFileSucceeded = false
-        var someFilesFailed = false
         let filesToSync = filesToSynchronize(selectedItems: selectedItems, dstDp: dstDp, forceSync: forceSync)
-        var downloadMultiple: Int64 = 1
-        if willDownloadFiles() {
-            downloadMultiple = 2
-        }
-        progress.totalSize = calculateTotalTransferSize(filesToSync: filesToSync) * downloadMultiple
-        var currentTotalSizeTransferred: Int64 = 0
-        var lastFile: DpFile?
-        var lastFileTansferred = false
-        inProgressDstDp = dstDp
-        for dpFile in filesToSync {
-            lastFile = dpFile
-            progress.initializeFileTransferInfoForFile(operation: "Copying", currentFile: dpFile, currentTotalSizeTransferred: currentTotalSizeTransferred)
+        try await copyFilesToDst(sourceName: selectionName(), willDownloadFiles: willDownloadFiles, filesToSync: filesToSync, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: forceSync, progress: progress)
+    }
 
-            do {
-                lastFileTansferred = false
-                var localFileUrl: URL?
-                if isCanceled { break }
-                if willDownloadFiles() {
-                    Task { @MainActor in
-                        progress.operation = "Downloading"
-                    }
-                    localFileUrl = try await downloadFile(file: dpFile, progress: progress)
-                    Task { @MainActor in
-                        progress.operation = "Uploading"
-                    }
-                    if isCanceled { break }
-                } else {
-                    if let url = dpFile.fileUrl, isFluffy(url: url) {
-                        dpFile.fileUrl = try await zipFile(url: url)
-                        if let name = dpFile.fileUrl?.lastPathComponent {
-                            dpFile.name = name
-                            if let zipUrl = dpFile.fileUrl, let zipSize = sizeOfFile(fileUrl: zipUrl) {
-                                dpFile.size = zipSize
-                            }
-                        }
-                        filesWereZipped = true
-                    }
-                }
-
-                if dstDp.updatePackageInfoBeforeTransfer {
-                    try await addOrUpdatePackageInJamfPro(dpFile: dpFile, jamfProInstance: jamfProInstance)
-                }
-
-                try await dstDp.transferFile(srcFile: dpFile, moveFrom: localFileUrl, progress: progress)
-                lastFileTansferred = true
-
-                if let size = dpFile.size {
-                    currentTotalSizeTransferred += size * downloadMultiple
-                }
-                someFileSucceeded = true
-
-                addOrUpdateInDstList(dpFile: dpFile, dstDp: dstDp)
-                if !dstDp.updatePackageInfoBeforeTransfer {
-                    try await addOrUpdatePackageInJamfPro(dpFile: dpFile, jamfProInstance: jamfProInstance)
-                }
-            } catch {
-                if isCanceled { break }
-                LogManager.shared.logMessage(message: "Failed to copy \(dpFile.name) to \(dstDp.selectionName()): \(error)", level: .error)
-                someFilesFailed = true
-            }
-            if isCanceled { break }
-        }
-        if let lastFile, lastFileTansferred {
-            progress.finalProgressValues(totalBytesTransferred: lastFile.size ?? 0, currentTotalSizeTransferred: currentTotalSizeTransferred)
-        }
-        inProgressDstDp = nil
-        if someFilesFailed {
-            if someFileSucceeded {
-                LogManager.shared.logMessage(message: "Not all files were transferred from \(selectionName()) to \(dstDp.selectionName())", level: .warning)
-            } else {
-                LogManager.shared.logMessage(message: "No files were transferred from \(selectionName()) to \(dstDp.selectionName())", level: .error)
-            }
-        } else {
-            if isCanceled {
-                LogManager.shared.logMessage(message: "Canceled synchronizing from \(selectionName()) to \(dstDp.selectionName())", level: .warning)
-            } else {
-                LogManager.shared.logMessage(message: "Finished synchronizing from \(selectionName()) to \(dstDp.selectionName())", level: .info)
-            }
-        }
+    /// Transfers a list of local files to this distribution point.
+    /// - Parameters:
+    ///     - fileUrls: The local file URLs for the files to transfer
+    ///     - jamfProInstance: The Jamf Pro instance of this distribution point, if it is associated with one
+    ///     - progress: The progress object that should be updated as the transfer progresses
+    /// - Returns: Returns true if all files were copied, otherwise false
+    func transferLocalFiles(fileUrls: [URL], jamfProInstance: JamfProInstance?, progress: SynchronizationProgress) async throws {
+        let dpFiles = convertFileUrlsToDpFiles(fileUrls: fileUrls)
+        try await copyFilesToDst(sourceName: "Selected local files", willDownloadFiles: false, filesToSync: dpFiles, dstDp: self, jamfProInstance: jamfProInstance, forceSync: true, progress: progress)
     }
 
     /// Removes files from this destination distribution point that are not on thie source distribution point.
@@ -383,13 +312,108 @@ class DistributionPoint: Identifiable {
 
     // MARK: - Private functions
 
+    private func copyFilesToDst(sourceName: String, willDownloadFiles: Bool, filesToSync: [DpFile], dstDp: DistributionPoint, jamfProInstance: JamfProInstance?, forceSync: Bool, progress: SynchronizationProgress) async throws {
+        isCanceled = false
+        filesWereZipped = false
+        var someFileSucceeded = false
+        var someFilesFailed = false
+        var downloadMultiple: Int64 = 1
+        if willDownloadFiles {
+            downloadMultiple = 2
+        }
+        progress.totalSize = calculateTotalTransferSize(filesToSync: filesToSync) * downloadMultiple
+        var currentTotalSizeTransferred: Int64 = 0
+        var lastFile: DpFile?
+        var lastFileTansferred = false
+        inProgressDstDp = dstDp
+        for dpFile in filesToSync {
+            lastFile = dpFile
+            progress.initializeFileTransferInfoForFile(operation: "Copying", currentFile: dpFile, currentTotalSizeTransferred: currentTotalSizeTransferred)
+
+            do {
+                lastFileTansferred = false
+                var localFileUrl: URL?
+                if isCanceled { break }
+                if willDownloadFiles {
+                    Task { @MainActor in
+                        progress.operation = "Downloading"
+                    }
+                    localFileUrl = try await downloadFile(file: dpFile, progress: progress)
+                    Task { @MainActor in
+                        progress.operation = "Uploading"
+                    }
+                    if isCanceled { break }
+                } else {
+                    if let url = dpFile.fileUrl, isFluffy(url: url) {
+                        dpFile.fileUrl = try await zipFile(url: url)
+                        if let name = dpFile.fileUrl?.lastPathComponent {
+                            dpFile.name = name
+                            if let zipUrl = dpFile.fileUrl, let zipSize = sizeOfFile(fileUrl: zipUrl) {
+                                dpFile.size = zipSize
+                            }
+                        }
+                        filesWereZipped = true
+                    }
+                }
+
+                if dstDp.updatePackageInfoBeforeTransfer {
+                    try await addOrUpdatePackageInJamfPro(dpFile: dpFile, jamfProInstance: jamfProInstance)
+                }
+
+                try await dstDp.transferFile(srcFile: dpFile, moveFrom: localFileUrl, progress: progress)
+                lastFileTansferred = true
+
+                if let size = dpFile.size {
+                    currentTotalSizeTransferred += size * downloadMultiple
+                }
+                someFileSucceeded = true
+
+                addOrUpdateInDstList(dpFile: dpFile, dstDp: dstDp)
+                if !dstDp.updatePackageInfoBeforeTransfer {
+                    try await addOrUpdatePackageInJamfPro(dpFile: dpFile, jamfProInstance: jamfProInstance)
+                }
+            } catch {
+                if isCanceled { break }
+                LogManager.shared.logMessage(message: "Failed to copy \(dpFile.name) to \(dstDp.selectionName()): \(error)", level: .error)
+                someFilesFailed = true
+            }
+            if isCanceled { break }
+        }
+        if let lastFile, lastFileTansferred {
+            progress.finalProgressValues(totalBytesTransferred: lastFile.size ?? 0, currentTotalSizeTransferred: currentTotalSizeTransferred)
+        }
+        inProgressDstDp = nil
+        if someFilesFailed {
+            if someFileSucceeded {
+                LogManager.shared.logMessage(message: "Not all files were transferred from \(sourceName) to \(dstDp.selectionName())", level: .warning)
+            } else {
+                LogManager.shared.logMessage(message: "No files were transferred from \(sourceName) to \(dstDp.selectionName())", level: .error)
+            }
+        } else {
+            if isCanceled {
+                LogManager.shared.logMessage(message: "Canceled synchronizing from \(sourceName) to \(dstDp.selectionName())", level: .warning)
+            } else {
+                LogManager.shared.logMessage(message: "Finished synchronizing from \(sourceName) to \(dstDp.selectionName())", level: .info)
+            }
+        }
+    }
+
+    func convertFileUrlsToDpFiles(fileUrls: [URL]) -> [DpFile] {
+        var dpFiles: [DpFile] = []
+        for fileUrl in fileUrls {
+            let dpFile = DpFile(name: fileUrl.lastPathComponent, fileUrl: fileUrl, size: sizeOfFile(fileUrl: fileUrl))
+            dpFiles.append(dpFile)
+        }
+        return dpFiles
+    }
+
     private func isAcceptableForDp(url: URL) -> Bool {
         guard url.pathExtension != "dmg" else { return true } // Include .dmg files
-        guard !url.lastPathComponent.hasSuffix(".pkg.zip") else { return true } // Include zip files that have ".pkg.zip"
-        guard url.pathExtension == "pkg" else { return false } // Exclude if not ".pkg"
+        guard !url.lastPathComponent.hasSuffix(".pkg.zip") && !url.lastPathComponent.hasSuffix(".mpkg.zip") else { return true } // Include zip files that have ".pkg.zip" or ".mpkg.zip"
+        guard url.pathExtension == "pkg" || url.pathExtension == "mpkg" else { return false } // Exclude if not ".pkg" or ".mpkg"
         guard isFluffy(url: url) else { return true } // Include flat .pkg files (not directories)
         let urlForZipFile = url.appendingPathExtension("zip")
-        guard !fileManager.fileExists(atPath: urlForZipFile.path) else { return false } // Exclude fluffy .pkg files that have a corresponding zip file
+        guard !fileManager.fileExists(atPath: urlForZipFile.path) else { return false } // Exclude fluffy package files that have a corresponding zip file
         return true // Include when it's a fluffy package without a corresponding zip file
     }
 

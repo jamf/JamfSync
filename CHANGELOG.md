@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2024-05-08
+### Features
+- Added buttons below the source and destination distribution point to allow local files to be added or removed directly to/from the distribution point.
+- Added the ability to copy selected log messages to the clipboard.
+- Added support for mpkg files.
+### Bug fixes
+- Changed the timeout for uploads to an hour to solve an issue with large uploads. This does not solve the issue with files > 5 GB that are uploaded to a JCDS2 DP.
+- Fixed an issue with the "Cloud" DP type where the file progress wasn't quite right.
+
 ## [1.2.0] - 2024-04-16
 ### Features
 - Added the ability to use the v1/packages endpoint on Jamf Pro version 11.5 and above, which includes the ablity to upload files to any cloud instance that Jamf Pro supports. It shows up as a distribution point called "Cloud", but only for the destination since there isn't a way to download those files at this time.

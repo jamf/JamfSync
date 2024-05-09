@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jamf/Subprocess",
       "state" : {
-        "revision" : "2fdaccadfe68bc80f53cfc2d5d2d2363a8d6a5a6",
-        "version" : "3.0.2"
+        "revision" : "9044073a5c3a9e36abcc7df4d833507b093c00e0",
+        "version" : "3.0.3"
       }
     },
     {

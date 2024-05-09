@@ -1,8 +1,5 @@
 //
-//  JamfProPackageUApi.swift
-//  Jamf Sync
-//
-//  Created by Harry Strand on 4/9/24.
+//  Copyright 2024, Jamf
 //
 
 import Foundation

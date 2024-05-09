@@ -123,16 +123,6 @@ final class DistributionPointTests: XCTestCase {
         XCTAssertTrue(destinationDp.isCanceled)
     }
 
-    // MARK: - willDownloadFiles tests
-
-    func test_willDownloadFiles() throws {
-        // When
-        let result = dp.willDownloadFiles()
-
-        // Then
-        XCTAssertFalse(result)
-    }
-
     // MARK: - downloadFile tests
 
     func test_downloadFile() throws {
@@ -293,7 +283,7 @@ final class DistributionPointTests: XCTestCase {
         // Given
         let selectedItems: [DpFile] = []
         let srcDp = MockDistributionPoint(name: "TestSrcDp", fileManager: mockFileManager)
-        srcDp.willDownloadFilesValue = true
+        srcDp.willDownloadFiles = true
         addTestSrcFiles(dp: srcDp)
         let dstDp = MockDistributionPoint(name: "TestDstDp", fileManager: mockFileManager)
         let synchronizationProgress = SynchronizationProgress()
@@ -607,6 +597,62 @@ final class DistributionPointTests: XCTestCase {
         XCTAssertEqual(synchronizationProgress.currentTotalSizeTransferred, 512344)
         XCTAssertEqual(jamfProInstance.filesAdded.count, 1)
         XCTAssertEqual(jamfProInstance.packagesUpdated.count, 2)
+    }
+
+    // MARK: - transferLocalFiles tests
+
+    func test_transferLocalFiles_withFiles() throws {
+        // Given
+        let path1 = "/source/directory/file1.pkg"
+        let path2 = "/source/directory/file2.pkg"
+        let path3 = "/source/directory/file3.pkg"
+        let filesToTransfer = [ URL(fileURLWithPath: path1), URL(fileURLWithPath: path2), URL(fileURLWithPath: path3) ]
+        mockFileManager.fileAttributes = [path1 : [.size : Int64(12345678)], path2 : [.size : Int64(456)], path3 : [.size : Int64(1111)]]
+
+        let dstDp = MockDistributionPoint(name: "TestDstDp", fileManager: mockFileManager)
+        let jamfProInstance = MockJamfProInstance()
+        jamfProInstance.packages = packagesFromDpFiles(dpFiles: dstDp.dpFiles.files)
+        let synchronizationProgress = SynchronizationProgress()
+        synchronizationProgress.printToConsole = true // Not as testable otherwise since it does it in the main thread, which may not happen until after the test is completed
+
+        let expectationCompleted = XCTestExpectation()
+        Task {
+            // When
+            try await dstDp.transferLocalFiles(fileUrls: filesToTransfer, jamfProInstance: jamfProInstance, progress: synchronizationProgress)
+            expectationCompleted.fulfill()
+        }
+        wait(for: [expectationCompleted], timeout: 5)
+
+        // Then
+        XCTAssertNotNil(findLogMessage(messageString: "Finished synchronizing from Selected local files to TestDstDp (local)"))
+        XCTAssertEqual(synchronizationProgress.totalSize, 12347245)
+        XCTAssertEqual(synchronizationProgress.currentFileSizeTransferred, 1111)
+        XCTAssertEqual(synchronizationProgress.currentTotalSizeTransferred, 12347245)
+    }
+
+    func test_transferLocalFiles_noFiles() throws {
+        // Given
+        let filesToTransfer: [URL] = []
+
+        let dstDp = MockDistributionPoint(name: "TestDstDp", fileManager: mockFileManager)
+        let jamfProInstance = MockJamfProInstance()
+        jamfProInstance.packages = packagesFromDpFiles(dpFiles: dstDp.dpFiles.files)
+        let synchronizationProgress = SynchronizationProgress()
+        synchronizationProgress.printToConsole = true // Not as testable otherwise since it does it in the main thread, which may not happen until after the test is completed
+
+        let expectationCompleted = XCTestExpectation()
+        Task {
+            // When
+            try await dstDp.transferLocalFiles(fileUrls: filesToTransfer, jamfProInstance: jamfProInstance, progress: synchronizationProgress)
+            expectationCompleted.fulfill()
+        }
+        wait(for: [expectationCompleted], timeout: 5)
+
+        // Then
+        XCTAssertNotNil(findLogMessage(messageString: "Finished synchronizing from Selected local files to TestDstDp (local)"))
+        XCTAssertEqual(synchronizationProgress.totalSize, 0)
+        XCTAssertNil(synchronizationProgress.currentFileSizeTransferred)
+        XCTAssertEqual(synchronizationProgress.currentTotalSizeTransferred, 0)
     }
 
     // MARK: - deleteFilesNotOnSource tests

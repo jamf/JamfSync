@@ -28,6 +28,10 @@ class LogViewModel: ObservableObject {
         logMessages.removeAll()
     }
 
+    func findLogMessage(id: UUID) -> LogMessage? {
+        return logMessages.first { $0.id == id }
+    }
+
     // MARK: - Private functions
 
     private func stopNotifications() {

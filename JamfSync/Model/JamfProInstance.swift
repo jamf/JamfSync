@@ -11,9 +11,10 @@ enum ServerCommunicationError: Error {
     case parsingError
     case badPackageData
     case forbidden
+    case contentTooLarge
     case invalidCredentials
     case couldNotAccessServer
-    case dataRequestFailed(statusCode: Int)
+    case dataRequestFailed(statusCode: Int, message: String? = nil)
     case notSupported
     case prepareForUploadFailed
 }
@@ -35,6 +36,8 @@ class JamfProInstance: SavableItem {
     var urlSession = URLSession(configuration: URLSessionConfiguration.default)
     var jamfProVersion: String?
     static let iconName = "icloud"
+    static let normalTimeoutValue = 60.0
+    static let uploadTimeoutValue = 3600.0
 
     init(name: String = "", url: URL? = nil, useClientApi: Bool = false, usernameOrClientId: String = "", passwordOrClientSecret: String = "") {
         self.url = url
@@ -111,8 +114,7 @@ class JamfProInstance: SavableItem {
         guard !usernameOrClientId.isEmpty, !passwordOrClientSecret.isEmpty else { return }
         jamfProVersion = try? await retrieveJamfProVersion()
         await determinePackageApi()
-        guard let packageApi else { throw DistributionPointError.programError }
-        packages = try await packageApi.loadPackages(jamfProInstance: self)
+        try await loadPackages()
         try await loadCloudDp()
         try await loadFileShares()
     }
@@ -192,7 +194,7 @@ class JamfProInstance: SavableItem {
     ///     - httpMethod: The method to use (GET, POST, etc.)
     ///     - httpBody: The body data, if needed, otherwise nil.
     /// - Returns: Returns a tuple with the data retruned and the URLResponse.
-    func dataRequest(url: URL, httpMethod: String, httpBody: Data? = nil, contentType: String = "application/json", acceptType: String? = nil, throwHttpError: Bool = true) async throws -> (data: Data?, response: URLResponse?) {
+    func dataRequest(url: URL, httpMethod: String, httpBody: Data? = nil, contentType: String = "application/json", acceptType: String? = nil, throwHttpError: Bool = true, timeout: Double = JamfProInstance.normalTimeoutValue) async throws -> (data: Data?, response: URLResponse?) {
         try await retrieveToken(username: usernameOrClientId, password: passwordOrClientSecret)
         guard let token else { throw ServerCommunicationError.noToken }
 
@@ -204,7 +206,7 @@ class JamfProInstance: SavableItem {
 
         var request = URLRequest(url: url)
         request.httpMethod = httpMethod
-        request.timeoutInterval = 60
+        request.timeoutInterval = timeout
         request.httpBody = httpBody
         request.allHTTPHeaderFields = headers
 
@@ -213,7 +215,8 @@ class JamfProInstance: SavableItem {
         if throwHttpError, let response = response as? HTTPURLResponse {
             if !(200...299).contains(response.statusCode) {
                 LogManager.shared.logMessage(message: "Failed to transmit data for \(url). Status code: \(response.statusCode)", level: .error)
-                throw ServerCommunicationError.dataRequestFailed(statusCode: response.statusCode)
+                let responseDataString = String(data: data, encoding: .utf8)
+                throw ServerCommunicationError.dataRequestFailed(statusCode: response.statusCode, message: responseDataString)
             }
         }
         return (data: data, response: response)
@@ -232,6 +235,13 @@ class JamfProInstance: SavableItem {
             // If it fails for any reason, just assume it's not available in the keychain. The user will need to go in and edit the password.
             LogManager.shared.logMessage(message: "Failed to get a keychain item \(serviceName): \(error)", level: .verbose)
         }
+    }
+
+    /// Loads or reloads packages
+    func loadPackages() async throws {
+        guard let packageApi else { throw DistributionPointError.programError }
+        packages.removeAll()
+        packages = try await packageApi.loadPackages(jamfProInstance: self)
     }
 
     /// Checks to see which packages on the Jamf Pro server are not in the source DP
@@ -311,7 +321,7 @@ class JamfProInstance: SavableItem {
             request.httpBody = clientString.data(using: .utf8)
         }
         request.httpMethod = "POST"
-        request.timeoutInterval = 60
+        request.timeoutInterval = JamfProInstance.normalTimeoutValue
         request.allHTTPHeaderFields = headers
 
         let response: (data: Data?, response: URLResponse?) = try await urlSession.data(for: request)

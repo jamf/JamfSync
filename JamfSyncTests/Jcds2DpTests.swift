@@ -207,7 +207,7 @@ final class Jcds2DpTests: XCTestCase {
 
                 // Then
                 XCTFail("Should have returned with ServerCommunicationError.dataRequestFailed")
-            } catch ServerCommunicationError.dataRequestFailed(let statusCode) {
+            } catch ServerCommunicationError.dataRequestFailed(let statusCode, let message) {
                 XCTAssertEqual(statusCode, 500)
             }
             expectationCompleted.fulfill()
@@ -236,14 +236,5 @@ final class Jcds2DpTests: XCTestCase {
         }
         wait(for: [expectationCompleted], timeout: 5)
         XCTAssertFalse(jcds2Dp.filesLoaded)
-    }
-    // MARK: - willDownloadFiles tests
-
-    func test_willDownloadFiles() throws {
-        // When
-        let result = jcds2Dp.willDownloadFiles()
-
-        // Then
-        XCTAssertTrue(result)
     }
 }

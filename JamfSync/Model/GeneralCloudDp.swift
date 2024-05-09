@@ -12,6 +12,7 @@ class GeneralCloudDp: DistributionPoint {
     var urlSession: URLSession?
     var downloadTask: URLSessionDownloadTask?
     var dispatchGroup: DispatchGroup?
+    static let overheadPerFile = 112
 
     init(jamfProInstanceId: UUID? = nil, jamfProInstanceName: String? = nil) {
         super.init(name: "Cloud")
@@ -19,6 +20,8 @@ class GeneralCloudDp: DistributionPoint {
         self.jamfProInstanceId = jamfProInstanceId
         self.jamfProInstanceName = jamfProInstanceName
         self.updatePackageInfoBeforeTransfer = true
+        self.willDownloadFiles = true
+        self.deleteByRemovingPackage = true
     }
 
     override func retrieveFileList() async throws {
@@ -31,10 +34,6 @@ class GeneralCloudDp: DistributionPoint {
         }
 
         filesLoaded = true
-    }
-
-    override func willDownloadFiles() -> Bool {
-        return true
     }
 
     override func downloadFile(file: DpFile, progress: SynchronizationProgress) async throws -> URL? {
@@ -100,6 +99,7 @@ class GeneralCloudDp: DistributionPoint {
         guard let url = jamfProInstance.url else { throw ServerCommunicationError.noJamfProUrl }
 
         let boundary = createBoundary()
+        progress.overheadSizePerFile = GeneralCloudDp.overheadPerFile + (boundary.count * 2) + fileUrl.lastPathComponent.count
         let tempFileName = try prepareFileForMultipartUpload(fileUrl: fileUrl, boundary: boundary)
         defer {
             try? FileManager.default.removeItem(at: tempFileName)
@@ -113,13 +113,16 @@ class GeneralCloudDp: DistributionPoint {
 
         let request = try createUploadRequest(url: packageUrl, fileUrl: tempFileName, boundary: boundary, jamfProInstance: jamfProInstance)
 
-        let (_, response) = try await urlSession.upload(for: request, fromFile: tempFileName, delegate: sessionDelegate)
+        let (responseData, response) = try await urlSession.upload(for: request, fromFile: tempFileName, delegate: sessionDelegate)
         if let httpResponse = response as? HTTPURLResponse {
             switch(httpResponse.statusCode) {
             case 200...299:
                 LogManager.shared.logMessage(message: "Successfully uploaded \(fileUrl.lastPathComponent)", level: .verbose)
+            case 413:
+                throw ServerCommunicationError.contentTooLarge
             default:
-                throw ServerCommunicationError.dataRequestFailed(statusCode: httpResponse.statusCode)
+                let responseDataString = String(data: responseData, encoding: .utf8)
+                throw ServerCommunicationError.dataRequestFailed(statusCode: httpResponse.statusCode, message: responseDataString)
             }
         }
     }
@@ -159,7 +162,7 @@ class GeneralCloudDp: DistributionPoint {
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.timeoutInterval = 60
+        request.timeoutInterval = JamfProInstance.uploadTimeoutValue
         request.allHTTPHeaderFields = [
             "Authorization": "Bearer \(token)",
             "Content-Type": "multipart/form-data; boundary=\(boundary)",

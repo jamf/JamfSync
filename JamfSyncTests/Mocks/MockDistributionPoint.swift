@@ -16,17 +16,20 @@ class MockDistributionPoint: DistributionPoint {
     var errorIdx = 0
     var transferItems: [TransferItem] = []
     var filesDeleted: [DpFile] = []
-    var willDownloadFilesValue = false
     var cancelSync = false
 
-    override func willDownloadFiles() -> Bool {
+    override func calculateTotalTransferSize(filesToSync: [DpFile]) -> Int64 {
         if cancelSync {
             cancel()
         }
-        return willDownloadFilesValue
+        return super.calculateTotalTransferSize(filesToSync: filesToSync)
     }
 
     override func transferFile(srcFile: DpFile, moveFrom: URL? = nil, progress: SynchronizationProgress) async throws {
+        if cancelSync {
+            cancel()
+            return
+        }
         if errorIdx < errors.count, let error = errors[errorIdx] {
             throw error
         }

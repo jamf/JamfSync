@@ -42,8 +42,10 @@ struct SourceDestinationView: View {
             ZStack {
                 HStack {
                     PackageListView(isSrc: true, dataModel: dataModel, packageListViewModel: dataModel.srcPackageListViewModel)
+                        .padding(.trailing, 3)
 
                     PackageListView(isSrc: false, dataModel: dataModel, packageListViewModel: dataModel.dstPackageListViewModel)
+                        .padding(.leading, 3)
                 }
                 if dataModel.showSpinner {
                     ProgressView()
