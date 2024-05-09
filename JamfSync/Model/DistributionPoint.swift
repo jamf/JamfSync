@@ -207,16 +207,15 @@ class DistributionPoint: Identifiable {
         try await copyFilesToDst(sourceName: selectionName(), willDownloadFiles: willDownloadFiles, filesToSync: filesToSync, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: forceSync, progress: progress)
     }
 
-    /// Loops through the files to synchronize to calculate the total size of files to be transferred.
+    /// Transfers a list of local files to this distribution point.
     /// - Parameters:
-    ///     - files: The local file URLs selected to copy to the destination distribution point
-    ///     - dstDp: The destination distribution point to copy the files to
-    ///     - jamfProInstance: The Jamf Pro instance of the destination distribution point, if it is associated with one
-    ///     - progress: The progress object that should be updated as the synchronization progresses
+    ///     - fileUrls: The local file URLs for the files to transfer
+    ///     - jamfProInstance: The Jamf Pro instance of this distribution point, if it is associated with one
+    ///     - progress: The progress object that should be updated as the transfer progresses
     /// - Returns: Returns true if all files were copied, otherwise false
-    func transferLocalFiles(fileUrls: [URL], dstDp: DistributionPoint, jamfProInstance: JamfProInstance?, progress: SynchronizationProgress) async throws {
+    func transferLocalFiles(fileUrls: [URL], jamfProInstance: JamfProInstance?, progress: SynchronizationProgress) async throws {
         let dpFiles = convertFileUrlsToDpFiles(fileUrls: fileUrls)
-        try await copyFilesToDst(sourceName: "Selected local files", willDownloadFiles: false, filesToSync: dpFiles, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: true, progress: progress)
+        try await copyFilesToDst(sourceName: "Selected local files", willDownloadFiles: false, filesToSync: dpFiles, dstDp: self, jamfProInstance: jamfProInstance, forceSync: true, progress: progress)
     }
 
     /// Removes files from this destination distribution point that are not on thie source distribution point.

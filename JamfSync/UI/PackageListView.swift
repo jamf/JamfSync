@@ -213,7 +213,7 @@ struct PackageListView: View {
             DataModel.shared.cancelUpdateListViewModels()
             DataModel.shared.synchronizationInProgress = true
             do {
-                try await dstDp.transferLocalFiles(fileUrls: fileUrls, dstDp: dstDp, jamfProInstance: DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId), progress: progress)
+                try await dstDp.transferLocalFiles(fileUrls: fileUrls, jamfProInstance: DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId), progress: progress)
             } catch {
                 LogManager.shared.logMessage(message: "Failed to transfer to \(dstDp.name): \(error)", level: .error)
             }
