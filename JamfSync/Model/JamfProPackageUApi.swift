@@ -96,20 +96,6 @@ class JamfProPackageUApi: JamfProPackageApi {
 
     private func convertToPackage(jsonPackage: JsonUapiPackageDetail) -> Package? {
         guard let jamfProIdString = jsonPackage.id, let jamfProId = Int(jamfProIdString), let displayName = jsonPackage.packageName, let fileName = jsonPackage.fileName else { return nil }
-        let checksums = Checksums()
-        if let md5Value = jsonPackage.md5, !md5Value.isEmpty {
-            checksums.updateChecksum(Checksum(type: .MD5, value: md5Value))
-        }
-        if let sha256Value = jsonPackage.sha256, !sha256Value.isEmpty {
-            checksums.updateChecksum(Checksum(type: .SHA_256, value: sha256Value))
-        }
-        if let hashType = jsonPackage.hashType, !hashType.isEmpty, let hashValue = jsonPackage.hashValue, !hashValue.isEmpty {
-            checksums.updateChecksum(Checksum(type: ChecksumType.fromRawValue(hashType), value: hashValue))
-        }
-        var size: Int64?
-        if let sizeString = jsonPackage.size {
-            size = Int64(sizeString)
-        }
-        return Package(jamfProId: jamfProId, displayName: displayName, fileName: fileName, category: jsonPackage.categoryId ?? "-1", size: size, checksums: checksums)
+        return Package(uapiPackageDetail: jsonPackage)
     }
 }

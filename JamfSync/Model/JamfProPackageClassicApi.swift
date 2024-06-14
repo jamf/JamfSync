@@ -92,7 +92,7 @@ class JamfProPackageClassicApi: JamfProPackageApi {
         if let data = response.data {
             let decoder = JSONDecoder()
             let jsonPackage = try decoder.decode(JsonCapiPackageItem.self, from: data)
-            return Package(packageDetail: jsonPackage.package)
+            return Package(capiPackageDetail: jsonPackage.package)
         }
         return nil
     }
@@ -114,24 +114,24 @@ class JamfProPackageClassicApi: JamfProPackageApi {
   <package>
     <id>\(jamfProPackageId)</id>
     <name>\(package.displayName)</name>
-    <category>\(category)</category>
+    <category>\(category ?? "None")</category>
     <filename>\(package.fileName)</filename>
-    <info/>
-    <notes/>
-    <priority>10</priority>
-    <reboot_required>false</reboot_required>
-    <fill_user_template>false</fill_user_template>
-    <fill_existing_users>false</fill_existing_users>
-    <allow_uninstalled>false</allow_uninstalled>
-    <os_requirements/>
+    <info>\(package.info ?? "")</info>
+    <notes>\(package.notes ?? "")</notes>
+    <priority>\(package.priority ?? 10)</priority>
+    <reboot_required>\(package.rebootRequired ?? false)</reboot_required>
+    <fill_user_template>\(package.fillUserTemplate ?? false)</fill_user_template>
+    <fill_existing_users>\(package.fillExistingUsers ?? false)</fill_existing_users>
+    <allow_uninstalled>\(package.uninstall ?? false)</allow_uninstalled>
+    <os_requirements>\(package.osRequirements ?? "")</os_requirements>
     <required_processor>None</required_processor>
     <hash_type>\(checksumTypeString)</hash_type>
     <hash_value>\(checksum?.value ?? "")</hash_value>
-    <switch_with_package>Do Not Install</switch_with_package>
-    <install_if_reported_available>false</install_if_reported_available>
-    <reinstall_option>Do Not Reinstall</reinstall_option>
+    <switch_with_package>\(package.switch_with_package ?? "Do Not Install")</switch_with_package>
+    <install_if_reported_available>\(package.install_if_reported_available ?? "false")</install_if_reported_available>
+    <reinstall_option>\(package.reinstall_option ?? "Do Not Reinstall")</reinstall_option>
     <triggering_files/>
-    <send_notification>false</send_notification>
+    <send_notification>\(package.send_notification ?? false)</send_notification>
   </package>
 """
     }

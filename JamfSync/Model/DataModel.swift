@@ -36,10 +36,10 @@ class DataModel: ObservableObject {
     @Published var dpToPromptForPassword: FileShareDp?
     @Published var shouldPromptForJamfProPassword = false
     @Published var shouldPresentSetupSheet = false
+    @Published var synchronizationInProgress = false
     private var dps: [DistributionPoint] = []
     var firstLoad = true
     var jamfProServersToPromptForPassword: [JamfProInstance] = []
-    var synchronizationInProgress = false
     var loadingInProgressGroup: DispatchGroup?
     private var updateListViewModelsTask: Task<Void, Error>?
     private var updateChecksumsTask: Task<Void, Error>?

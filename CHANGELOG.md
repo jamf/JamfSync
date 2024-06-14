@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2024-06-14
+### Bug fixes
+- Fixed an issue where some package fields for packages on the server would be overwritten with default values when packages were updated.
+- Fixed an issue where the Synchronize button may not activate after synchronization is completed.
+
 ## [1.3.0] - 2024-05-08
 ### Features
 - Added buttons below the source and destination distribution point to allow local files to be added or removed directly to/from the distribution point.
