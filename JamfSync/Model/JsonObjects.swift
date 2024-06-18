@@ -119,16 +119,17 @@ struct JsonUapiPackageDetail: Codable {
         }
         packageName = package.displayName
         fileName = package.fileName
-        categoryId = package.categoryId
-        priority = package.priority
-        fillUserTemplate = package.fillUserTemplate
-        uninstall = package.uninstall
-        rebootRequired = package.rebootRequired
-        osInstall = package.osInstall
-        suppressUpdates = package.suppressUpdates
-        suppressFromDock = package.suppressFromDock
-        suppressEula = package.suppressEula
-        suppressRegistration = package.suppressRegistration
+        categoryId = package.category
+        categoryId = package.categoryId ?? "-1"
+        priority = package.priority ?? 10
+        fillUserTemplate = package.fillUserTemplate ?? false
+        uninstall = package.uninstall ?? false
+        rebootRequired = package.rebootRequired ?? false
+        osInstall = package.osInstall ?? false
+        suppressUpdates = package.suppressUpdates ?? false
+        suppressFromDock = package.suppressFromDock ?? false
+        suppressEula = package.suppressEula ?? false
+        suppressRegistration = package.suppressRegistration ?? false
         if let checksum = package.checksums.findChecksum(type: .MD5) {
             md5 = checksum.value
         } else {
