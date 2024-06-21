@@ -76,7 +76,7 @@ class Jcds2Dp: DistributionPoint {
                 try fileManager.createDirectory(at: tempDirectory, withIntermediateDirectories: false)
                 localUrl = tempDirectory.appendingPathComponent(srcFile.name)
                 if let localUrl {
-                    try fileManager.moveItem(at: moveFrom, to: localUrl)
+                    try fileManager.moveRetainingDestinationPermisssions(at: moveFrom, to: localUrl)
                 }
             }
         }
