@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed an issue where some package fields for packages on the server would be overwritten with default values when packages were updated.
 - Made it so you can delete a package on the Jamf Pro server that doesn't have a file associated with it, as long as "Files and associated packages" is selected.
 - Fixed an issue where the Synchronize button may not activate after synchronization is completed.
-- Made a change so when downloading files, it will retain the Posix and ACL permissions that are used when creating new files in the destination directory.
+- Made a change so when transferring files from JCDS distribution points to local or file share distribution points, it will retain the Posix and ACL permissions that are used when creating new files in the destination directory.
 
 ## [1.3.0] - 2024-05-08
 ### Features
