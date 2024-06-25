@@ -89,6 +89,11 @@ class DataModel: ObservableObject {
                             LogManager.shared.logMessage(message: "Bad credentials or access \(serverInfo)", level: .error)
                         } catch ServerCommunicationError.couldNotAccessServer {
                             LogManager.shared.logMessage(message: "Failed to access \(serverInfo)", level: .error)
+                        } catch ServerCommunicationError.invalidCredentials {
+                            if let jamfProInstance = savableItem as? JamfProInstance {
+                                jamfProServersToPromptForPassword.append(jamfProInstance)
+                                jamfProInstance.passwordOrClientSecret = ""
+                            }
                         }
                     }
                 } catch {
