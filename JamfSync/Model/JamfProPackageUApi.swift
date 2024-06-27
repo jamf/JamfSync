@@ -39,7 +39,6 @@ class JamfProPackageUApi: JamfProPackageApi {
         let jsonUapiPackageDetail = JsonUapiPackageDetail(package: package)
         let jsonEncoder = JSONEncoder()
         let jsonData = try jsonEncoder.encode(jsonUapiPackageDetail)
-        NSLog("jsonData = \n\(String(data: jsonData, encoding: .utf8) ?? "nil")")
         let response = try await jamfProInstance.dataRequest(url: packageUrl, httpMethod: "POST", httpBody: jsonData, contentType: "application/json")
         if let data = response.data {
             let decoder = JSONDecoder()
