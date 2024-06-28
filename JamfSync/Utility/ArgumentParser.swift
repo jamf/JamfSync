@@ -81,14 +81,14 @@ class ArgumentParser: NSObject {
     func displayHelp() {
         displayVersion()
         
-        print("NOTE: Run JamfSync with no parameters first to add Jamf Pro servers and/or folders.")
+        print("NOTE: Run Jamf Sync with no parameters first to add Jamf Pro servers and/or folders.")
         print("      Passwords for Jamf Pro servers and distribution points must be stored in the")
         print("      keychain in order to synchronize via command line arguments.")
         print("")
         print("Usage:")
-        print("\tJamfSync [(-s | --srcDp) <name>] [(-d | --dstDp) <name>] [(-f | --forceSync)] [(-r | --removeFilesNotOnSource)] [(-rp | --removePackagesNotOnSource)] [-p | --progress]")
-        print("\tJamfSync [-h | --help]")
-        print("\tJamfSync [-v | --version]")
+        print("\t\"/Applications/Jamf Sync.app/Contents/MacOS/Jamf Sync\" [(-s | --srcDp) <name>] [(-d | --dstDp) <name>] [(-f | --forceSync)] [(-r | --removeFilesNotOnSource)] [(-rp | --removePackagesNotOnSource)] [-p | --progress]")
+        print("\t\"/Applications/Jamf Sync.app/Contents/MacOS/Jamf Sync\" [-h | --help]")
+        print("\t\"/Applications/Jamf Sync.app/Contents/MacOS/Jamf Sync\" [-v | --version]")
         print("")
         print("\t-s --srcDp:\t\tThe name of the source distribution point or folder.")
         print("\t-d --dstDp:\t\tThe name of the destination distribution point or folder.")

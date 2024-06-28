@@ -163,7 +163,12 @@ class PackageListViewModel: ObservableObject {
                             try await packageApi.deletePackage(packageId: jamfProId, jamfProInstance: jamfProInstance)
                         }
                     } else {
-                        try await selectedDp.deleteFile(file: dpFile, progress: progress)
+                        if selectedDp.dpFiles.findDpFile(name: dpFile.name) != nil {
+                            try await selectedDp.deleteFile(file: dpFile, progress: progress)
+                        }
+                        if packagesToo, let jamfProInstance, let packageApi = jamfProInstance.packageApi, let package = jamfProInstance.findPackage(name: dpFile.name), let jamfProId = package.jamfProId {
+                            try await packageApi.deletePackage(packageId: jamfProId, jamfProInstance: jamfProInstance)
+                        }
                     }
                     LogManager.shared.logMessage(message: "Deleted \(dpFile.name) from \(selectedDp.selectionName())", level: .info)
                 } catch {

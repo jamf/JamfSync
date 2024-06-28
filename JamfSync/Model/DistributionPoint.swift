@@ -264,7 +264,7 @@ class DistributionPoint: Identifiable {
         let dstUrl = URL(fileURLWithPath: localPath).appendingPathComponent(filename)
         try? fileManager.removeItem(at: dstUrl)
         if let moveFrom {
-            try fileManager.moveItem(at: moveFrom, to: dstUrl)
+            try fileManager.moveRetainingDestinationPermisssions(at: moveFrom, to: dstUrl)
         } else {
             try fileManager.copyItem(at: srcUrl, to: dstUrl)
         }

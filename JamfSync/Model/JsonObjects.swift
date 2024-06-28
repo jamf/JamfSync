@@ -120,15 +120,16 @@ struct JsonUapiPackageDetail: Codable {
         packageName = package.displayName
         fileName = package.fileName
         categoryId = package.category
-        priority = 10
-        fillUserTemplate = false
-        uninstall = false
-        rebootRequired = false
-        osInstall = false
-        suppressUpdates = false
-        suppressFromDock = false
-        suppressEula = false
-        suppressRegistration = false
+        categoryId = package.categoryId ?? "-1"
+        priority = package.priority ?? 10
+        fillUserTemplate = package.fillUserTemplate ?? false
+        uninstall = package.uninstall ?? false
+        rebootRequired = package.rebootRequired ?? false
+        osInstall = package.osInstall ?? false
+        suppressUpdates = package.suppressUpdates ?? false
+        suppressFromDock = package.suppressFromDock ?? false
+        suppressEula = package.suppressEula ?? false
+        suppressRegistration = package.suppressRegistration ?? false
         if let checksum = package.checksums.findChecksum(type: .MD5) {
             md5 = checksum.value
         } else {
@@ -152,22 +153,22 @@ struct JsonUapiPackageDetail: Codable {
             size = nil
         }
 
-        info = nil
-        notes = nil
-        osRequirements = nil
-        indexed = nil
-        fillExistingUsers = nil
-        swu = nil
-        selfHealNotify = nil
-        selfHealingAction = nil
-        serialNumber = nil
-        parentPackageId = nil
-        basePath = nil
-        cloudTransferStatus = nil
-        ignoreConflicts = nil
-        installLanguage = nil
-        osInstallerVersion = nil
-        format = nil
+        info = package.info
+        notes = package.notes
+        osRequirements = package.osRequirements
+        indexed = package.indexed
+        fillExistingUsers = package.fillExistingUsers
+        swu = package.swu
+        selfHealNotify = package.selfHealNotify
+        selfHealingAction = package.selfHealingAction
+        serialNumber = package.serialNumber
+        parentPackageId = package.parentPackageId
+        basePath = package.basePath
+        cloudTransferStatus = package.cloudTransferStatus
+        ignoreConflicts = package.ignoreConflicts
+        installLanguage = package.installLanguage
+        osInstallerVersion = package.osInstallerVersion
+        format = package.format
     }
 }
 

@@ -59,6 +59,7 @@
 		84BC6E492AC380FD00CF6D39 /* FolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E482AC380FD00CF6D39 /* FolderView.swift */; };
 		84BC6E4D2AC38C6200CF6D39 /* FileShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E4A2AC38C6200CF6D39 /* FileShare.swift */; };
 		84BC6E552AC4933500CF6D39 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 84BC6E542AC4933500CF6D39 /* README.md */; };
+		84CAB0E52C25C47400582D59 /* FileManager+moveRetainingPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CAB0E42C25C47400582D59 /* FileManager+moveRetainingPermissions.swift */; };
 		84CCB5D22B4C852F00328291 /* SetupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CCB5D12B4C852F00328291 /* SetupViewModel.swift */; };
 		84CCB5D42B4C946200328291 /* LogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CCB5D32B4C946200328291 /* LogViewModel.swift */; };
 		84CD1BAC2BBB132D008F0DF3 /* Subprocess in Frameworks */ = {isa = PBXBuildFile; productRef = 84CD1BAB2BBB132D008F0DF3 /* Subprocess */; };
@@ -169,6 +170,7 @@
 		84BC6E482AC380FD00CF6D39 /* FolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderView.swift; sourceTree = "<group>"; };
 		84BC6E4A2AC38C6200CF6D39 /* FileShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileShare.swift; sourceTree = "<group>"; };
 		84BC6E542AC4933500CF6D39 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		84CAB0E42C25C47400582D59 /* FileManager+moveRetainingPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+moveRetainingPermissions.swift"; sourceTree = "<group>"; };
 		84CCB5D12B4C852F00328291 /* SetupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupViewModel.swift; sourceTree = "<group>"; };
 		84CCB5D32B4C946200328291 /* LogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewModel.swift; sourceTree = "<group>"; };
 		84D568612BD0722B00C91686 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
@@ -375,14 +377,15 @@
 				84AB59C42B20D569007333AD /* CloudSessionDelegate.swift */,
 				84F258B42B76C81C00B8F401 /* CommandLineProcessing.swift */,
 				84761C9F2AFEE259006BBF72 /* FileHash.swift */,
+				84CAB0E42C25C47400582D59 /* FileManager+moveRetainingPermissions.swift */,
 				84BC6E4A2AC38C6200CF6D39 /* FileShare.swift */,
 				84F3331C2B48BEEF0037E4E5 /* FileShares.swift */,
 				84FC41652AD895F400DCB033 /* KeychainHelper.swift */,
 				8468917D2BCEC4BB00B9FCA4 /* OutputStream_write.swift */,
 				84DD583A2BC5C2A700E8DA23 /* URL+isDirectory.swift */,
 				84E489982B5AC80600FFFE59 /* UserSettings.swift */,
-				84FC415F2AD5A78C00DCB033 /* View+NSWindow.swift */,
 				849FC3402BD06A43008BAC02 /* VersionInfo.swift */,
+				84FC415F2AD5A78C00DCB033 /* View+NSWindow.swift */,
 				8412279E2BEADBB20097B83E /* XmlErrorParser.swift */,
 			);
 			path = Utility;
@@ -571,6 +574,7 @@
 				84FC41622AD7097300DCB033 /* SynchronizationProgress.swift in Sources */,
 				844CF9D12AC4B96600576E1A /* FolderDp.swift in Sources */,
 				84F258B52B76C81C00B8F401 /* CommandLineProcessing.swift in Sources */,
+				84CAB0E52C25C47400582D59 /* FileManager+moveRetainingPermissions.swift in Sources */,
 				84BC6E322AC3631400CF6D39 /* Checksum.swift in Sources */,
 				84BC6E452AC37F4100CF6D39 /* SetupView.swift in Sources */,
 				844E40D12B4F46FD003D1940 /* Checksums.swift in Sources */,
@@ -821,7 +825,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.jamfsync;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -853,7 +857,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.jamfsync;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

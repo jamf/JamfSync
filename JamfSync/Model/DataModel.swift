@@ -36,10 +36,10 @@ class DataModel: ObservableObject {
     @Published var dpToPromptForPassword: FileShareDp?
     @Published var shouldPromptForJamfProPassword = false
     @Published var shouldPresentSetupSheet = false
+    @Published var synchronizationInProgress = false
     private var dps: [DistributionPoint] = []
     var firstLoad = true
     var jamfProServersToPromptForPassword: [JamfProInstance] = []
-    var synchronizationInProgress = false
     var loadingInProgressGroup: DispatchGroup?
     private var updateListViewModelsTask: Task<Void, Error>?
     private var updateChecksumsTask: Task<Void, Error>?
@@ -89,6 +89,11 @@ class DataModel: ObservableObject {
                             LogManager.shared.logMessage(message: "Bad credentials or access \(serverInfo)", level: .error)
                         } catch ServerCommunicationError.couldNotAccessServer {
                             LogManager.shared.logMessage(message: "Failed to access \(serverInfo)", level: .error)
+                        } catch ServerCommunicationError.invalidCredentials {
+                            if let jamfProInstance = savableItem as? JamfProInstance {
+                                jamfProServersToPromptForPassword.append(jamfProInstance)
+                                jamfProInstance.passwordOrClientSecret = ""
+                            }
                         }
                     }
                 } catch {

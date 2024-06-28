@@ -17,7 +17,7 @@ struct FileSharePasswordView: View {
         VStack(spacing: 10) {
             Text("File Share Password")
                 .font(.title)
-            Text("Enter the password for \(fileShareDp?.selectionName() ?? "")")
+            Text("Enter the password for \(fileShareDp?.selectionName() ?? ""): \(fileShareDp?.address ?? "")")
                 .padding(.bottom)
 
             HStack {
@@ -88,7 +88,7 @@ struct FileSharePasswordView: View {
 
 struct FileSharePasswordView_Previews: PreviewProvider {
     static var previews: some View {
-        @State var fileShareDp: FileShareDp? = FileShareDp(jamfProId: 1, name: "My Fileshare", address: "My place", isMaster: true, connectionType: .smb, shareName: "CasperShare", workgroupOrDomain: "", sharePort: 0, readOnlyUsername: nil, readOnlyPassword: nil, readWriteUsername: "admin", readWritePassword: "password")
+        @State var fileShareDp: FileShareDp? = FileShareDp(jamfProId: 1, name: "My Fileshare description that's kind of long", address: "https://myfileshareurl.com", isMaster: true, connectionType: .smb, shareName: "CasperShare", workgroupOrDomain: "", sharePort: 0, readOnlyUsername: nil, readOnlyPassword: nil, readWriteUsername: "admin", readWritePassword: "password")
         @State var canceled: Bool = false
         FileSharePasswordView(fileShareDp: $fileShareDp, canceled: $canceled)
     }
