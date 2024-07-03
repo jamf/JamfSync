@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2024-07-02
+### Bug fixes
+- Fixed an issue where it would fail to copy a file from a JCDS DP to a file share DP.
+
 ## [1.3.1] - 2024-06-25
 ### Bug fixes
 - Fixed an issue where some package fields for packages on the server would be overwritten with default values when packages were updated.
