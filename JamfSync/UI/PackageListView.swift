@@ -132,7 +132,7 @@ struct PackageListView: View {
                         HStack {
                             if let dp = packageListViewModel.retrieveSelectedDp() {
                                 if let jamfProInstanceId = dp.jamfProInstanceId, let jamfProInstance = dataModel.findJamfProInstance(id: jamfProInstanceId) {
-                                    Button("Files and associated packages", role: .destructive) {
+                                    Button("Files and associated package records", role: .destructive) {
                                         Task {
                                             packageListViewModel.deleteSelectedFilesFromDp(packagesToo: true)
                                         }

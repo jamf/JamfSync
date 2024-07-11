@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.3] - 2024-07-11
+### Bug fixes
+- Changed the wording for the delete prompt to be a little less ambiguous.
+
 ## [1.3.2] - 2024-07-02
 ### Bug fixes
 - Fixed an issue where it would fail to copy a file from a JCDS DP to a file share DP.
@@ -32,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added the ability to use the v1/packages endpoint on Jamf Pro version 11.5 and above, which includes the ablity to upload files to any cloud instance that Jamf Pro supports. It shows up as a distribution point called "Cloud", but only for the destination since there isn't a way to download those files at this time.
 ### Enhancements
 - Made the column headers resizable.
-- Made it so it will show packages ending with ".app.zip" and if a package is non-flat (right click menu has "Show Package Contents"), it will only show up in the list if it doesn't have a corresponding ".app.zip" file. When a non-flat package is transferred, it will create a corresponding ".app.zip" file in the same directory and just transfer that.
+- Made it so it will show packages ending with ".pkg.zip" and if a package is non-flat (right click menu has "Show Package Contents"), it will only show up in the list if it doesn't have a corresponding ".pkg.zip" file. When a non-flat package is transferred, it will create a corresponding ".pkg.zip" file in the same directory and just transfer that.
 - Updated the About view.
 ### Bug fixes
 - Fixed an issue where files containing a "+" (and possibly other characters) would fail to upload to JCDS2 distribution points.
