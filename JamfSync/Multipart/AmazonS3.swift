@@ -6,13 +6,51 @@ import Cocoa
 import CryptoKit
 import Foundation
 
+
+class CompleteMultipart: NSObject {
+    var partNumber: Int
+    var eTag: String
+    
+    init(partNumber: Int, eTag: String) {
+        self.partNumber = partNumber
+        self.eTag = eTag
+    }
+}
+
+struct Chunk {
+    static var all               = 0
+    static var size              = 1024*1024*10       //  1024*1024 = 1 MB
+    static var index             = 1
+    static var numberOf          = 0
+    static var previousSignature = ""
+    static var authHeader        = ""
+}
+
+// for aws uri encoding
+//var myCharacterSet = CharacterSet()
+var partNumberEtagList = [CompleteMultipart]()
+
+func tagValue(xmlString:String, startTag:String, endTag:String, includeTags: Bool) -> String {
+    var rawValue = ""
+    if let start = xmlString.range(of: startTag),
+        let end  = xmlString.range(of: endTag, range: start.upperBound..<xmlString.endIndex) {
+        rawValue.append(String(xmlString[start.upperBound..<end.lowerBound]))
+    }
+    if includeTags {
+        return "\(startTag)\(rawValue)\(endTag)"
+    } else {
+        return rawValue
+    }
+}
+
+/*
 class AmazonS3: NSObject, URLSessionDelegate {
     
     static let shared = AmazonS3()
     private override init() {
         // character set for asw header uri encoding
-        myCharacterSet.formUnion(.alphanumerics)
-        myCharacterSet.insert(charactersIn: "/-._~")
+//        myCharacterSet.formUnion(.alphanumerics)
+//        myCharacterSet.insert(charactersIn: "/-._~")
     }
     
     let theFetchQ    = OperationQueue() // queue to fetch package info
@@ -115,6 +153,7 @@ class AmazonS3: NSObject, URLSessionDelegate {
         
     }
     
+    /*
     func location(whichServer: String, theRegion: String = "", completion: @escaping (_ returnInfo: String) -> Void) {
         
         var region          = (theRegion == "") ? "x":theRegion
@@ -186,6 +225,7 @@ class AmazonS3: NSObject, URLSessionDelegate {
         }
         task.resume()
     }
+    */
     
     /*
      // uses core datalistFiles(which
@@ -297,3 +337,4 @@ class AmazonS3: NSObject, URLSessionDelegate {
     }
     */
 }
+*/

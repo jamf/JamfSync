@@ -92,6 +92,8 @@
 		84FC416A2AD898B000DCB033 /* Haversack in Frameworks */ = {isa = PBXBuildFile; productRef = 84FC41692AD898B000DCB033 /* Haversack */; };
 		84FC418B2ADD7B1000DCB033 /* StoredSettings.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 84FC41892ADD7B1000DCB033 /* StoredSettings.xcdatamodeld */; };
 		84FC418E2ADD89AD00DCB033 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FC418D2ADD89AD00DCB033 /* DataManager.swift */; };
+		CE9899B32C9A7A77000C36B7 /* Awake.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9899B22C9A7A77000C36B7 /* Awake.swift */; };
+		CE9899B72C9A8C4B000C36B7 /* AmazonS3.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9899B62C9A8C4B000C36B7 /* AmazonS3.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -201,6 +203,8 @@
 		84FC41652AD895F400DCB033 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		84FC418A2ADD7B1000DCB033 /* StoredSettings.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = StoredSettings.xcdatamodel; sourceTree = "<group>"; };
 		84FC418D2ADD89AD00DCB033 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
+		CE9899B22C9A7A77000C36B7 /* Awake.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Awake.swift; sourceTree = "<group>"; };
+		CE9899B62C9A8C4B000C36B7 /* AmazonS3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AmazonS3.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -270,6 +274,7 @@
 		84BC6DF22AC3122100CF6D39 /* JamfSync */ = {
 			isa = PBXGroup;
 			children = (
+				CE9899AF2C9A6A20000C36B7 /* Multipart */,
 				847298EE2BDC5566002D4652 /* Info.plist */,
 				84BC6E1F2AC312AA00CF6D39 /* Model */,
 				84BC6DFC2AC3122200CF6D39 /* JamfSync.entitlements */,
@@ -429,6 +434,15 @@
 			path = CoreData;
 			sourceTree = "<group>";
 		};
+		CE9899AF2C9A6A20000C36B7 /* Multipart */ = {
+			isa = PBXGroup;
+			children = (
+				CE9899B62C9A8C4B000C36B7 /* AmazonS3.swift */,
+				CE9899B22C9A7A77000C36B7 /* Awake.swift */,
+			);
+			path = Multipart;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -581,6 +595,7 @@
 				84CCB5D22B4C852F00328291 /* SetupViewModel.swift in Sources */,
 				84CCB5D42B4C946200328291 /* LogViewModel.swift in Sources */,
 				848C2D282BC48A3800036999 /* GeneralCloudDp.swift in Sources */,
+				CE9899B32C9A7A77000C36B7 /* Awake.swift in Sources */,
 				84DD58392BC58F2E00E8DA23 /* JamfProPackageClassicApi.swift in Sources */,
 				84E2AE762AF85EC700AE8284 /* LogMessage.swift in Sources */,
 				840A79072ACC8EFF00161D85 /* FolderInstance.swift in Sources */,
@@ -607,6 +622,7 @@
 				84E4898F2B58679600FFFE59 /* HeaderView.swift in Sources */,
 				84FC415E2AD5A5C600DCB033 /* SynchronizeProgressView.swift in Sources */,
 				84E489952B58830A00FFFE59 /* ChecksumView.swift in Sources */,
+				CE9899B72C9A8C4B000C36B7 /* AmazonS3.swift in Sources */,
 				8463EF2B2AE6D3040028D591 /* FileSharePasswordView.swift in Sources */,
 				84BC6E352AC3631400CF6D39 /* Package.swift in Sources */,
 				84BC6E392AC3631400CF6D39 /* DataModel.swift in Sources */,

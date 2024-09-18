@@ -239,3 +239,24 @@ struct JsonInitiateUpload: Decodable {
 struct JsonJamfProVersion: Decodable {
     let version: String
 }
+
+// Added - BIG-RAT
+struct Headers {
+    static var canonical = ""
+    static var signed    = ""
+}
+
+class UploadTime {
+    var start: Int
+    var end: Int
+    
+    init(start: Int, end: Int) {
+        self.start = start
+        self.end = end
+    }
+    
+    func total() -> Int {
+        end - start
+    }
+}
+var uploadTime: UploadTime = UploadTime(start: 0, end: 0)

@@ -38,7 +38,7 @@ public func enableIdleDisk() -> Bool {
     if noDiskIdleReturn != nil {
         _ = IOPMAssertionRelease(noDiskIdleAssertionID) == kIOReturnSuccess
         noDiskIdleReturn = nil
-        WriteToLog.shared.message(stringOfText: "allow external disk(s) to become idle")
+        //WriteToLog.shared.message(stringOfText: "allow external disk(s) to become idle")
         return true
     }
     return false
