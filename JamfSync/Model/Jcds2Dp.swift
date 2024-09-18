@@ -607,6 +607,7 @@ class Jcds2Dp: DistributionPoint {
             // allow up to 3 concurrent uploads
             if currentSessions < 4 && Chunk.index <= Chunk.numberOf {
 //                uploading = true
+                
                 let currentEpoch = Int(Date().timeIntervalSince1970)
                 let expireEpoch = initiateUploadData?.expiration ?? 0 //s3Info["expiration"] as? Int ?? 0
                 let timeLeft = (expireEpoch - currentEpoch)/60
@@ -694,6 +695,7 @@ class Jcds2Dp: DistributionPoint {
                     Chunk.index += 1
                     
                 }
+                
                 
             } else {
                 sleep(1)
