@@ -263,7 +263,7 @@ class Jcds2Dp: DistributionPoint {
                         <CompleteMultipartUpload>
                         \(completionArray)</CompleteMultipartUpload>
                         """
-                    print("[chunkUploads] completionXml: \n\(completionXml)")
+//                    print("[chunkUploads] completionXml: \n\(completionXml)")
                     
                     
 //                                var s3Info = [String: Any]()
@@ -415,7 +415,7 @@ class Jcds2Dp: DistributionPoint {
         sortedHeaders = String(sortedHeaders.dropLast())
         signedHeaders = String(signedHeaders.dropLast())
         var canonicalURI = key.removingPercentEncoding?.replacingOccurrences(of: "?uploads", with: "")
-        print("[awsSignature256] canonicalURI: \(canonicalURI)")
+//        print("[awsSignature256] canonicalURI: \(canonicalURI)")
         canonicalURI = canonicalURI?.addingPercentEncoding(withAllowedCharacters: myCharacterSet) ?? ""
         
         // CANONICAL REQUEST //
@@ -428,20 +428,13 @@ class Jcds2Dp: DistributionPoint {
         \(signedHeaders)
         UNSIGNED-PAYLOAD
         """
-        print("[awsSignature256] canonicalRequest \n\(canonicalRequest)")
+//        print("[awsSignature256] canonicalRequest \n\(canonicalRequest)")
         
-//        let data = canonicalRequest.data(using: String.Encoding.utf8)!
-//            let length = Int(CC_SHA256_DIGEST_LENGTH)
-//            var digest = [UInt8](repeating: 0, count: length)
-//            data.withUnsafeBytes {
-//                _ = CC_SHA256($0.baseAddress, CC_LONG(data.count), &digest)
-//            }
-//        let canonicalRequestStringCC = digest.compactMap { String(format: "%02x", $0) }.joined()
         let canonicalRequestData = Data(canonicalRequest.utf8)
         let canonicalRequestDataHashed = SHA256.hash(data: canonicalRequestData)
         let canonicalRequestString = canonicalRequestDataHashed.compactMap { String(format: "%02x", $0) }.joined()
         
-        print("[awsSignature256]   canonicalRequestString: \(canonicalRequestString)")
+//        print("[awsSignature256]   canonicalRequestString: \(canonicalRequestString)")
         
         let scope = "\(date.prefix(8))/\(region)/s3/aws4_request"
         // STRING TO SIGN
@@ -452,7 +445,7 @@ class Jcds2Dp: DistributionPoint {
             \(canonicalRequestString)
             """
 
-        print("\n[awsSignature] stringToSign: \(stringToSign)\n")
+//        print("\n[awsSignature] stringToSign: \(stringToSign)\n")
         
         let hexOfFinalSignature = hmac_sha256(date: "\(date.prefix(8))", secretKey: secretKey, key: key, region: region, stringToSign: stringToSign)
         
@@ -466,6 +459,7 @@ class Jcds2Dp: DistributionPoint {
             return("multipart failed")
         }
         let packageToUpload = fileUrl.lastPathComponent
+        LogManager.shared.logMessage(message: "start uploading \(packageToUpload)", level: .info)
         
         var urlHostAllowedPlus = CharacterSet.urlHostAllowed
         urlHostAllowedPlus.remove(charactersIn: "+")
@@ -480,12 +474,12 @@ class Jcds2Dp: DistributionPoint {
         var contentType     = ""
         var jcdsServerURL   = URL(string: "")
         
-        print("bucket: \(bucket)")
-        print("region: \(region)")
-        print("key: \(key)")
-        print("accessKeyId: \(accessKeyId)")
-        print("secretAccessKey: \(secretAccessKey)")
-        print("sessionToken: \(sessionToken)")
+//        print("bucket: \(bucket)")
+//        print("region: \(region)")
+//        print("key: \(key)")
+//        print("accessKeyId: \(accessKeyId)")
+//        print("secretAccessKey: \(secretAccessKey)")
+//        print("sessionToken: \(sessionToken)")
         
         //                print("[uploadPackages] S3 url: https://\(bucket).s3.amazonaws.com/\(key)")
         jcdsServerURL = ( region == "us-east-1" ) ? URL(string: "https://\(bucket).s3.amazonaws.com/\(key)")!:URL(string: "https://\(bucket).s3-\(region).amazonaws.com/\(key)")!
@@ -594,18 +588,16 @@ class Jcds2Dp: DistributionPoint {
     
     private func multipartUploadController(whichChunk: Int, uploadId: String, fileUrl: URL) async -> Bool {
         
-        var uploadedChunks = 0
-        var failedChunks   = 0
+        var uploadedChunks  = 0
+        var failedChunks    = 0
         var currentSessions = 1
+        Chunk.index         = 1
 
-        var uploading = false
         
-//        let uploadGroup = DispatchGroup()
-//        while (uploadedChunks+failedChunks) < Chunk.numberOf {
         while true {
 //        while Chunk.index <= Chunk.numberOf {
-            // allow up to 3 concurrent uploads
-            if currentSessions < 4 && Chunk.index <= Chunk.numberOf {
+            // allow up to 5 concurrent uploads
+            if currentSessions < 6 && Chunk.index <= Chunk.numberOf {
 //                uploading = true
                 
                 let currentEpoch = Int(Date().timeIntervalSince1970)
@@ -633,8 +625,8 @@ class Jcds2Dp: DistributionPoint {
 //                                currentSessions += 1
                                 print("[multipartUploadController] call for part: \(Chunk.index)")
                                 
-                            let result = await multipartUpload(whichChunk: Chunk.index, uploadId: uploadId, chunk2: Data(), fileUrl: fileUrl)
-//                                multipartUpload(whichChunk: Chunk.index, uploadId: uploadId, chunk2: Data(), fileUrl: fileUrl) {
+                            let result = await multipartUpload(whichChunk: Chunk.index, uploadId: uploadId, fileUrl: fileUrl)
+//                                multipartUpload(whichChunk: Chunk.index, uploadId: uploadId, fileUrl: fileUrl) {
 //                                    result in
                                     currentSessions -= 1
                                     switch result {
@@ -653,7 +645,7 @@ class Jcds2Dp: DistributionPoint {
                                             return(false)
                                         }
                                     }
-                                    uploading = false
+//                                    uploading = false
 //                                }
                                 
                                 print("[multipartUploadController] increase index to: \(Chunk.index+1)")
@@ -668,8 +660,8 @@ class Jcds2Dp: DistributionPoint {
                     currentSessions += 1
                     print("[multipartUploadController] call for part: \(Chunk.index)")
                     
-                    let result = await multipartUpload(whichChunk: Chunk.index, uploadId: uploadId, chunk2: Data(), fileUrl: fileUrl)
-//                    multipartUpload(whichChunk: Chunk.index, uploadId: uploadId, chunk2: Data(), fileUrl: fileUrl) {
+                    let result = await multipartUpload(whichChunk: Chunk.index, uploadId: uploadId, fileUrl: fileUrl)
+//                    multipartUpload(whichChunk: Chunk.index, uploadId: uploadId, fileUrl: fileUrl) {
 //                        result in
                         currentSessions -= 1
                         switch result {
@@ -688,27 +680,24 @@ class Jcds2Dp: DistributionPoint {
                                 return(false)
                             }
                         }
-                        uploading = false
+//                        uploading = false
 //                    }
                     
                     print("[multipartUploadController] increase index to: \(Chunk.index+1)")
                     Chunk.index += 1
                     
                 }
-                
-                
             } else {
                 sleep(1)
             }
         }   // while - end
     }
     
-    //  async -> String
-    private func multipartUpload(whichChunk: Int, uploadId: String, chunk2: Data, fileUrl: URL) async -> (Result<Void, Error>) {
-//    func multipartUpload(whichChunk: Int, uploadId: String, chunk2: Data, fileUrl: URL, completion: @escaping (Result<Void, Error>) -> Void) {
+    private func multipartUpload(whichChunk: Int, uploadId: String, fileUrl: URL) async -> (Result<Void, Error>) {
+//    func multipartUpload(whichChunk: Int, uploadId: String, fileUrl: URL, completion: @escaping (Result<Void, Error>) -> Void) {
+        
         print("[multipartUpload] whichChunk: \(whichChunk)")
            
-        
         let chunk = getChunk(fileUrl: fileUrl, part: whichChunk)
         
         if chunk.count == 0 {
@@ -777,13 +766,6 @@ class Jcds2Dp: DistributionPoint {
         
         var hashOfPayload = ""
         var hashedPayload = ""
-//        do {
-//            hashOfPayload = try fileSha256(forFile: fileUrl)
-//        } catch {
-//            print("\n[uploadPackages] hashOfPayload: failed")
-////            completion("[uploadPackages] hashOfPayload: failed")
-//            return
-//        }
         
         request.addValue("\(currentDate)", forHTTPHeaderField: "Date")
         //                request.addValue(contentType, forHTTPHeaderField: "Content-Type")
@@ -808,8 +790,8 @@ class Jcds2Dp: DistributionPoint {
         //WriteToLog.shared.message(stringOfText: "[multipartUpload] Perform upload task for \(fileUrl.lastPathComponent)")
 //        uploadStartTime = Date()
         do {
-            let (responseData, response) = try await URLSession.shared.upload(for: request, from: chunk)
-//            let (responseData, response) = try await URLSession.shared.data(for: request)
+            let (responseData, response) = try await urlSession.upload(for: request, from: chunk)
+            
             let responseString = String(data: responseData, encoding: .utf8) ?? ""
             
             let httpResponse = response as? HTTPURLResponse
@@ -904,39 +886,25 @@ class Jcds2Dp: DistributionPoint {
         URLCache.shared.removeAllCachedResponses()
         
         //WriteToLog.shared.message(stringOfText: "[completeMultipartUpload] Perform task for \(fileUrl.lastPathComponent)")
-        
+        var responseString = ""
         do {
 //            let (responseData, response) = try await URLSession.shared.upload(for: request, from: chunk)
             let (responseData, response) = try await URLSession.shared.data(for: request)
-            let responseString = String(data: responseData, encoding: .utf8) ?? ""
+            responseString = String(data: responseData, encoding: .utf8) ?? ""
+//            let responseString = String(data: responseData, encoding: .utf8) ?? ""
             
 //                print("[completeMultipartUpload] upload response: \(responseString)")
-                  return(responseString)
+//            return(responseString)
         } catch {
-            return(error.localizedDescription)
+            responseString = error.localizedDescription
+//            return(error.localizedDescription)
         }
+        uploadTime.end = Int(Date().timeIntervalSince1970)
+        LogManager.shared.logMessage(message: "finished uploading \(packageToUpload)", level: .info)
+        LogManager.shared.logMessage(message: "upload of \(packageToUpload) completed in \(uploadTime.total())", level: .info)
         
-        
-        /*
-        let task = session.dataTask(with: request) { (data, response, error) in
-            if let error = error {
-                print("[completeMultipartUpload] Error: \(error)")
-                completion(error.localizedDescription)
-                
-            } else if let data = data {
-                let responseData = String(data: data, encoding: .utf8) ?? ""
-                print("[completeMultipartUpload] upload response: \(responseData)")
-                
-                    completion(responseData)
-            }
-            uploadTime.end = Int(Date().timeIntervalSince1970)
-            print("upload completed in \(uploadTime.end - uploadTime.start) seconds")
-            
-            _ = enableSleep()
-        }
-        task.resume()
-         */
-
+        _ = enableSleep()
+        return(responseString)
     }
     
     private func getChunk(fileUrl: URL, part: Int) -> Data {

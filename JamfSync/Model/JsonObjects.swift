@@ -255,8 +255,25 @@ class UploadTime {
         self.end = end
     }
     
-    func total() -> Int {
-        end - start
+    func total() -> String {
+        let totalSeconds = end - start
+        var totalTime = ""
+        if totalSeconds > 3600 {
+            let hours = totalSeconds / 3600
+            let unit = (hours > 1 ) ? "hours ":"hour "
+            totalTime = "\(hours) \(unit)"
+        }
+        if totalSeconds > 60 {
+            let minutes = (totalSeconds % 3600) / 60
+            let unit = (minutes > 1 ) ? "minutes ":"minute "
+            totalTime = totalTime + "\(minutes) \(unit)"
+        }
+        if totalSeconds > 0 {
+            let seconds = (totalSeconds % 3600) % 60
+            let unit = (seconds > 1 ) ? "seconds":"second"
+            totalTime = totalTime + "\(seconds) \(unit)"
+        }
+        return totalTime
     }
 }
 var uploadTime: UploadTime = UploadTime(start: 0, end: 0)
