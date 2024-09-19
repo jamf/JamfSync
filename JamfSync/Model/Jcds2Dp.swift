@@ -221,7 +221,7 @@ class Jcds2Dp: DistributionPoint {
                 if Chunk.all % Chunk.size > 0 {
                     Chunk.numberOf += 1
                 }
-                print("chunks: \(Chunk.numberOf)")
+                LogManager.shared.logMessage(message: "File will be split into \(Chunk.numberOf) parts.", level: .debug)
                 if uploadFileSize > 32212255000 {
                     LogManager.shared.logMessage(message: "Maximum upload file size (30GB) exceeded. File size: \(Int(uploadFileSize))", level: .info)
                     return
