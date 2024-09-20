@@ -444,48 +444,55 @@ class Jcds2Dp: DistributionPoint {
     
     private func multipartUploadController(whichChunk: Int, uploadId: String, fileUrl: URL) async -> Bool {
         
-        var uploadedChunks  = 0
-        var failedChunks    = 0
-        var currentSessions = 1
-        var expireEpoch     = initiateUploadData?.expiration ?? 0
-        var wasSuccessful   = false
-        Chunk.index         = 1
+        var uploadedChunks   = 0
+        var currentSessions  = 1
+        var expireEpoch      = initiateUploadData?.expiration ?? 0
+        var remainingParts   = Array(1...Chunk.numberOf)
+        var failedParts      = [Int]()
+        var keepLooping      = true
+        var successfullUpload = false
+        Chunk.index          = 0
 
-        while Chunk.index <= Chunk.numberOf {
+        while keepLooping {
                 
-                let currentEpoch = Int(Date().timeIntervalSince1970)
-                let timeLeft = (expireEpoch - currentEpoch)/60
+            Chunk.index = remainingParts.removeFirst()
+            LogManager.shared.logMessage(message: "Call for part: \(Chunk.index)", level: .debug)
             
-                LogManager.shared.logMessage(message: "Upload token time remaining: \(timeLeft) minutes", level: .debug)
-                if timeLeft < 5 {
-                    // place holder for renew upload token
-                    // await something something...
-                    // update initiateUploadData if need be
-                }
-                currentSessions += 1
-                print("[multipartUploadController] call for part: \(Chunk.index)")
-                
-                let result = await multipartUpload(whichChunk: Chunk.index, uploadId: uploadId, fileUrl: fileUrl)
-                    currentSessions -= 1
-                    switch result {
-                    case .success:
-                        uploadedChunks += 1
-                        LogManager.shared.logMessage(message: "Uploaded chunk \(uploadedChunks) of \(Chunk.numberOf)", level: .debug)
-                    case .failure(let error):
-                        failedChunks += 1
-                        LogManager.shared.logMessage(message: "Failed to upload chunk: \(error.localizedDescription)", level: .debug)
-                    }
-                    if uploadedChunks+failedChunks == Chunk.numberOf {
-                        if failedChunks == 0 {
-                            wasSuccessful = true
-                        } else {
-                            LogManager.shared.logMessage(message: "\(failedChunks) parts failed to upload", level: .debug)
-                        }
-                    }
-                
-                Chunk.index += 1
+            let currentEpoch = Int(Date().timeIntervalSince1970)
+            let timeLeft = (expireEpoch - currentEpoch)/60
+        
+            LogManager.shared.logMessage(message: "Upload token time remaining: \(timeLeft) minutes", level: .debug)
+            if timeLeft < 5 {
+                // place holder for renew upload token
+                // await something something...
+                // update initiateUploadData if need be
             }
-        return(wasSuccessful)
+            currentSessions += 1
+            print("[multipartUploadController] call for part: \(Chunk.index)")
+            
+            let result = await multipartUpload(whichChunk: Chunk.index, uploadId: uploadId, fileUrl: fileUrl)
+                currentSessions -= 1
+                switch result {
+                case .success:
+                    uploadedChunks += 1
+                    failedParts.removeAll(where: { $0 == Chunk.index })
+                    LogManager.shared.logMessage(message: "Uploaded chunk \(Chunk.index), \(Chunk.numberOf - uploadedChunks) remaining", level: .debug)
+                case .failure(let error):
+                    if (failedParts.firstIndex(where: { $0 == Chunk.index }) != nil) {
+                        LogManager.shared.logMessage(message: "Part \(Chunk.index) has previously failed, aborting upload.", level: .debug)
+                        keepLooping = false
+                    } else {
+                        remainingParts.append(Chunk.index)
+                        failedParts.append(Chunk.index)
+                        LogManager.shared.logMessage(message: "**** Failed to upload chunk \(Chunk.index): \(error.localizedDescription)", level: .debug)
+                    }
+                }
+                if uploadedChunks == Chunk.numberOf {
+                    successfullUpload = true
+                    keepLooping = false
+                }
+            }
+        return(successfullUpload)
     }
     
     private func multipartUpload(whichChunk: Int, uploadId: String, fileUrl: URL) async -> (Result<Void, Error>) {
