@@ -260,17 +260,17 @@ class UploadTime {
         var totalTime = ""
         if totalSeconds > 3600 {
             let hours = totalSeconds / 3600
-            let unit = (hours > 1 ) ? "hours ":"hour "
+            let unit = (hours == 1 ) ? "hour ":"hours "
             totalTime = "\(hours) \(unit)"
         }
         if totalSeconds > 60 {
             let minutes = (totalSeconds % 3600) / 60
-            let unit = (minutes > 1 ) ? "minutes ":"minute "
+            let unit = (minutes == 1 ) ? "minute ":"minutes "
             totalTime = totalTime + "\(minutes) \(unit)"
         }
         if totalSeconds > 0 {
             let seconds = (totalSeconds % 3600) % 60
-            let unit = (seconds > 1 ) ? "seconds":"second"
+            let unit = (seconds == 1 ) ? "second":"seconds"
             totalTime = totalTime + "\(seconds) \(unit)"
         }
         return totalTime
