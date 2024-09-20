@@ -1,8 +1,7 @@
 //
-//  Awake.swift
+//  Copyright 2024, Jamf
 //
-//  Copyright 2024 jamf. All rights reserved.
-//
+
 
 import Foundation
 import IOKit.pwr_mgt
@@ -38,7 +37,6 @@ public func enableIdleDisk() -> Bool {
     if noDiskIdleReturn != nil {
         _ = IOPMAssertionRelease(noDiskIdleAssertionID) == kIOReturnSuccess
         noDiskIdleReturn = nil
-        //WriteToLog.shared.message(stringOfText: "allow external disk(s) to become idle")
         return true
     }
     return false
