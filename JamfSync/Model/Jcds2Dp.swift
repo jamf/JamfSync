@@ -444,59 +444,132 @@ class Jcds2Dp: DistributionPoint {
     
     private func multipartUploadController(whichChunk: Int, uploadId: String, fileUrl: URL) async -> Bool {
         
-        var uploadedChunks  = 0
-        var failedChunks    = 0
-        var currentSessions = 1
-        var expireEpoch     = initiateUploadData?.expiration ?? 0
-        var wasSuccessful   = false
-        Chunk.index         = 1
+        var uploadedChunks   = 0
+        var failedChunks     = 0
+        var currentSessions  = 1
+        var expireEpoch      = initiateUploadData?.expiration ?? 0
+        var remainingParts   = Array(1...Chunk.numberOf)
+        var keepLooping      = true
+        var successfulUpload = false
+        Chunk.index          = 0
 
-        while Chunk.index <= Chunk.numberOf {
-                
-                let currentEpoch = Int(Date().timeIntervalSince1970)
-                let timeLeft = (expireEpoch - currentEpoch)/60
-            
-                LogManager.shared.logMessage(message: "Upload token time remaining: \(timeLeft) minutes", level: .debug)
-                if timeLeft < 5 {
-                    // place holder for renew upload token
-                    // await something something...
-                    // update initiateUploadData if need be
-                }
-                currentSessions += 1
-                print("[multipartUploadController] call for part: \(Chunk.index)")
-                
-                let result = await multipartUpload(whichChunk: Chunk.index, uploadId: uploadId, fileUrl: fileUrl)
-                    currentSessions -= 1
-                    switch result {
-                    case .success:
-                        uploadedChunks += 1
-                        LogManager.shared.logMessage(message: "Uploaded chunk \(uploadedChunks) of \(Chunk.numberOf)", level: .debug)
-                    case .failure(let error):
-                        failedChunks += 1
-                        LogManager.shared.logMessage(message: "Failed to upload chunk: \(error.localizedDescription)", level: .debug)
-                    }
-                    if uploadedChunks+failedChunks == Chunk.numberOf {
-                        if failedChunks == 0 {
-                            wasSuccessful = true
+//        while uploadedChunks+failedChunks < Chunk.numberOf {
+        while keepLooping {
+                        // allow up to 5 concurrent uploads
+                        if currentSessions < 6 && Chunk.index < Chunk.numberOf {
+                            Chunk.index = remainingParts.removeFirst()
+                            
+                            let currentEpoch = Int(Date().timeIntervalSince1970)
+                            let expireEpoch = initiateUploadData?.expiration ?? 0 //s3Info["expiration"] as? Int ?? 0
+                            let timeLeft = (expireEpoch - currentEpoch)/60
+
+                            print("[multipartUploadController] timeLeft: \(timeLeft) minutes")
+                            if timeLeft < 5 {
+                                //  place holser for renew upload token
+                                currentSessions += 1
+                                // get bearer token to refresh upload token
+            //                    TokenDelegate.shared.getToken(whichServer: "source", base64creds: JamfProServer.base64Creds["source"] ?? "") { [self]
+            //                        authResult in
+            //                        let (statusCode,theResult) = authResult
+                                    let theResult = "success"
+            //                        print("[multipartUploadController] refresh getToken result: \(authResult)")
+                                    
+                                    if theResult == "success" {
+                                        // refresh upload token
+
+                                            multipartUpload(whichChunk: Chunk.index, uploadId: uploadId, chunk2: Data(), fileUrl: fileUrl) {
+                                                result in
+                                                currentSessions -= 1
+                                                switch result {
+                                                case .success:
+                                                    uploadedChunks += 1
+                                                    print("Uploaded chunk \(uploadedChunks) of \(Chunk.numberOf)")
+                                                case .failure(let error):
+                                                    failedChunks += 1
+                                                    remainingParts.append(Chunk.index)
+                                                    print("**** Failed to upload chunk \(Chunk.index): \(error.localizedDescription)")
+                                                }
+                                                if uploadedChunks+failedChunks == Chunk.numberOf {
+                                                    if failedChunks == 0 {
+            //                                            completion(.success(()))
+            //                                            return  //(.success(()))
+            //                                            return(true)
+                                                        successfulUpload = true
+                                                    } else {
+                                                        print("\(failedChunks) parts failed to upload")
+            //                                            completion(.failure(()))
+            //                                            return  //(.success(()))
+            //                                            return(false)
+                                                    }
+                                                    keepLooping = false
+                                                }
+            //                                    uploading = false
+                                            }
+                                            
+                                            print("[multipartUploadController] increase index to: \(Chunk.index+1)")
+//                                            Chunk.index += 1
+                                        }
+            //                        } else {
+            //
+            //                        }
+            //                    }
+                            } else {
+                                
+                                currentSessions += 1
+                                print("[multipartUploadController] call for part: \(Chunk.index)")
+                                
+                                multipartUpload(whichChunk: Chunk.index, uploadId: uploadId, chunk2: Data(), fileUrl: fileUrl) {
+                                    result in
+                                    currentSessions -= 1
+                                    switch result {
+                                    case .success:
+                                        uploadedChunks += 1
+                                        print("Uploaded chunk \(uploadedChunks) of \(Chunk.numberOf)")
+                                    case .failure(let error):
+                                        failedChunks += 1
+                                        remainingParts.append(Chunk.index)
+                                        print("**** Failed to upload chunk \(Chunk.index): \(error.localizedDescription)")
+                                    }
+                                    if uploadedChunks+failedChunks == Chunk.numberOf {
+                                        if failedChunks == 0 {
+            //                                return(true)
+                                            successfulUpload = true
+                                        } else {
+                                            print("\(failedChunks) parts failed to upload")
+            //                                return(false)
+                                        }
+                                        keepLooping = false
+                                    }
+                                    print("uploadedChunks: \(uploadedChunks)")
+                                    print("failedChunks: \(failedChunks)")
+                                    print("total chunks: \(Chunk.numberOf)")
+                                    print("keepLooping: \(keepLooping)")
+            //                        uploading = false
+                                }
+                                
+                                print("[multipartUploadController] increase index to: \(Chunk.index+1)")
+//                                Chunk.index += 1
+                                
+                            }
+                            
+                            
                         } else {
-                            LogManager.shared.logMessage(message: "\(failedChunks) parts failed to upload", level: .debug)
+                            sleep(1)
                         }
                     }
-                
-                Chunk.index += 1
-            }
-        return(wasSuccessful)
+        print("successfulUpload: \(successfulUpload)")
+        return(successfulUpload)
     }
     
-    private func multipartUpload(whichChunk: Int, uploadId: String, fileUrl: URL) async -> (Result<Void, Error>) {
-        
-        LogManager.shared.logMessage(message: "Start processing part \(whichChunk)", level: .debug)
+    private func multipartUpload(whichChunk: Int, uploadId: String, chunk2: Data, fileUrl: URL, completion: @escaping (Result<Void, Error>) -> Void) {
+
+        print("[multipartUpload] whichChunk: \(whichChunk)")
            
         let chunk = getChunk(fileUrl: fileUrl, part: whichChunk)
         
         if chunk.count == 0 {
-            return(.success(()))
-            
+            completion(.success(()))
+            return
         }
         let partNumber      = whichChunk
         let packageToUpload = fileUrl.lastPathComponent
@@ -511,13 +584,34 @@ class Jcds2Dp: DistributionPoint {
         let accessKeyId     = initiateUploadData?.accessKeyID ?? ""
         let secretAccessKey = initiateUploadData?.secretAccessKey ?? ""
         let sessionToken    = initiateUploadData?.sessionToken ?? ""
-        let jcdsServerURL   = ( region == "us-east-1" ) ? URL(string: "https://\(bucket).s3.amazonaws.com/\(key)?partNumber=\(partNumber)&uploadId=\(uploadId)")!:URL(string: "https://\(bucket).s3-\(region).amazonaws.com/\(key)?partNumber=\(partNumber)&uploadId=\(uploadId)")!
+//        var contentType     = ""
+        var jcdsServerURL   = URL(string: "")
+        
+        //                print("[uploadPackages] S3 url: https://\(bucket).s3.amazonaws.com/\(key)")
+        jcdsServerURL = ( region == "us-east-1" ) ? URL(string: "https://\(bucket).s3.amazonaws.com/\(key)?partNumber=\(partNumber)&uploadId=\(uploadId)")!:URL(string: "https://\(bucket).s3-\(region).amazonaws.com/\(key)?partNumber=\(partNumber)&uploadId=\(uploadId)")!
+        
+//        let fileType = fileUrl.pathExtension
+//        switch fileType {
+//        case "pkg":
+//            //WriteToLog.shared.message(stringOfText: "[uploadPackages] Content-Type: application/x-newton-compatible-pkg")
+//            contentType = "application/x-newton-compatible-pkg"
+//        case "dmg":
+//            //WriteToLog.shared.message(stringOfText: "[uploadPackages] Content-Type: application/octet-stream")
+//            contentType = "application/octet-stream"
+//        case "zip":
+//            //WriteToLog.shared.message(stringOfText: "[uploadPackages] Content-Type: application/zip")
+//            contentType = "application/zip"     // or application/x-zip-compressed?
+//        default:
+//            //WriteToLog.shared.message(stringOfText: "[uploadPackages] Content-Type: unsupported (\(fileType))")
+//            contentType = ""
+//        }
         
         let currentDate = Date()
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyyMMdd'T'HHmmss'Z'"
         dateFormatter.timeZone = TimeZone(identifier: "UTC")
         let dateString = dateFormatter.string(from: currentDate)
+        
         
         var urlSession: URLSession = {
             let configuration = URLSessionConfiguration.ephemeral
@@ -530,7 +624,7 @@ class Jcds2Dp: DistributionPoint {
             return URLSession(configuration: configuration)
         }()
         
-        var request = URLRequest(url: jcdsServerURL,
+        var request = URLRequest(url: jcdsServerURL!,
                                  cachePolicy: .reloadIgnoringLocalCacheData,
                                  timeoutInterval: 3600)
         
@@ -548,24 +642,27 @@ class Jcds2Dp: DistributionPoint {
         var signatureProvided = "\(awsSignature256(for: sessionToken, httpMethod: request.httpMethod!, date: dateString, accessKeyId: accessKeyId, secretKey: secretAccessKey, bucket: bucket, key: key, queryParameters: "partNumber=\(partNumber)&uploadId=\(uploadId)", region: region, fileUrl: fileUrl, hashedPayload: hashedPayload, contentType: contentType(filename: packageToUpload) ?? "", currentDate: "\(currentDate)"))"
         
         request.addValue("AWS4-HMAC-SHA256 Credential=\(accessKeyId)/\(dateString.prefix(8))/\(region)/s3/aws4_request,SignedHeaders=date;host;x-amz-content-sha256;x-amz-date;x-amz-security-token,Signature=\(signatureProvided)", forHTTPHeaderField: "Authorization")
-        
+
         URLCache.shared.removeAllCachedResponses()
         
-        do {
-            let (responseData, response) = try await urlSession.upload(for: request, from: chunk)
-            
-            let responseString = String(data: responseData, encoding: .utf8) ?? ""
-            
+        let task = URLSession.shared.uploadTask(with: request, from: chunk) { data, response, error in
+//        let task = session.dataTask(with: request) { data, response, error in
+            URLSession.shared.finishTasksAndInvalidate()
+
+
             let httpResponse = response as? HTTPURLResponse
             let allHeaders = httpResponse?.allHeaderFields
             
             print("[multipartUpload] partNumber: \(partNumber) - Etag: \(allHeaders?["Etag"] ?? "")")
             partNumberEtagList.append(CompleteMultipart(partNumber: partNumber, eTag: "\(allHeaders?["Etag"] ?? "")"))
 
-            return(.success(()))
-        } catch {
-            return(.failure(error))
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(()))
+            }
         }
+        task.resume()
     }
     
     private func completeMultipartUpload(fileUrl: URL, completeMultipartUploadXml: String, uploadId: String) async -> String {
