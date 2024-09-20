@@ -450,7 +450,7 @@ class Jcds2Dp: DistributionPoint {
         var remainingParts   = Array(1...Chunk.numberOf)
         var failedParts      = [Int]()
         var keepLooping      = true
-        var successfulUpload = false
+        var successfullUpload = false
         Chunk.index          = 0
 
         while keepLooping {
@@ -496,7 +496,7 @@ class Jcds2Dp: DistributionPoint {
                                 }
                             }
                             if uploadedChunks == Chunk.numberOf {
-                                successfulUpload = true
+                                successfullUpload = true
                                 keepLooping = false
                             }
                         }
@@ -523,7 +523,7 @@ class Jcds2Dp: DistributionPoint {
                             }
                         }
                         if uploadedChunks == Chunk.numberOf {
-                            successfulUpload = true
+                            successfullUpload = true
                             keepLooping = false
                         }
                     }
@@ -532,7 +532,7 @@ class Jcds2Dp: DistributionPoint {
                 sleep(1)
             }
         }
-        return(successfulUpload)
+        return(successfullUpload)
     }
     
     private func multipartUpload(whichChunk: Int, uploadId: String, chunk2: Data, fileUrl: URL, completion: @escaping (Result<Void, Error>) -> Void) {
