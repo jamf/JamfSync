@@ -210,21 +210,20 @@ class Jcds2Dp: DistributionPoint {
         
         guard let fileUrl else { throw DistributionPointError.badFileUrl }
         
-        
         _ = disableSleep(reason: "start upload")
 
         if let fileProperties = try? FileManager.default.attributesOfItem(atPath: fileUrl.path(percentEncoded: false)) {
             if let size = fileProperties[FileAttributeKey.size] as? NSNumber {
                 let uploadFileSize = size.doubleValue
-                Chunk.all = Int(truncating: size)
-                Chunk.numberOf = Int(uploadFileSize)/Chunk.size
-                if Chunk.all % Chunk.size > 0 {
-                    Chunk.numberOf += 1
-                }
                 LogManager.shared.logMessage(message: "File will be split into \(Chunk.numberOf) parts.", level: .debug)
                 if uploadFileSize > 32212255000 {
                     LogManager.shared.logMessage(message: "Maximum upload file size (30GB) exceeded. File size: \(Int(uploadFileSize))", level: .info)
                     return
+                }
+                Chunk.all = Int(truncating: size)
+                Chunk.numberOf = Int(uploadFileSize)/Chunk.size
+                if Chunk.all % Chunk.size > 0 {
+                    Chunk.numberOf += 1
                 }
             }
         } else {
@@ -254,44 +253,12 @@ class Jcds2Dp: DistributionPoint {
                     \(completionArray)</CompleteMultipartUpload>
                     """
 //
-                    let responseString = await completeMultipartUpload(fileUrl: fileUrl, completeMultipartUploadXml: completionXml, uploadId: uploadId)
+                let responseString = await completeMultipartUpload(fileUrl: fileUrl, completeMultipartUploadXml: completionXml, uploadId: uploadId)
                 LogManager.shared.logMessage(message: "Join parts response: \(responseString)", level: .debug)
             } else {
                 LogManager.shared.logMessage(message: "Failed to start uploading", level: .debug)
             }
             _ = enableSleep()
-    }
-    
-    private func splitFile(fileUrl: URL) -> Bool {
-        // writes parts to files
-        print("split file")
-        let data = FileManager.default.contents(atPath: fileUrl.path(percentEncoded: false)) ?? Data()
-        var startIndex = 0
-        var part       = 1
-        let totalSize = data.count
-
-        var url: URL?
-        while startIndex < totalSize {
-            print("[chunkData] startIndex: \(startIndex)")
-            let endIndex = min(startIndex + Chunk.size, totalSize)
-            let chunk = data.subdata(in: startIndex..<endIndex)
-            
-            let filename = fileUrl.lastPathComponent
-            url = URL(filePath: "/tmp/\(filename).part\(part)")
-            
-            do {
-                try chunk.write(to: url!, options: [.atomic, .completeFileProtection])
-            } catch {
-                print(error.localizedDescription)
-                return false
-            }
-            part+=1
-            
-            print("chunk \((startIndex/Chunk.size)+1) size: \(chunk.count)")
-            startIndex += Chunk.size
-                
-        }
-        return true
     }
     
     private func hmac_sha256(date: String, secretKey: String, key: String, region: String, stringToSign: String) -> String {
@@ -376,9 +343,6 @@ class Jcds2Dp: DistributionPoint {
     
     private func createMultipartUpload(fileUrl: URL) async -> String {
         
-        if !splitFile(fileUrl: fileUrl) {
-            return("multipart failed")
-        }
         let packageToUpload = fileUrl.lastPathComponent
         LogManager.shared.logMessage(message: "Start uploading \(packageToUpload)", level: .info)
         
