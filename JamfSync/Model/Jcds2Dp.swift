@@ -262,38 +262,6 @@ class Jcds2Dp: DistributionPoint {
             _ = enableSleep()
     }
     
-    private func splitFile(fileUrl: URL) -> Bool {
-        // writes parts to files
-        print("split file")
-        let data = FileManager.default.contents(atPath: fileUrl.path(percentEncoded: false)) ?? Data()
-        var startIndex = 0
-        var part       = 1
-        let totalSize = data.count
-
-        var url: URL?
-        while startIndex < totalSize {
-            print("[chunkData] startIndex: \(startIndex)")
-            let endIndex = min(startIndex + Chunk.size, totalSize)
-            let chunk = data.subdata(in: startIndex..<endIndex)
-            
-            let filename = fileUrl.lastPathComponent
-            url = URL(filePath: "/tmp/\(filename).part\(part)")
-            
-            do {
-                try chunk.write(to: url!, options: [.atomic, .completeFileProtection])
-            } catch {
-                print(error.localizedDescription)
-                return false
-            }
-            part+=1
-            
-            print("chunk \((startIndex/Chunk.size)+1) size: \(chunk.count)")
-            startIndex += Chunk.size
-                
-        }
-        return true
-    }
-    
     private func hmac_sha256(date: String, secretKey: String, key: String, region: String, stringToSign: String) -> String {
         let aws4SecretKey = Data("AWS4\(secretKey)".utf8)
         let dateStampData = Data(date.utf8)
@@ -376,9 +344,6 @@ class Jcds2Dp: DistributionPoint {
     
     private func createMultipartUpload(fileUrl: URL) async -> String {
         
-        if !splitFile(fileUrl: fileUrl) {
-            return("multipart failed")
-        }
         let packageToUpload = fileUrl.lastPathComponent
         LogManager.shared.logMessage(message: "Start uploading \(packageToUpload)", level: .info)
         
