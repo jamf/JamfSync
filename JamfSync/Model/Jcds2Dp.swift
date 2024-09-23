@@ -224,7 +224,7 @@ class Jcds2Dp: DistributionPoint {
                 LogManager.shared.logMessage(message: "Successfully uploaded \(file.name)", level: .verbose)
             default:
                 let message = parseErrorData(data: responseData)
-                throw ServerCommunicationError.dataRequestFailed(statusCode: httpResponse.statusCode, message: message)
+                throw ServerCommunicationError.uploadFailed(statusCode: httpResponse.statusCode, message: message)
             }
         }
     }

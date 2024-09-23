@@ -989,7 +989,7 @@
 /* Begin XCRemoteSwiftPackageReference section */
 		84CD1BAA2BBAF573008F0DF3 /* XCRemoteSwiftPackageReference "Subprocess" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/jamf/Subprocess";
+			repositoryURL = "https://github.com/jamf/Subprocess.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 3.0.2;
