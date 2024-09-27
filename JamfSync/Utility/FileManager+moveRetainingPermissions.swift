@@ -6,6 +6,7 @@ import Foundation
 
 extension FileManager {
     func moveRetainingDestinationPermisssions(at srcURL: URL, to dstURL: URL) throws {
+        LogManager.shared.logMessage(message: "Moving file from \(srcURL) to \(dstURL) while retaining permissions", level: .debug)
         try "Placeholder file with permissions of containing directory".write(to: dstURL, atomically: false, encoding: .utf8)
         do {
             if let result = try self.replaceItemAt(dstURL, withItemAt: srcURL), result.path() != dstURL.path() {
@@ -14,6 +15,7 @@ extension FileManager {
             }
         } catch {
             // The above only works when it is a local folder and not a file share. So just copy the file in that case.
+            LogManager.shared.logMessage(message: "Failed to replace the temporary file when moving \(srcURL) to \(dstURL) while retaining permissions. Just copying it without permissions now.", level: .debug)
             try? self.removeItem(at: dstURL)
             try self.copyItem(at: srcURL, to: dstURL)
         }

@@ -13,7 +13,8 @@ class Jcds2Dp: DistributionPoint {
     var urlSession: URLSession?
     var downloadTask: URLSessionDownloadTask?
     var dispatchGroup: DispatchGroup?
-    
+    var keepAwake = KeepAwake()
+
     // for aws uri encoding - BIG-RAT
     var myCharacterSet = CharacterSet()
 
@@ -200,7 +201,7 @@ class Jcds2Dp: DistributionPoint {
     }
 
     private func uploadToCloud(file: DpFile, moveFrom: URL?, progress: SynchronizationProgress) async throws {
-        guard let initiateUploadData, let bucketName = initiateUploadData.bucketName else { throw DistributionPointError.failedToInitiateCloudUpload }
+        guard initiateUploadData != nil else { throw DistributionPointError.failedToInitiateCloudUpload }
         var fileUrl: URL?
         if let moveFrom {
             fileUrl = moveFrom
@@ -210,8 +211,7 @@ class Jcds2Dp: DistributionPoint {
         
         guard let fileUrl else { throw DistributionPointError.badFileUrl }
         
-        
-        _ = disableSleep(reason: "start upload")
+        keepAwake.disableSleep(reason: "Starting upload")
 
         if let fileProperties = try? FileManager.default.attributesOfItem(atPath: fileUrl.path(percentEncoded: false)) {
             if let size = fileProperties[FileAttributeKey.size] as? NSNumber {
@@ -233,33 +233,34 @@ class Jcds2Dp: DistributionPoint {
         
         let uploadId = await createMultipartUpload(fileUrl: fileUrl)
         
-            partNumberEtagList.removeAll()
-            let result = await multipartUploadController(whichChunk: 1, uploadId: uploadId, fileUrl: fileUrl)
-            var completionArray = ""
-            if result {
-                LogManager.shared.logMessage(message: "All chunks uploaded successfully", level: .debug)
-                
-                for thePart in partNumberEtagList.sorted(by: {$0.partNumber < $1.partNumber}) {
-                    let currentPart = """
-                            <Part>
-                                <PartNumber>\(thePart.partNumber)</PartNumber>
-                                <ETag>\(thePart.eTag)</ETag>
-                            </Part>
-                        
-                        """
-                    completionArray.append(currentPart)
-                }
-                let completionXml = """
-                    <CompleteMultipartUpload>
-                    \(completionArray)</CompleteMultipartUpload>
+        partNumberEtagList.removeAll()
+        let result = await multipartUploadController(whichChunk: 1, uploadId: uploadId, fileUrl: fileUrl)
+        var completionArray = ""
+        if result {
+            LogManager.shared.logMessage(message: "All chunks uploaded successfully", level: .debug)
+
+            for thePart in partNumberEtagList.sorted(by: {$0.partNumber < $1.partNumber}) {
+                let currentPart = """
+                        <Part>
+                            <PartNumber>\(thePart.partNumber)</PartNumber>
+                            <ETag>\(thePart.eTag)</ETag>
+                        </Part>
+                    
                     """
-//
-                    let responseString = await completeMultipartUpload(fileUrl: fileUrl, completeMultipartUploadXml: completionXml, uploadId: uploadId)
-                LogManager.shared.logMessage(message: "Join parts response: \(responseString)", level: .debug)
-            } else {
-                LogManager.shared.logMessage(message: "Failed to start uploading", level: .debug)
+                completionArray.append(currentPart)
             }
-            _ = enableSleep()
+            let completionXml = """
+                <CompleteMultipartUpload>
+                \(completionArray)</CompleteMultipartUpload>
+                """
+//
+                let responseString = await completeMultipartUpload(fileUrl: fileUrl, completeMultipartUploadXml: completionXml, uploadId: uploadId)
+            LogManager.shared.logMessage(message: "Join parts response: \(responseString)", level: .debug)
+        } else {
+            LogManager.shared.logMessage(message: "Failed to start uploading", level: .debug)
+        }
+
+        keepAwake.enableSleep()
     }
     
     private func hmac_sha256(date: String, secretKey: String, key: String, region: String, stringToSign: String) -> String {
@@ -290,7 +291,7 @@ class Jcds2Dp: DistributionPoint {
         
     }
     
-    private func awsSignature256(for resource: String, httpMethod: String, date: String, accessKeyId: String, secretKey: String, bucket: String, key: String, queryParameters: String = "", region: String, fileUrl: URL, hashedPayload: String, contentType: String, currentDate: String) -> String {
+    private func awsSignature256(for resource: String, httpMethod: String, date: String, accessKeyId: String, secretKey: String, bucket: String, key: String, queryParameters: String = "", region: String, fileUrl: URL, contentType: String, currentDate: String) -> String {
         
         var requestHeaders = [String:String]()
         requestHeaders["date"] = currentDate
@@ -343,7 +344,6 @@ class Jcds2Dp: DistributionPoint {
     }
     
     private func createMultipartUpload(fileUrl: URL) async -> String {
-        
         let packageToUpload = fileUrl.lastPathComponent
         LogManager.shared.logMessage(message: "Start uploading \(packageToUpload)", level: .info)
         
@@ -376,7 +376,7 @@ class Jcds2Dp: DistributionPoint {
         request.addValue(sessionToken, forHTTPHeaderField: "x-amz-security-token")
         
         request.httpMethod = "POST"
-        let signatureProvided = "\(awsSignature256(for: sessionToken, httpMethod: request.httpMethod!, date: dateString, accessKeyId: accessKeyId, secretKey: secretAccessKey, bucket: bucket, key: key, queryParameters: "uploads=", region: region, fileUrl: fileUrl, hashedPayload: "", contentType: contentType, currentDate: "\(currentDate)"))"
+        let signatureProvided = "\(awsSignature256(for: sessionToken, httpMethod: request.httpMethod!, date: dateString, accessKeyId: accessKeyId, secretKey: secretAccessKey, bucket: bucket, key: key, queryParameters: "uploads=", region: region, fileUrl: fileUrl, contentType: contentType, currentDate: "\(currentDate)"))"
         
         request.addValue("AWS4-HMAC-SHA256 Credential=\(accessKeyId)/\(dateString.prefix(8))/\(region)/s3/aws4_request,SignedHeaders=date;host;x-amz-content-sha256;x-amz-date;x-amz-security-token,Signature=\(signatureProvided)", forHTTPHeaderField: "Authorization")
         
@@ -408,10 +408,9 @@ class Jcds2Dp: DistributionPoint {
     }
     
     private func multipartUploadController(whichChunk: Int, uploadId: String, fileUrl: URL) async -> Bool {
-        
         var uploadedChunks   = 0
         var currentSessions  = 1
-        var expireEpoch      = initiateUploadData?.expiration ?? 0
+        let expireEpoch      = initiateUploadData?.expiration ?? 0
         var remainingParts   = Array(1...Chunk.numberOf)
         var failedParts      = [Int]()
         var keepLooping      = true
@@ -419,13 +418,12 @@ class Jcds2Dp: DistributionPoint {
         Chunk.index          = 0
 
         while keepLooping {
-                
             Chunk.index = remainingParts.removeFirst()
             LogManager.shared.logMessage(message: "Call for part: \(Chunk.index)", level: .debug)
-            
+
             let currentEpoch = Int(Date().timeIntervalSince1970)
             let timeLeft = (expireEpoch - currentEpoch)/60
-        
+
             LogManager.shared.logMessage(message: "Upload token time remaining: \(timeLeft) minutes", level: .debug)
             if timeLeft < 5 {
                 // place holder for renew upload token
@@ -434,29 +432,29 @@ class Jcds2Dp: DistributionPoint {
             }
             currentSessions += 1
             print("[multipartUploadController] call for part: \(Chunk.index)")
-            
+
             let result = await multipartUpload(whichChunk: Chunk.index, uploadId: uploadId, fileUrl: fileUrl)
-                currentSessions -= 1
-                switch result {
-                case .success:
-                    uploadedChunks += 1
-                    failedParts.removeAll(where: { $0 == Chunk.index })
-                    LogManager.shared.logMessage(message: "Uploaded chunk \(Chunk.index), \(Chunk.numberOf - uploadedChunks) remaining", level: .debug)
-                case .failure(let error):
-                    if (failedParts.firstIndex(where: { $0 == Chunk.index }) != nil) {
-                        LogManager.shared.logMessage(message: "Part \(Chunk.index) has previously failed, aborting upload.", level: .debug)
-                        keepLooping = false
-                    } else {
-                        remainingParts.append(Chunk.index)
-                        failedParts.append(Chunk.index)
-                        LogManager.shared.logMessage(message: "**** Failed to upload chunk \(Chunk.index): \(error.localizedDescription)", level: .debug)
-                    }
-                }
-                if uploadedChunks == Chunk.numberOf {
-                    successfullUpload = true
+            currentSessions -= 1
+            switch result {
+            case .success:
+                uploadedChunks += 1
+                failedParts.removeAll(where: { $0 == Chunk.index })
+                LogManager.shared.logMessage(message: "Uploaded chunk \(Chunk.index), \(Chunk.numberOf - uploadedChunks) remaining", level: .debug)
+            case .failure(let error):
+                if (failedParts.firstIndex(where: { $0 == Chunk.index }) != nil) {
+                    LogManager.shared.logMessage(message: "Part \(Chunk.index) has previously failed, aborting upload.", level: .debug)
                     keepLooping = false
+                } else {
+                    remainingParts.append(Chunk.index)
+                    failedParts.append(Chunk.index)
+                    LogManager.shared.logMessage(message: "**** Failed to upload chunk \(Chunk.index): \(error.localizedDescription)", level: .debug)
                 }
             }
+            if uploadedChunks == Chunk.numberOf {
+                successfullUpload = true
+                keepLooping = false
+            }
+        }
         return(successfullUpload)
     }
     
@@ -491,7 +489,7 @@ class Jcds2Dp: DistributionPoint {
         dateFormatter.timeZone = TimeZone(identifier: "UTC")
         let dateString = dateFormatter.string(from: currentDate)
         
-        var urlSession: URLSession = {
+        let urlSession: URLSession = {
             let configuration = URLSessionConfiguration.ephemeral
             configuration.httpShouldSetCookies = true
             configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -506,9 +504,6 @@ class Jcds2Dp: DistributionPoint {
                                  cachePolicy: .reloadIgnoringLocalCacheData,
                                  timeoutInterval: 3600)
         
-        var hashOfPayload = ""
-        var hashedPayload = ""
-        
         request.addValue("\(currentDate)", forHTTPHeaderField: "Date")
         request.addValue("\(bucket).s3.amazonaws.com", forHTTPHeaderField: "Host")
         request.addValue("UNSIGNED-PAYLOAD", forHTTPHeaderField: "x-amz-content-sha256")
@@ -517,7 +512,7 @@ class Jcds2Dp: DistributionPoint {
         
         request.httpMethod = "PUT"
         
-        var signatureProvided = "\(awsSignature256(for: sessionToken, httpMethod: request.httpMethod!, date: dateString, accessKeyId: accessKeyId, secretKey: secretAccessKey, bucket: bucket, key: key, queryParameters: "partNumber=\(partNumber)&uploadId=\(uploadId)", region: region, fileUrl: fileUrl, hashedPayload: hashedPayload, contentType: contentType(filename: packageToUpload) ?? "", currentDate: "\(currentDate)"))"
+        let signatureProvided = "\(awsSignature256(for: sessionToken, httpMethod: request.httpMethod!, date: dateString, accessKeyId: accessKeyId, secretKey: secretAccessKey, bucket: bucket, key: key, queryParameters: "partNumber=\(partNumber)&uploadId=\(uploadId)", region: region, fileUrl: fileUrl, contentType: contentType(filename: packageToUpload) ?? "", currentDate: "\(currentDate)"))"
         
         request.addValue("AWS4-HMAC-SHA256 Credential=\(accessKeyId)/\(dateString.prefix(8))/\(region)/s3/aws4_request,SignedHeaders=date;host;x-amz-content-sha256;x-amz-date;x-amz-security-token,Signature=\(signatureProvided)", forHTTPHeaderField: "Authorization")
         
@@ -554,7 +549,7 @@ class Jcds2Dp: DistributionPoint {
         let accessKeyId     = initiateUploadData?.accessKeyID ?? ""
         let secretAccessKey = initiateUploadData?.secretAccessKey ?? ""
         let sessionToken    = initiateUploadData?.sessionToken ?? ""
-        var contentType     = ""
+        let contentType     = ""
         let jcdsServerURL   = ( region == "us-east-1" ) ? URL(string: "https://\(bucket).s3.amazonaws.com/\(key)" + "?uploadId=\(uploadId)")!:URL(string: "https://\(bucket).s3-\(region).amazonaws.com/\(key)" + "?uploadId=\(uploadId)")!
         
         let currentDate = Date()
@@ -575,7 +570,7 @@ class Jcds2Dp: DistributionPoint {
         request.addValue(sessionToken, forHTTPHeaderField: "x-amz-security-token")
         
         request.httpMethod = "POST"
-        let signatureProvided = "\(awsSignature256(for: sessionToken, httpMethod: request.httpMethod!, date: dateString, accessKeyId: accessKeyId, secretKey: secretAccessKey, bucket: bucket, key: key, queryParameters: "uploadId=\(uploadId)", region: region, fileUrl: fileUrl, hashedPayload: "", contentType: contentType, currentDate: "\(currentDate)"))"
+        let signatureProvided = "\(awsSignature256(for: sessionToken, httpMethod: request.httpMethod!, date: dateString, accessKeyId: accessKeyId, secretKey: secretAccessKey, bucket: bucket, key: key, queryParameters: "uploadId=\(uploadId)", region: region, fileUrl: fileUrl, contentType: contentType, currentDate: "\(currentDate)"))"
         
         request.addValue("AWS4-HMAC-SHA256 Credential=\(accessKeyId)/\(dateString.prefix(8))/\(region)/s3/aws4_request,SignedHeaders=date;host;x-amz-content-sha256;x-amz-date;x-amz-security-token,Signature=\(signatureProvided)", forHTTPHeaderField: "Authorization")
         
@@ -595,7 +590,7 @@ class Jcds2Dp: DistributionPoint {
         LogManager.shared.logMessage(message: "Finished uploading \(packageToUpload)", level: .info)
         LogManager.shared.logMessage(message: "Upload of \(packageToUpload) completed in \(uploadTime.total())", level: .info)
         
-        _ = enableSleep()
+        keepAwake.enableSleep()
         return(responseString)
     }
     
@@ -648,7 +643,7 @@ class Jcds2Dp: DistributionPoint {
         request.addValue(requestTimeStamp, forHTTPHeaderField: "x-amz-date")
         request.addValue(securityToken, forHTTPHeaderField: "x-amz-security-token")
         
-        let (signedHeaders, signatureProvided) = try awsSignatureV4(uploadData: uploadData, httpMethod: "PUT", requestHeaders: request.allHTTPHeaderFields ?? [:], date: requestTimeStamp, key: key, hashedPayload: "", contentType: contentType, currentDate: currentDate)
+        let (signedHeaders, signatureProvided) = try awsSignatureV4(uploadData: uploadData, httpMethod: "PUT", requestHeaders: request.allHTTPHeaderFields ?? [:], date: requestTimeStamp, key: key, contentType: contentType, currentDate: currentDate)
         
         request.addValue("AWS4-HMAC-SHA256 Credential=\(String(describing: accessKeyID))/\(requestTimeStamp.prefix(8))/\(region)/s3/aws4_request,SignedHeaders=\(signedHeaders),Signature=\(signatureProvided)", forHTTPHeaderField: "Authorization")
 
@@ -657,7 +652,7 @@ class Jcds2Dp: DistributionPoint {
         return request
     }
     
-    private func awsSignatureV4(uploadData: JsonInitiateUpload, httpMethod: String, requestHeaders: [String: String], date: String, key: String, hashedPayload: String, contentType: String, currentDate: String) throws -> (String, String) {
+    private func awsSignatureV4(uploadData: JsonInitiateUpload, httpMethod: String, requestHeaders: [String: String], date: String, key: String, contentType: String, currentDate: String) throws -> (String, String) {
         
         guard let secretAccessKey = uploadData.secretAccessKey, let region = uploadData.region else {
             throw DistributionPointError.awsSignatureFailed

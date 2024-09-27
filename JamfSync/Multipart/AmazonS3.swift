@@ -6,7 +6,6 @@ import Cocoa
 import CryptoKit
 import Foundation
 
-
 class CompleteMultipart: NSObject {
     var partNumber: Int
     var eTag: String

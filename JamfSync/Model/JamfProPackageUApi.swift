@@ -94,7 +94,7 @@ class JamfProPackageUApi: JamfProPackageApi {
     }
 
     private func convertToPackage(jsonPackage: JsonUapiPackageDetail) -> Package? {
-        guard let jamfProIdString = jsonPackage.id, let jamfProId = Int(jamfProIdString), let displayName = jsonPackage.packageName, let fileName = jsonPackage.fileName else { return nil }
+        guard let jamfProIdString = jsonPackage.id, let _ = Int(jamfProIdString), let _ = jsonPackage.packageName, let _ = jsonPackage.fileName else { return nil }
         return Package(uapiPackageDetail: jsonPackage)
     }
 }

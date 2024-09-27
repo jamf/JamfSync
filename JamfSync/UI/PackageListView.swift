@@ -131,7 +131,7 @@ struct PackageListView: View {
                     .alert("Are you sure you want to delete the \(packageListViewModel.selectedDpFiles.count) selected items?", isPresented: $packageListViewModel.shouldPresentConfirmationSheet) {
                         HStack {
                             if let dp = packageListViewModel.retrieveSelectedDp() {
-                                if let jamfProInstanceId = dp.jamfProInstanceId, let jamfProInstance = dataModel.findJamfProInstance(id: jamfProInstanceId) {
+                                if let jamfProInstanceId = dp.jamfProInstanceId, let _ = dataModel.findJamfProInstance(id: jamfProInstanceId) {
                                     Button("Files and associated packages", role: .destructive) {
                                         Task {
                                             packageListViewModel.deleteSelectedFilesFromDp(packagesToo: true)
