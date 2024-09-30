@@ -13,7 +13,6 @@ class Jcds2Dp: DistributionPoint {
     var downloadTask: URLSessionDownloadTask?
     var dispatchGroup: DispatchGroup?
     var keepAwake = KeepAwake()
-    static let maxUploadSize = 32212255000.0
 
     init(jamfProInstanceId: UUID? = nil, jamfProInstanceName: String? = nil) {
         super.init(name: "JCDS")
@@ -196,65 +195,30 @@ class Jcds2Dp: DistributionPoint {
     private func uploadToCloud(file: DpFile, moveFrom: URL?, progress: SynchronizationProgress) async throws {
         guard let initiateUploadData else { throw DistributionPointError.failedToInitiateCloudUpload }
         var fileUrl: URL?
+        var fileSize: Int64?
         if let moveFrom {
             fileUrl = moveFrom
         } else {
             fileUrl = file.fileUrl
         }
-        
-        guard let fileUrl else { throw DistributionPointError.badFileUrl }
-        
-        keepAwake.disableSleep(reason: "Starting upload")
 
-        if let fileProperties = try? FileManager.default.attributesOfItem(atPath: fileUrl.path(percentEncoded: false)) {
-            if let size = fileProperties[FileAttributeKey.size] as? NSNumber {
-                let uploadFileSize = size.doubleValue
-                Chunk.all = Int(truncating: size)
-                Chunk.numberOf = Int(uploadFileSize / Double(Chunk.size))
-                if Chunk.all % Chunk.size > 0 {
-                    Chunk.numberOf += 1
-                }
-                LogManager.shared.logMessage(message: "File will be split into \(Chunk.numberOf) parts.", level: .debug)
-                if uploadFileSize > Self.maxUploadSize {
-                    LogManager.shared.logMessage(message: "Maximum upload file size (30GB) exceeded. File size: \(Int(uploadFileSize))", level: .info)
-                    return
-                }
-            }
-        } else {
-            LogManager.shared.logMessage(message: "A problem occurred trying to access the file: \(fileUrl)", level: .debug)
+        if let fileUrl, fileSize == nil {
+            fileSize = sizeOfFile(fileUrl: fileUrl)
         }
+
+        guard let fileUrl, let fileSize else { throw DistributionPointError.badFileUrl }
+
+        keepAwake.disableSleep(reason: "Starting upload")
+        defer { keepAwake.enableSleep() }
 
         let multipartUpload = MultipartUpload(initiateUploadData: initiateUploadData)
+        
+        let uploadId = try await multipartUpload.startMultipartUpload(fileUrl: fileUrl, fileSize: fileSize)
 
-        let uploadId = try await multipartUpload.startMultipartUpload(fileUrl: fileUrl)
+        try await multipartUpload.processMultipartUpload(whichChunk: 1, uploadId: uploadId, fileUrl: fileUrl)
+        LogManager.shared.logMessage(message: "All chunks uploaded successfully", level: .debug)
 
-        partNumberEtagList.removeAll()
-        let result = try await multipartUpload.processMultipartUpload(whichChunk: 1, uploadId: uploadId, fileUrl: fileUrl)
-        var completionArray = ""
-        if result {
-            LogManager.shared.logMessage(message: "All chunks uploaded successfully", level: .debug)
-
-            for thePart in partNumberEtagList.sorted(by: {$0.partNumber < $1.partNumber}) {
-                let currentPart = """
-                        <Part>
-                            <PartNumber>\(thePart.partNumber)</PartNumber>
-                            <ETag>\(thePart.eTag)</ETag>
-                        </Part>
-                    
-                    """
-                completionArray.append(currentPart)
-            }
-            let completionXml = """
-                <CompleteMultipartUpload>
-                \(completionArray)</CompleteMultipartUpload>
-                """
-
-            let responseString = try await multipartUpload.completeMultipartUpload(fileUrl: fileUrl, completeMultipartUploadXml: completionXml, uploadId: uploadId)
-            LogManager.shared.logMessage(message: "Join parts response: \(responseString)", level: .debug)
-        } else {
-            LogManager.shared.logMessage(message: "Failed to start uploading", level: .debug)
-        }
-
-        keepAwake.enableSleep()
+        let responseString = try await multipartUpload.completeMultipartUpload(fileUrl: fileUrl, uploadId: uploadId)
+        LogManager.shared.logMessage(message: "Join parts response: \(responseString)", level: .debug)
     }
 }

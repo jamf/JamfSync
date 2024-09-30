@@ -7,13 +7,25 @@ import CryptoKit
 
 class MultipartUpload {
     var initiateUploadData: JsonInitiateUpload
-    var uploadTime: UploadTime = UploadTime(start: 0, end: 0)
+    var uploadTime = UploadTime(start: 0, end: 0)
+    var partNumberEtagList: [CompletedChunk] = []
+    var totalChunks = 0
+    let maxUploadSize = 32212255000
+    let chunkSize = 1024 * 1024 * 10
+
 
     init(initiateUploadData: JsonInitiateUpload) {
         self.initiateUploadData = initiateUploadData
     }
 
-    func startMultipartUpload(fileUrl: URL) async throws -> String {
+    func startMultipartUpload(fileUrl: URL, fileSize: Int64) async throws -> String {
+        totalChunks = Int(truncatingIfNeeded: (fileSize + Int64(chunkSize) - 1) / Int64(chunkSize))
+        if fileSize > maxUploadSize {
+            LogManager.shared.logMessage(message: "Maximum upload file size (30GB) exceeded. File size: \(fileSize)", level: .error)
+            throw DistributionPointError.maxUploadSizeExceeded
+        }
+        LogManager.shared.logMessage(message: "File will be split into \(totalChunks) parts.", level: .debug)
+
         let filename = fileUrl.lastPathComponent
         LogManager.shared.logMessage(message: "Starting upload of \(filename)", level: .debug)
 
@@ -23,22 +35,36 @@ class MultipartUpload {
 
         uploadTime.start = Int(Date().timeIntervalSince1970)
         let (responseData, response) = try await URLSession.shared.data(for: request)
-        let responseString = String(data: responseData, encoding: .utf8) ?? ""
-        LogManager.shared.logMessage(message: "Create multipart upload response: \(responseString)", level: .debug)
+        let responseDataString = String(data: responseData, encoding: .utf8) ?? ""
+        if let httpResponse = response as? HTTPURLResponse {
+            if !(200...299).contains(httpResponse.statusCode) {
+                LogManager.shared.logMessage(message: "Failed to upload \(filename). Status code: \(httpResponse.statusCode)", level: .debug)
+                throw ServerCommunicationError.uploadFailed(statusCode: httpResponse.statusCode, message: responseDataString)
+            }
+        }
 
-        let uploadId = tagValue(xmlString: responseString, startTag: "<UploadId>", endTag: "</UploadId>", includeTags: false)
+        let uploadId = tagValue(xmlString: responseDataString, startTag: "<UploadId>", endTag: "</UploadId>")
         if uploadId != "" {
            return(uploadId)
         } else {
-            if let messageRange = responseString.range(of: "<Message>(.*?)</Message>", options: .regularExpression) {
-                var message = responseString[messageRange]
+            if let messageRange = responseDataString.range(of: "<Message>(.*?)</Message>", options: .regularExpression) {
+                var message = responseDataString[messageRange]
                 message = "\(message.replacingOccurrences(of: "<Message>", with: "").replacingOccurrences(of: "</Message>", with: ""))"
                 LogManager.shared.logMessage(message: "Error occurred when starting the multipart upload: \(message)", level: .error)
             } else {
-                LogManager.shared.logMessage(message: "Error occurred when starting the multipart upload: \(responseString)", level: .error)
+                LogManager.shared.logMessage(message: "Error occurred when starting the multipart upload: \(responseDataString)", level: .error)
             }
             throw DistributionPointError.uploadFailure
         }
+    }
+
+    private func tagValue(xmlString:String, startTag:String, endTag:String) -> String {
+        var rawValue = ""
+        if let start = xmlString.range(of: startTag),
+            let end  = xmlString.range(of: endTag, range: start.upperBound..<xmlString.endIndex) {
+            rawValue.append(String(xmlString[start.upperBound..<end.lowerBound]))
+        }
+        return rawValue
     }
 
     private func createMultipartUploadRequest(fileUrl: URL, urlQuery: String, httpMethod: String) throws -> URLRequest {
@@ -80,54 +106,48 @@ class MultipartUpload {
         return request
     }
 
-    func processMultipartUpload(whichChunk: Int, uploadId: String, fileUrl: URL) async throws -> Bool {
-        var uploadedChunks   = 0
-        var currentSessions  = 1
-        let expireEpoch      = initiateUploadData.expiration ?? 0
-        var remainingParts   = Array(1...Chunk.numberOf)
-        var failedParts      = [Int]()
-        var keepLooping      = true
-        var successfullUpload = false
-        Chunk.index          = 0
+    func processMultipartUpload(whichChunk: Int, uploadId: String, fileUrl: URL) async throws {
+        var uploadedChunks    = 0
+        var remainingParts    = Array(1...totalChunks)
+        var failedParts       = [Int]()
+        var chunkIndex        = 0
 
-        while keepLooping {
-            Chunk.index = remainingParts.removeFirst()
-            LogManager.shared.logMessage(message: "Call for part: \(Chunk.index)", level: .debug)
+        partNumberEtagList.removeAll()
 
-            let currentEpoch = Int(Date().timeIntervalSince1970)
-            let timeLeft = (expireEpoch - currentEpoch)/60
+        while uploadedChunks < totalChunks {
+            chunkIndex = remainingParts.removeFirst()
+            LogManager.shared.logMessage(message: "Call for part: \(chunkIndex)", level: .debug)
 
-            LogManager.shared.logMessage(message: "Upload token time remaining: \(timeLeft) minutes", level: .debug)
-            if timeLeft < 5 {
-                // place holder for renew upload token
-                // await something something...
-                // update initiateUploadData if need be
-            }
-            currentSessions += 1
-            print("[multipartUploadController] call for part: \(Chunk.index)")
+            if let expireEpoch = initiateUploadData.expiration {
+                let currentEpoch = Int(Date().timeIntervalSince1970)
+                let timeLeft = (expireEpoch - currentEpoch)/60
 
-            do {
-                try await uploadChunk(whichChunk: Chunk.index, uploadId: uploadId, fileUrl: fileUrl)
-                currentSessions -= 1
-                uploadedChunks += 1
-                failedParts.removeAll(where: { $0 == Chunk.index })
-                LogManager.shared.logMessage(message: "Uploaded chunk \(Chunk.index), \(Chunk.numberOf - uploadedChunks) remaining", level: .debug)
-            } catch {
-                if (failedParts.firstIndex(where: { $0 == Chunk.index }) != nil) {
-                    LogManager.shared.logMessage(message: "Part \(Chunk.index) has previously failed, aborting upload.", level: .debug)
-                    keepLooping = false
-                } else {
-                    remainingParts.append(Chunk.index)
-                    failedParts.append(Chunk.index)
-                    LogManager.shared.logMessage(message: "**** Failed to upload chunk \(Chunk.index): \(error.localizedDescription)", level: .debug)
+                LogManager.shared.logMessage(message: "Upload token time remaining: \(timeLeft) minutes", level: .debug)
+                if timeLeft < 5 {
+                    // place holder for renew upload token
+                    // await something something...
+                    // update initiateUploadData if need be
                 }
             }
-            if uploadedChunks == Chunk.numberOf {
-                successfullUpload = true
-                keepLooping = false
+
+            print("[multipartUploadController] call for part: \(chunkIndex)")
+
+            do {
+                try await uploadChunk(whichChunk: chunkIndex, uploadId: uploadId, fileUrl: fileUrl)
+                uploadedChunks += 1
+                failedParts.removeAll(where: { $0 == chunkIndex })
+                LogManager.shared.logMessage(message: "Uploaded chunk \(chunkIndex), \(totalChunks - uploadedChunks) remaining", level: .debug)
+            } catch {
+                if (failedParts.firstIndex(where: { $0 == chunkIndex }) != nil) {
+                    LogManager.shared.logMessage(message: "Part \(chunkIndex) has previously failed, aborting upload.", level: .debug)
+                    throw DistributionPointError.uploadFailure
+                } else {
+                    remainingParts.append(chunkIndex)
+                    failedParts.append(chunkIndex)
+                    LogManager.shared.logMessage(message: "**** Failed to upload chunk \(chunkIndex): \(error.localizedDescription)", level: .debug)
+                }
             }
         }
-        return(successfullUpload)
     }
 
     private func uploadChunk(whichChunk: Int, uploadId: String, fileUrl: URL) async throws {
@@ -153,43 +173,66 @@ class MultipartUpload {
         URLCache.shared.removeAllCachedResponses()
 
         let (responseData, response) = try await urlSession.upload(for: request, from: chunk)
-
-        let responseString = String(data: responseData, encoding: .utf8) ?? ""
-
-        let httpResponse = response as? HTTPURLResponse
-        let allHeaders = httpResponse?.allHeaderFields
-
-        print("[multipartUpload] partNumber: \(whichChunk) - Etag: \(allHeaders?["Etag"] ?? "")")
-        partNumberEtagList.append(CompleteMultipart(partNumber: whichChunk, eTag: "\(allHeaders?["Etag"] ?? "")"))
+        if let httpResponse = response as? HTTPURLResponse {
+            if !(200...299).contains(httpResponse.statusCode) {
+                LogManager.shared.logMessage(message: "Failed to upload part \(whichChunk) for \(fileUrl). Status code: \(httpResponse.statusCode)", level: .debug)
+                let responseDataString = String(data: responseData, encoding: .utf8) ?? ""
+                throw ServerCommunicationError.uploadFailed(statusCode: httpResponse.statusCode, message: responseDataString)
+            }
+            let allHeaders = httpResponse.allHeaderFields
+            print("[multipartUpload] partNumber: \(whichChunk) - Etag: \(allHeaders["Etag"] ?? "")")
+            partNumberEtagList.append(CompletedChunk(partNumber: whichChunk, eTag: (allHeaders["Etag"] as? String) ?? ""))
+        }
     }
 
-    func completeMultipartUpload(fileUrl: URL, completeMultipartUploadXml: String, uploadId: String) async throws -> String {
-
+    func completeMultipartUpload(fileUrl: URL, uploadId: String) async throws {
+        let completedPartsXml = createCompletedPartsXml()
         let packageToUpload = fileUrl.lastPathComponent
 
         var request = try createMultipartUploadRequest(fileUrl: fileUrl, urlQuery: "&uploadId=\(uploadId)", httpMethod: "PUT")
 
-        let requestData = completeMultipartUploadXml.data(using: .utf8)
+        let requestData = completedPartsXml.data(using: .utf8)
         request.httpBody = requestData
 
         URLCache.shared.removeAllCachedResponses()
 
-        var responseString = ""
         let (responseData, response) = try await URLSession.shared.data(for: request)
-        responseString = String(data: responseData, encoding: .utf8) ?? ""
+        if let httpResponse = response as? HTTPURLResponse {
+            if !(200...299).contains(httpResponse.statusCode) {
+               LogManager.shared.logMessage(message: "Failed to complete upload for \(packageToUpload). Status code: \(httpResponse.statusCode)", level: .error)
+                let responseDataString = String(data: responseData, encoding: .utf8) ?? ""
+                throw ServerCommunicationError.uploadFailed(statusCode: httpResponse.statusCode, message: responseDataString)
+            }
+        }
+
         uploadTime.end = Int(Date().timeIntervalSince1970)
         LogManager.shared.logMessage(message: "Finished uploading \(packageToUpload)", level: .info)
         LogManager.shared.logMessage(message: "Upload of \(packageToUpload) completed in \(uploadTime.total())", level: .info)
+    }
 
-//        keepAwake.enableSleep()
-        return(responseString)
+    private func createCompletedPartsXml() -> String {
+        var completionArray = ""
+        for thePart in partNumberEtagList.sorted(by: {$0.partNumber < $1.partNumber}) {
+            let currentPart = """
+                    <Part>
+                        <PartNumber>\(thePart.partNumber)</PartNumber>
+                        <ETag>\(thePart.eTag)</ETag>
+                    </Part>
+                
+                """
+            completionArray.append(currentPart)
+        }
+        return """
+            <CompleteMultipartUpload>
+            \(completionArray)</CompleteMultipartUpload>
+            """
     }
 
     private func getChunk(fileUrl: URL, part: Int) throws -> Data {
         let fileHandle = try FileHandle(forReadingFrom: fileUrl)
 
-        fileHandle.seek(toFileOffset: UInt64((part - 1) * Chunk.size))
-        let data = fileHandle.readData(ofLength: Chunk.size)
+        fileHandle.seek(toFileOffset: UInt64((part - 1) * chunkSize))
+        let data = fileHandle.readData(ofLength: chunkSize)
 
         try fileHandle.close()
 

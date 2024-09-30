@@ -95,7 +95,7 @@
 		84FC418B2ADD7B1000DCB033 /* StoredSettings.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 84FC41892ADD7B1000DCB033 /* StoredSettings.xcdatamodeld */; };
 		84FC418E2ADD89AD00DCB033 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FC418D2ADD89AD00DCB033 /* DataManager.swift */; };
 		CE9899B32C9A7A77000C36B7 /* KeepAwake.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9899B22C9A7A77000C36B7 /* KeepAwake.swift */; };
-		CE9899B72C9A8C4B000C36B7 /* AmazonS3.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9899B62C9A8C4B000C36B7 /* AmazonS3.swift */; };
+		CE9899B72C9A8C4B000C36B7 /* CompletedChunk.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9899B62C9A8C4B000C36B7 /* CompletedChunk.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -208,7 +208,7 @@
 		84FC418A2ADD7B1000DCB033 /* StoredSettings.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = StoredSettings.xcdatamodel; sourceTree = "<group>"; };
 		84FC418D2ADD89AD00DCB033 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		CE9899B22C9A7A77000C36B7 /* KeepAwake.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeepAwake.swift; sourceTree = "<group>"; };
-		CE9899B62C9A8C4B000C36B7 /* AmazonS3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AmazonS3.swift; sourceTree = "<group>"; };
+		CE9899B62C9A8C4B000C36B7 /* CompletedChunk.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompletedChunk.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -443,7 +443,7 @@
 			children = (
 				84413CA02CA75A7B00363CFA /* UploadTime.swift */,
 				84413C962CA7586300363CFA /* MultipartUpload.swift */,
-				CE9899B62C9A8C4B000C36B7 /* AmazonS3.swift */,
+				CE9899B62C9A8C4B000C36B7 /* CompletedChunk.swift */,
 				CE9899B22C9A7A77000C36B7 /* KeepAwake.swift */,
 			);
 			path = Multipart;
@@ -629,7 +629,7 @@
 				84FC415E2AD5A5C600DCB033 /* SynchronizeProgressView.swift in Sources */,
 				84413CA12CA75A7E00363CFA /* UploadTime.swift in Sources */,
 				84E489952B58830A00FFFE59 /* ChecksumView.swift in Sources */,
-				CE9899B72C9A8C4B000C36B7 /* AmazonS3.swift in Sources */,
+				CE9899B72C9A8C4B000C36B7 /* CompletedChunk.swift in Sources */,
 				8463EF2B2AE6D3040028D591 /* FileSharePasswordView.swift in Sources */,
 				84BC6E352AC3631400CF6D39 /* Package.swift in Sources */,
 				84BC6E392AC3631400CF6D39 /* DataModel.swift in Sources */,

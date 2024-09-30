@@ -24,6 +24,7 @@ enum DistributionPointError: Error {
     case downloadingNotSupported
     case uploadingNotSupported
     case uploadFailure
+    case maxUploadSizeExceeded
 }
 
 enum ReadWriteCapable {

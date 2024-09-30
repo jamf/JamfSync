@@ -15,6 +15,7 @@ enum ServerCommunicationError: Error {
     case invalidCredentials
     case couldNotAccessServer
     case dataRequestFailed(statusCode: Int, message: String? = nil)
+    case uploadFailed(statusCode: Int, message: String? = nil)
     case notSupported
     case prepareForUploadFailed
 }
