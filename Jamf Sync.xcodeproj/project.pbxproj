@@ -15,6 +15,8 @@
 		841227A12BEADD6E0097B83E /* XmlErrorParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841227A02BEADD6E0097B83E /* XmlErrorParserTests.swift */; };
 		841DE9D92BA395900092DBE7 /* Jamf Sync User Guide.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 841DE9D82BA395900092DBE7 /* Jamf Sync User Guide.pdf */; };
 		843BE0F62AEFE6350053431B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 843BE0F52AEFE6350053431B /* Assets.xcassets */; };
+		84413C972CA7586900363CFA /* MultipartUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84413C962CA7586300363CFA /* MultipartUpload.swift */; };
+		84413CA12CA75A7E00363CFA /* UploadTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84413CA02CA75A7B00363CFA /* UploadTime.swift */; };
 		844CF9D12AC4B96600576E1A /* FolderDp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844CF9D02AC4B96600576E1A /* FolderDp.swift */; };
 		844CF9D32AC4C76A00576E1A /* JamfProInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844CF9D22AC4C76A00576E1A /* JamfProInstance.swift */; };
 		844E40D12B4F46FD003D1940 /* Checksums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844E40D02B4F46FD003D1940 /* Checksums.swift */; };
@@ -123,6 +125,8 @@
 		841DE9D82BA395900092DBE7 /* Jamf Sync User Guide.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Jamf Sync User Guide.pdf"; sourceTree = "<group>"; };
 		841DE9DA2BA395F00092DBE7 /* User Guide */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "User Guide"; sourceTree = "<group>"; };
 		843BE0F52AEFE6350053431B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		84413C962CA7586300363CFA /* MultipartUpload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartUpload.swift; sourceTree = "<group>"; };
+		84413CA02CA75A7B00363CFA /* UploadTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadTime.swift; sourceTree = "<group>"; };
 		844CF9D02AC4B96600576E1A /* FolderDp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderDp.swift; sourceTree = "<group>"; };
 		844CF9D22AC4C76A00576E1A /* JamfProInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamfProInstance.swift; sourceTree = "<group>"; };
 		844E40D02B4F46FD003D1940 /* Checksums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checksums.swift; sourceTree = "<group>"; };
@@ -437,6 +441,8 @@
 		CE9899AF2C9A6A20000C36B7 /* Multipart */ = {
 			isa = PBXGroup;
 			children = (
+				84413CA02CA75A7B00363CFA /* UploadTime.swift */,
+				84413C962CA7586300363CFA /* MultipartUpload.swift */,
 				CE9899B62C9A8C4B000C36B7 /* AmazonS3.swift */,
 				CE9899B22C9A7A77000C36B7 /* KeepAwake.swift */,
 			);
@@ -621,6 +627,7 @@
 				84BC6E3B2AC3631400CF6D39 /* DpFiles.swift in Sources */,
 				84E4898F2B58679600FFFE59 /* HeaderView.swift in Sources */,
 				84FC415E2AD5A5C600DCB033 /* SynchronizeProgressView.swift in Sources */,
+				84413CA12CA75A7E00363CFA /* UploadTime.swift in Sources */,
 				84E489952B58830A00FFFE59 /* ChecksumView.swift in Sources */,
 				CE9899B72C9A8C4B000C36B7 /* AmazonS3.swift in Sources */,
 				8463EF2B2AE6D3040028D591 /* FileSharePasswordView.swift in Sources */,
@@ -644,6 +651,7 @@
 				84FC418B2ADD7B1000DCB033 /* StoredSettings.xcdatamodeld in Sources */,
 				84BC6DF42AC3122100CF6D39 /* JamfSyncApp.swift in Sources */,
 				84AB59C52B20D569007333AD /* CloudSessionDelegate.swift in Sources */,
+				84413C972CA7586900363CFA /* MultipartUpload.swift in Sources */,
 				84D568622BD0722B00C91686 /* AboutView.swift in Sources */,
 				844E40D32B505404003D1940 /* PackageListViewModel.swift in Sources */,
 				84FC41662AD895F400DCB033 /* KeychainHelper.swift in Sources */,

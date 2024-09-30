@@ -19,7 +19,7 @@ var partNumberEtagList = [CompleteMultipart]()
 
 struct Chunk {
     static var all               = 0
-    static var size              = 1024*1024*10
+    static var size              = 1024 * 1024 * 10
     static var index             = 1
     static var numberOf          = 0
     static var previousSignature = ""
