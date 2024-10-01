@@ -18,45 +18,117 @@ class MultipartUpload {
         self.initiateUploadData = initiateUploadData
     }
 
-    func startMultipartUpload(fileUrl: URL, fileSize: Int64) async throws -> String {
+    // TODO: OLD CODE - REMOVE THIS
+    func startMultipartUpload(fileUrl: URL, fileSize: Int64) async -> String {
         totalChunks = Int(truncatingIfNeeded: (fileSize + Int64(chunkSize) - 1) / Int64(chunkSize))
         if fileSize > maxUploadSize {
             LogManager.shared.logMessage(message: "Maximum upload file size (30GB) exceeded. File size: \(fileSize)", level: .error)
-            throw DistributionPointError.maxUploadSizeExceeded
+            return "bad"
+//            throw DistributionPointError.maxUploadSizeExceeded
         }
-        LogManager.shared.logMessage(message: "File will be split into \(totalChunks) parts.", level: .debug)
+        let packageToUpload = fileUrl.lastPathComponent
+        LogManager.shared.logMessage(message: "Start uploading \(packageToUpload)", level: .info)
 
-        let filename = fileUrl.lastPathComponent
-        LogManager.shared.logMessage(message: "Starting upload of \(filename)", level: .debug)
+        var urlHostAllowedPlus = CharacterSet.urlHostAllowed
+        urlHostAllowedPlus.remove(charactersIn: "+")
+        let encodedPackageName = packageToUpload.addingPercentEncoding(withAllowedCharacters: urlHostAllowedPlus) ?? ""
 
-        let request = try createMultipartUploadRequest(fileUrl: fileUrl, urlQuery: "", httpMethod: "POST")
+        let bucket          = initiateUploadData.bucketName ?? ""
+        let region          = initiateUploadData.region ?? ""
+        let key             = (initiateUploadData.path ?? "") + encodedPackageName + "?uploads"
+        let accessKeyId     = initiateUploadData.accessKeyID ?? ""
+        let secretAccessKey = initiateUploadData.secretAccessKey ?? ""
+        let sessionToken    = initiateUploadData.sessionToken ?? ""
+        let contentType     = ""
+        let jcdsServerURL   = ( region == "us-east-1" ) ? URL(string: "https://\(bucket).s3.amazonaws.com/\(key)")!:URL(string: "https://\(bucket).s3-\(region).amazonaws.com/\(key)")!
+
+        let currentDate = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd'T'HHmmss'Z'"
+        dateFormatter.timeZone = TimeZone(identifier: "UTC")
+        let dateString = dateFormatter.string(from: currentDate)
+
+        var request = URLRequest(url: jcdsServerURL,
+                                 cachePolicy: .reloadIgnoringLocalCacheData)
+
+        request.addValue("\(currentDate)", forHTTPHeaderField: "Date")
+        request.addValue("\(bucket).s3.amazonaws.com", forHTTPHeaderField: "Host")
+        request.addValue("UNSIGNED-PAYLOAD", forHTTPHeaderField: "x-amz-content-sha256")
+        request.addValue(dateString, forHTTPHeaderField: "x-amz-date")
+        request.addValue(sessionToken, forHTTPHeaderField: "x-amz-security-token")
+
+        request.httpMethod = "POST"
+        let signatureProvided = "\(awsSignature256(for: sessionToken, httpMethod: request.httpMethod!, date: dateString, accessKeyId: accessKeyId, secretKey: secretAccessKey, bucket: bucket, key: key, queryParameters: "uploads=", region: region/*, fileUrl: fileUrl, contentType: contentType*/, currentDate: "\(currentDate)"))"
+
+        request.addValue("AWS4-HMAC-SHA256 Credential=\(accessKeyId)/\(dateString.prefix(8))/\(region)/s3/aws4_request,SignedHeaders=date;host;x-amz-content-sha256;x-amz-date;x-amz-security-token,Signature=\(signatureProvided)", forHTTPHeaderField: "Authorization")
+
 
         URLCache.shared.removeAllCachedResponses()
 
         uploadTime.start = Int(Date().timeIntervalSince1970)
-        let (responseData, response) = try await URLSession.shared.data(for: request)
-        let responseDataString = String(data: responseData, encoding: .utf8) ?? ""
-        if let httpResponse = response as? HTTPURLResponse {
-            if !(200...299).contains(httpResponse.statusCode) {
-                LogManager.shared.logMessage(message: "Failed to upload \(filename). Status code: \(httpResponse.statusCode)", level: .debug)
-                throw ServerCommunicationError.uploadFailed(statusCode: httpResponse.statusCode, message: responseDataString)
-            }
-        }
+        do {
+            let (responseData, response) = try await URLSession.shared.data(for: request)
+            let responseString = String(data: responseData, encoding: .utf8) ?? ""
+            LogManager.shared.logMessage(message: "Create multipart upload response: \(responseString)", level: .debug)
 
-        let uploadId = tagValue(xmlString: responseDataString, startTag: "<UploadId>", endTag: "</UploadId>")
-        if uploadId != "" {
-           return(uploadId)
-        } else {
-            if let messageRange = responseDataString.range(of: "<Message>(.*?)</Message>", options: .regularExpression) {
-                var message = responseDataString[messageRange]
-                message = "\(message.replacingOccurrences(of: "<Message>", with: "").replacingOccurrences(of: "</Message>", with: ""))"
-                LogManager.shared.logMessage(message: "Error occurred when starting the multipart upload: \(message)", level: .error)
+            let uploadId = tagValue(xmlString: responseString, startTag: "<UploadId>", endTag: "</UploadId>")
+            if uploadId != "" {
+               return(uploadId)
             } else {
-                LogManager.shared.logMessage(message: "Error occurred when starting the multipart upload: \(responseDataString)", level: .error)
+                if let messageRange = responseString.range(of: "<Message>(.*?)</Message>", options: .regularExpression) {
+                    var message = responseString[messageRange]
+                    message = "\(message.replacingOccurrences(of: "<Message>", with: "").replacingOccurrences(of: "</Message>", with: ""))"
+                    LogManager.shared.logMessage(message: "Create multipart error: \(message)", level: .debug)
+                } else {
+                    LogManager.shared.logMessage(message: "Create multipart response: \(responseString)", level: .debug)
+                }
+                return("multipart failed")
             }
-            throw DistributionPointError.uploadFailure
+        } catch {
+            return("multipart failed")
         }
     }
+
+// TODO: NEW CODE - FIX AND PUT THIS BACK IN
+//    func startMultipartUpload(fileUrl: URL, fileSize: Int64) async throws -> String {
+//        totalChunks = Int(truncatingIfNeeded: (fileSize + Int64(chunkSize) - 1) / Int64(chunkSize))
+//        if fileSize > maxUploadSize {
+//            LogManager.shared.logMessage(message: "Maximum upload file size (30GB) exceeded. File size: \(fileSize)", level: .error)
+//            throw DistributionPointError.maxUploadSizeExceeded
+//        }
+//        LogManager.shared.logMessage(message: "File will be split into \(totalChunks) parts.", level: .debug)
+//
+//        let filename = fileUrl.lastPathComponent
+//        LogManager.shared.logMessage(message: "Starting upload of \(filename)", level: .debug)
+//
+//        let request = try createMultipartUploadRequest(fileUrl: fileUrl, httpMethod: "POST")
+//
+//        URLCache.shared.removeAllCachedResponses()
+//
+//        uploadTime.start = Int(Date().timeIntervalSince1970)
+//        let (responseData, response) = try await URLSession.shared.data(for: request)
+//        let responseDataString = String(data: responseData, encoding: .utf8) ?? ""
+//        if let httpResponse = response as? HTTPURLResponse {
+//            if !(200...299).contains(httpResponse.statusCode) {
+//                LogManager.shared.logMessage(message: "Failed to upload \(filename). Status code: \(httpResponse.statusCode)", level: .debug)
+//                throw ServerCommunicationError.uploadFailed(statusCode: httpResponse.statusCode, message: responseDataString)
+//            }
+//        }
+//
+//        let uploadId = tagValue(xmlString: responseDataString, startTag: "<UploadId>", endTag: "</UploadId>")
+//        if uploadId != "" {
+//           return(uploadId)
+//        } else {
+//            if let messageRange = responseDataString.range(of: "<Message>(.*?)</Message>", options: .regularExpression) {
+//                var message = responseDataString[messageRange]
+//                message = "\(message.replacingOccurrences(of: "<Message>", with: "").replacingOccurrences(of: "</Message>", with: ""))"
+//                LogManager.shared.logMessage(message: "Error occurred when starting the multipart upload: \(message)", level: .error)
+//            } else {
+//                LogManager.shared.logMessage(message: "Error occurred when starting the multipart upload: \(responseDataString)", level: .error)
+//            }
+//            throw DistributionPointError.uploadFailure
+//        }
+//    }
 
     private func tagValue(xmlString:String, startTag:String, endTag:String) -> String {
         var rawValue = ""
@@ -67,7 +139,7 @@ class MultipartUpload {
         return rawValue
     }
 
-    private func createMultipartUploadRequest(fileUrl: URL, urlQuery: String, httpMethod: String) throws -> URLRequest {
+    private func createMultipartUploadRequest(fileUrl: URL, httpMethod: String, urlQuery: String? = nil, contentType: String? = nil) throws -> URLRequest {
         let filename = fileUrl.lastPathComponent
         var urlHostAllowedPlus = CharacterSet.urlHostAllowed
         urlHostAllowedPlus.remove(charactersIn: "+")
@@ -79,8 +151,11 @@ class MultipartUpload {
         let accessKeyId     = initiateUploadData.accessKeyID ?? ""
         let secretAccessKey = initiateUploadData.secretAccessKey ?? ""
         let sessionToken    = initiateUploadData.sessionToken ?? ""
-        let contentType     = ""
-        let jcdsServerURL   = ( region == "us-east-1" ) ? URL(string: "https://\(bucket).s3.amazonaws.com/\(key)\(urlQuery)"):URL(string: "https://\(bucket).s3-\(region).amazonaws.com/\(key)\(urlQuery)")
+        var urlQueryString  = ""
+        if let urlQuery {
+            urlQueryString = "&\(urlQuery)"
+        }
+        let jcdsServerURL   = ( region == "us-east-1" ) ? URL(string: "https://\(bucket).s3.amazonaws.com/\(key)\(urlQueryString)"):URL(string: "https://\(bucket).s3-\(region).amazonaws.com/\(key)\(urlQueryString)")
 
         let currentDate = Date()
         let dateFormatter = DateFormatter()
@@ -97,9 +172,12 @@ class MultipartUpload {
         request.addValue("UNSIGNED-PAYLOAD", forHTTPHeaderField: "x-amz-content-sha256")
         request.addValue(dateString, forHTTPHeaderField: "x-amz-date")
         request.addValue(sessionToken, forHTTPHeaderField: "x-amz-security-token")
+        if let contentType {
+            request.addValue(contentType, forHTTPHeaderField: "Content-Type")
+        }
 
         request.httpMethod = httpMethod
-        let signatureProvided = "\(awsSignature256(for: sessionToken, httpMethod: request.httpMethod!, date: dateString, accessKeyId: accessKeyId, secretKey: secretAccessKey, bucket: bucket, key: key, queryParameters: "uploads=", region: region, fileUrl: fileUrl, contentType: contentType, currentDate: "\(currentDate)"))"
+        let signatureProvided = "\(awsSignature256(for: sessionToken, httpMethod: request.httpMethod!, date: dateString, accessKeyId: accessKeyId, secretKey: secretAccessKey, bucket: bucket, key: key, queryParameters: urlQuery ?? "", region: region/*, fileUrl: fileUrl, contentType: contentType*/, currentDate: "\(currentDate)"))"
 
         request.addValue("AWS4-HMAC-SHA256 Credential=\(accessKeyId)/\(dateString.prefix(8))/\(region)/s3/aws4_request,SignedHeaders=date;host;x-amz-content-sha256;x-amz-date;x-amz-security-token,Signature=\(signatureProvided)", forHTTPHeaderField: "Authorization")
 
@@ -150,14 +228,36 @@ class MultipartUpload {
         }
     }
 
-    private func uploadChunk(whichChunk: Int, uploadId: String, fileUrl: URL) async throws {
+// TODO: OLD CODE - REMOVE THIS
+    private func uploadChunk(whichChunk: Int, uploadId: String, fileUrl: URL) async throws -> (Result<Void, Error>) {
         LogManager.shared.logMessage(message: "Start processing part \(whichChunk)", level: .debug)
 
         let chunk = try getChunk(fileUrl: fileUrl, part: whichChunk)
 
-        guard chunk.count > 0 else { return }
+        if chunk.count == 0 {
+            return(.success(()))
 
-        let request = try createMultipartUploadRequest(fileUrl: fileUrl, urlQuery: "?partNumber=\(whichChunk)&uploadId=\(uploadId)", httpMethod: "PUT")
+        }
+        let partNumber      = whichChunk
+        let packageToUpload = fileUrl.lastPathComponent
+
+        var urlHostAllowedPlus = CharacterSet.urlHostAllowed
+        urlHostAllowedPlus.remove(charactersIn: "+")
+        let encodedPackageName = packageToUpload.addingPercentEncoding(withAllowedCharacters: urlHostAllowedPlus) ?? ""
+
+        let bucket          = initiateUploadData.bucketName ?? ""
+        let region          = initiateUploadData.region ?? ""
+        let key             = (initiateUploadData.path ?? "") + encodedPackageName
+        let accessKeyId     = initiateUploadData.accessKeyID ?? ""
+        let secretAccessKey = initiateUploadData.secretAccessKey ?? ""
+        let sessionToken    = initiateUploadData.sessionToken ?? ""
+        let jcdsServerURL   = ( region == "us-east-1" ) ? URL(string: "https://\(bucket).s3.amazonaws.com/\(key)?partNumber=\(partNumber)&uploadId=\(uploadId)")!:URL(string: "https://\(bucket).s3-\(region).amazonaws.com/\(key)?partNumber=\(partNumber)&uploadId=\(uploadId)")!
+
+        let currentDate = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd'T'HHmmss'Z'"
+        dateFormatter.timeZone = TimeZone(identifier: "UTC")
+        let dateString = dateFormatter.string(from: currentDate)
 
         let urlSession: URLSession = {
             let configuration = URLSessionConfiguration.ephemeral
@@ -170,45 +270,172 @@ class MultipartUpload {
             return URLSession(configuration: configuration)
         }()
 
+        var request = URLRequest(url: jcdsServerURL,
+                                 cachePolicy: .reloadIgnoringLocalCacheData,
+                                 timeoutInterval: 3600)
+
+        request.addValue("\(currentDate)", forHTTPHeaderField: "Date")
+        request.addValue("\(bucket).s3.amazonaws.com", forHTTPHeaderField: "Host")
+        request.addValue("UNSIGNED-PAYLOAD", forHTTPHeaderField: "x-amz-content-sha256")
+        request.addValue(dateString, forHTTPHeaderField: "x-amz-date")
+        request.addValue(sessionToken, forHTTPHeaderField: "x-amz-security-token")
+
+        request.httpMethod = "PUT"
+
+        let signatureProvided = "\(awsSignature256(for: sessionToken, httpMethod: request.httpMethod!, date: dateString, accessKeyId: accessKeyId, secretKey: secretAccessKey, bucket: bucket, key: key, queryParameters: "partNumber=\(partNumber)&uploadId=\(uploadId)", region: region/*, fileUrl: fileUrl, contentType: contentType(filename: packageToUpload) ?? ""*/, currentDate: "\(currentDate)"))"
+
+        request.addValue("AWS4-HMAC-SHA256 Credential=\(accessKeyId)/\(dateString.prefix(8))/\(region)/s3/aws4_request,SignedHeaders=date;host;x-amz-content-sha256;x-amz-date;x-amz-security-token,Signature=\(signatureProvided)", forHTTPHeaderField: "Authorization")
+
         URLCache.shared.removeAllCachedResponses()
 
-        let (responseData, response) = try await urlSession.upload(for: request, from: chunk)
-        if let httpResponse = response as? HTTPURLResponse {
-            if !(200...299).contains(httpResponse.statusCode) {
-                LogManager.shared.logMessage(message: "Failed to upload part \(whichChunk) for \(fileUrl). Status code: \(httpResponse.statusCode)", level: .debug)
-                let responseDataString = String(data: responseData, encoding: .utf8) ?? ""
-                throw ServerCommunicationError.uploadFailed(statusCode: httpResponse.statusCode, message: responseDataString)
-            }
-            let allHeaders = httpResponse.allHeaderFields
-            print("[multipartUpload] partNumber: \(whichChunk) - Etag: \(allHeaders["Etag"] ?? "")")
-            partNumberEtagList.append(CompletedChunk(partNumber: whichChunk, eTag: (allHeaders["Etag"] as? String) ?? ""))
+        do {
+            let (responseData, response) = try await urlSession.upload(for: request, from: chunk)
+
+            let responseString = String(data: responseData, encoding: .utf8) ?? ""
+
+            let httpResponse = response as? HTTPURLResponse
+            let allHeaders = httpResponse?.allHeaderFields
+
+            print("[multipartUpload] partNumber: \(partNumber) - Etag: \(allHeaders?["Etag"] ?? "")")
+            partNumberEtagList.append(CompletedChunk(partNumber: partNumber, eTag: "\(allHeaders?["Etag"] ?? "")"))
+
+            return(.success(()))
+        } catch {
+            return(.failure(error))
         }
     }
 
-    func completeMultipartUpload(fileUrl: URL, uploadId: String) async throws {
-        let completedPartsXml = createCompletedPartsXml()
+// TODO: NEW CODE - FIX AND PUT THIS BACK IN
+//    private func uploadChunk(whichChunk: Int, uploadId: String, fileUrl: URL) async throws {
+//        LogManager.shared.logMessage(message: "Start processing part \(whichChunk)", level: .debug)
+//
+//        let chunk = try getChunk(fileUrl: fileUrl, part: whichChunk)
+//
+//        guard chunk.count > 0 else { return }
+//
+//        let request = try createMultipartUploadRequest(fileUrl: fileUrl, httpMethod: "PUT", urlQuery: "partNumber=\(whichChunk)&uploadId=\(uploadId)")
+//
+//        let urlSession: URLSession = {
+//            let configuration = URLSessionConfiguration.ephemeral
+//            configuration.httpShouldSetCookies = true
+//            configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+//            configuration.urlCache = nil
+//            configuration.timeoutIntervalForRequest = 3600.0
+//            configuration.timeoutIntervalForResource = 3600.0
+////            configuration.urlCache = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
+//            return URLSession(configuration: configuration)
+//        }()
+//
+//        URLCache.shared.removeAllCachedResponses()
+//
+//        let (responseData, response) = try await urlSession.upload(for: request, from: chunk)
+//        if let httpResponse = response as? HTTPURLResponse {
+//            if !(200...299).contains(httpResponse.statusCode) {
+//                LogManager.shared.logMessage(message: "Failed to upload part \(whichChunk) for \(fileUrl). Status code: \(httpResponse.statusCode)", level: .debug)
+//                let responseDataString = String(data: responseData, encoding: .utf8) ?? ""
+//                throw ServerCommunicationError.uploadFailed(statusCode: httpResponse.statusCode, message: responseDataString)
+//            }
+//            let allHeaders = httpResponse.allHeaderFields
+//            print("[multipartUpload] partNumber: \(whichChunk) - Etag: \(allHeaders["Etag"] ?? "")")
+//            partNumberEtagList.append(CompletedChunk(partNumber: whichChunk, eTag: (allHeaders["Etag"] as? String) ?? ""))
+//        }
+//    }
+
+
+    // TODO: OLD CODE - REMOVE THIS
+    func completeMultipartUpload(fileUrl: URL, uploadId: String) async throws -> String {
+        let completeMultipartUploadXml = createCompletedPartsXml()
         let packageToUpload = fileUrl.lastPathComponent
 
-        var request = try createMultipartUploadRequest(fileUrl: fileUrl, urlQuery: "&uploadId=\(uploadId)", httpMethod: "PUT")
+        var urlHostAllowedPlus = CharacterSet.urlHostAllowed
+        urlHostAllowedPlus.remove(charactersIn: "+")
+        let encodedPackageName = packageToUpload.addingPercentEncoding(withAllowedCharacters: urlHostAllowedPlus) ?? ""
 
-        let requestData = completedPartsXml.data(using: .utf8)
+        let bucket          = initiateUploadData.bucketName ?? ""
+        let region          = initiateUploadData.region ?? ""
+        let key             = (initiateUploadData.path ?? "") + encodedPackageName
+        let accessKeyId     = initiateUploadData.accessKeyID ?? ""
+        let secretAccessKey = initiateUploadData.secretAccessKey ?? ""
+        let sessionToken    = initiateUploadData.sessionToken ?? ""
+        let contentType     = ""
+        let jcdsServerURL   = ( region == "us-east-1" ) ? URL(string: "https://\(bucket).s3.amazonaws.com/\(key)" + "?uploadId=\(uploadId)")!:URL(string: "https://\(bucket).s3-\(region).amazonaws.com/\(key)" + "?uploadId=\(uploadId)")!
+
+        let currentDate = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd'T'HHmmss'Z'"
+        dateFormatter.timeZone = TimeZone(identifier: "UTC")
+        let dateString = dateFormatter.string(from: currentDate)
+
+        var request = URLRequest(url: jcdsServerURL,
+                                 cachePolicy: .reloadIgnoringLocalCacheData)
+
+
+        request.addValue("\(currentDate)", forHTTPHeaderField: "Date")
+        request.addValue("text/xml", forHTTPHeaderField: "Content-Type")
+        request.addValue("\(bucket).s3.amazonaws.com", forHTTPHeaderField: "Host")
+        request.addValue("UNSIGNED-PAYLOAD", forHTTPHeaderField: "x-amz-content-sha256")
+        request.addValue(dateString, forHTTPHeaderField: "x-amz-date")
+        request.addValue(sessionToken, forHTTPHeaderField: "x-amz-security-token")
+
+        request.httpMethod = "POST"
+        let signatureProvided = "\(awsSignature256(for: sessionToken, httpMethod: request.httpMethod!, date: dateString, accessKeyId: accessKeyId, secretKey: secretAccessKey, bucket: bucket, key: key, queryParameters: "uploadId=\(uploadId)", region: region/*, fileUrl: fileUrl, contentType: contentType*/, currentDate: "\(currentDate)"))"
+
+        request.addValue("AWS4-HMAC-SHA256 Credential=\(accessKeyId)/\(dateString.prefix(8))/\(region)/s3/aws4_request,SignedHeaders=date;host;x-amz-content-sha256;x-amz-date;x-amz-security-token,Signature=\(signatureProvided)", forHTTPHeaderField: "Authorization")
+
+//        var request = try createMultipartUploadRequest(fileUrl: fileUrl, httpMethod: "POST", urlQuery: "uploadId=\(uploadId)", contentType: "text/xml")
+
+        let requestData = completeMultipartUploadXml.data(using: .utf8)
         request.httpBody = requestData
 
         URLCache.shared.removeAllCachedResponses()
 
-        let (responseData, response) = try await URLSession.shared.data(for: request)
-        if let httpResponse = response as? HTTPURLResponse {
-            if !(200...299).contains(httpResponse.statusCode) {
-               LogManager.shared.logMessage(message: "Failed to complete upload for \(packageToUpload). Status code: \(httpResponse.statusCode)", level: .error)
-                let responseDataString = String(data: responseData, encoding: .utf8) ?? ""
-                throw ServerCommunicationError.uploadFailed(statusCode: httpResponse.statusCode, message: responseDataString)
+        var responseString = ""
+        do {
+            let (responseData, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse {
+                if !(200...299).contains(httpResponse.statusCode) {
+                   LogManager.shared.logMessage(message: "Failed to complete upload for \(packageToUpload). Status code: \(httpResponse.statusCode)", level: .error)
+                    let responseDataString = String(data: responseData, encoding: .utf8) ?? ""
+                    throw ServerCommunicationError.uploadFailed(statusCode: httpResponse.statusCode, message: responseDataString)
+                }
             }
+            responseString = String(data: responseData, encoding: .utf8) ?? ""
+        } catch {
+            responseString = error.localizedDescription
         }
-
         uploadTime.end = Int(Date().timeIntervalSince1970)
         LogManager.shared.logMessage(message: "Finished uploading \(packageToUpload)", level: .info)
         LogManager.shared.logMessage(message: "Upload of \(packageToUpload) completed in \(uploadTime.total())", level: .info)
+
+//        keepAwake.enableSleep()
+        return(responseString)
     }
+
+// TODO: NEW CODE - FIX AND PUT THIS BACK IN
+//    func completeMultipartUpload(fileUrl: URL, uploadId: String) async throws {
+//        let completedPartsXml = createCompletedPartsXml()
+//        let packageToUpload = fileUrl.lastPathComponent
+//
+//        var request = try createMultipartUploadRequest(fileUrl: fileUrl, httpMethod: "POST", urlQuery: "uploadId=\(uploadId)")
+//
+//        let requestData = completedPartsXml.data(using: .utf8)
+//        request.httpBody = requestData
+//
+//        URLCache.shared.removeAllCachedResponses()
+//
+//        let (responseData, response) = try await URLSession.shared.data(for: request)
+//        if let httpResponse = response as? HTTPURLResponse {
+//            if !(200...299).contains(httpResponse.statusCode) {
+//               LogManager.shared.logMessage(message: "Failed to complete upload for \(packageToUpload). Status code: \(httpResponse.statusCode)", level: .error)
+//                let responseDataString = String(data: responseData, encoding: .utf8) ?? ""
+//                throw ServerCommunicationError.uploadFailed(statusCode: httpResponse.statusCode, message: responseDataString)
+//            }
+//        }
+//
+//        uploadTime.end = Int(Date().timeIntervalSince1970)
+//        LogManager.shared.logMessage(message: "Finished uploading \(packageToUpload)", level: .info)
+//        LogManager.shared.logMessage(message: "Upload of \(packageToUpload) completed in \(uploadTime.total())", level: .info)
+//    }
 
     private func createCompletedPartsXml() -> String {
         var completionArray = ""
@@ -239,7 +466,7 @@ class MultipartUpload {
         return data
     }
 
-    private func awsSignature256(for resource: String, httpMethod: String, date: String, accessKeyId: String, secretKey: String, bucket: String, key: String, queryParameters: String = "", region: String, fileUrl: URL, contentType: String, currentDate: String) -> String {
+    private func awsSignature256(for resource: String, httpMethod: String, date: String, accessKeyId: String, secretKey: String, bucket: String, key: String, queryParameters: String = "", region: String/*, fileUrl: URL, contentType: String*/, currentDate: String) -> String {
 
         var requestHeaders = [String:String]()
         requestHeaders["date"] = currentDate
