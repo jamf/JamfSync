@@ -12,6 +12,7 @@ protocol RenewTokenProtocol {
 class MultipartUpload {
     var initiateUploadData: JsonInitiateUpload
     let renewTokenObject: RenewTokenProtocol
+    let progress: SynchronizationProgress
     var uploadTime = UploadTime(start: 0, end: 0)
     var partNumberEtagList: [CompletedChunk] = []
     var totalChunks = 0
@@ -21,9 +22,10 @@ class MultipartUpload {
     let operationQueue = OperationQueue()
     var urlSession: URLSession?
     
-    init(initiateUploadData: JsonInitiateUpload, renewTokenProtocol: RenewTokenProtocol) {
+    init(initiateUploadData: JsonInitiateUpload, renewTokenProtocol: RenewTokenProtocol, progress: SynchronizationProgress) {
         self.initiateUploadData = initiateUploadData
         self.renewTokenObject = renewTokenProtocol
+        self.progress = progress
     }
     
     func createUrlSession(sessionDelegate: CloudSessionDelegate) -> URLSession {
@@ -131,8 +133,6 @@ class MultipartUpload {
         var remainingParts    = Array(1...totalChunks)
         var failedParts       = [Int]()
         var chunkIndex        = 0
-        
-        let synchronizationProgress = SynchronizationProgress()
 
         partNumberEtagList.removeAll()
 
@@ -151,7 +151,7 @@ class MultipartUpload {
             }
 
             do {
-                try await uploadChunk(whichChunk: chunkIndex, uploadId: uploadId, fileUrl: fileUrl, progress: synchronizationProgress)
+                try await uploadChunk(whichChunk: chunkIndex, uploadId: uploadId, fileUrl: fileUrl, progress: progress)
                 uploadedChunks += 1
                 failedParts.removeAll(where: { $0 == chunkIndex })
                 LogManager.shared.logMessage(message: "Uploaded chunk \(chunkIndex), \(totalChunks - uploadedChunks) remaining", level: .debug)
