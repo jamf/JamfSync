@@ -225,16 +225,26 @@ struct JsonCloudFileDownload: Decodable {
     let uri: String?
 }
 
-struct JsonInitiateUpload: Decodable {
-    let accessKeyID: String?
-    let expiration: Int?
-    let secretAccessKey: String?
-    let sessionToken: String?
+class JsonInitiateUpload: Decodable {
+    var accessKeyID: String?
+    var expiration: Int?
+    var secretAccessKey: String?
+    var sessionToken: String?
     let region: String?
     let bucketName: String?
     let path: String?
     let uuid: String?
 }
+//struct JsonInitiateUpload: Decodable {
+//    var accessKeyID: String?
+//    var expiration: Int?
+//    var secretAccessKey: String?
+//    var sessionToken: String?
+//    let region: String?
+//    let bucketName: String?
+//    let path: String?
+//    let uuid: String?
+//}
 
 struct JsonJamfProVersion: Decodable {
     let version: String

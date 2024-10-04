@@ -4,7 +4,7 @@
 
 import Foundation
 
-class Jcds2Dp: DistributionPoint {
+class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
     var dpIndex: Int?
     var initiateUploadData: JsonInitiateUpload?
     let expirationBuffer = 60 // If the uploading will expire in 60 seconds, initiate upload again
@@ -191,6 +191,24 @@ class Jcds2Dp: DistributionPoint {
             self.initiateUploadData = try? decoder.decode(JsonInitiateUpload.self, from: data)
         }
     }
+    
+    func renewUploadToken() async throws {
+        guard let jamfProInstanceId, let jamfProInstance = findJamfProInstance(id: jamfProInstanceId), let url = jamfProInstance.url else { throw ServerCommunicationError.noJamfProUrl }
+
+        let initiateUploadUrl = url.appendingPathComponent("/api/v1/jcds/renew-credentials")
+        let response = try await jamfProInstance.dataRequest(url: initiateUploadUrl, httpMethod: "POST")
+        if let data = response.data {
+            let decoder = JSONDecoder()
+            let renewedCredentials = try? decoder.decode(JsonInitiateUpload.self, from: data)
+            initiateUploadData?.accessKeyID = renewedCredentials?.accessKeyID as? String ?? ""
+            initiateUploadData?.expiration = renewedCredentials?.expiration as? Int ?? 0
+            initiateUploadData?.secretAccessKey = renewedCredentials?.secretAccessKey as? String ?? ""
+            initiateUploadData?.sessionToken = renewedCredentials?.sessionToken as? String ?? ""
+            
+            print("[renewUploadToken] expiration: \(initiateUploadData?.expiration ?? 0)")
+            print("[renewUploadToken]      token: \(initiateUploadData?.sessionToken ?? "")")
+        }
+    }
 
     private func uploadToCloud(file: DpFile, moveFrom: URL?, progress: SynchronizationProgress) async throws {
         guard let initiateUploadData else { throw DistributionPointError.failedToInitiateCloudUpload }
@@ -211,7 +229,7 @@ class Jcds2Dp: DistributionPoint {
         keepAwake.disableSleep(reason: "Starting upload")
         defer { keepAwake.enableSleep() }
 
-        let multipartUpload = MultipartUpload(initiateUploadData: initiateUploadData)
+        let multipartUpload = MultipartUpload(initiateUploadData: initiateUploadData, renewTokenProtocol: self)
         
         let uploadId = try await multipartUpload.startMultipartUpload(fileUrl: fileUrl, fileSize: fileSize)
 

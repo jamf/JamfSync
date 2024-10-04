@@ -21,6 +21,7 @@ class CloudSessionDelegate: NSObject, URLSessionTaskDelegate, URLSessionDownload
     }
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
+        print("[urlSession.CloudSessionDelegate] totalBytesTransferred: \(totalBytesSent), bytesTransferred: \(bytesSent)")
         progress.updateFileTransferInfo(totalBytesTransferred: totalBytesSent, bytesTransferred: bytesSent)
     }
 
