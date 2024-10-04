@@ -204,9 +204,6 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
             initiateUploadData?.expiration = renewedCredentials?.expiration as? Int ?? 0
             initiateUploadData?.secretAccessKey = renewedCredentials?.secretAccessKey as? String ?? ""
             initiateUploadData?.sessionToken = renewedCredentials?.sessionToken as? String ?? ""
-            
-            print("[renewUploadToken] expiration: \(initiateUploadData?.expiration ?? 0)")
-            print("[renewUploadToken]      token: \(initiateUploadData?.sessionToken ?? "")")
         }
     }
 

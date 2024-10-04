@@ -11,7 +11,7 @@ protocol RenewTokenProtocol {
 
 class MultipartUpload {
     var initiateUploadData: JsonInitiateUpload
-    let renewTokenProtocol: RenewTokenProtocol
+    let renewTokenObject: RenewTokenProtocol
     var uploadTime = UploadTime(start: 0, end: 0)
     var partNumberEtagList: [CompletedChunk] = []
     var totalChunks = 0
@@ -23,7 +23,7 @@ class MultipartUpload {
     
     init(initiateUploadData: JsonInitiateUpload, renewTokenProtocol: RenewTokenProtocol) {
         self.initiateUploadData = initiateUploadData
-        self.renewTokenProtocol = renewTokenProtocol
+        self.renewTokenObject = renewTokenProtocol
     }
     
     func createUrlSession(sessionDelegate: CloudSessionDelegate) -> URLSession {
@@ -146,7 +146,7 @@ class MultipartUpload {
 
                 LogManager.shared.logMessage(message: "Upload token time remaining: \(timeLeft) minutes", level: .debug)
                 if timeLeft < 5 {
-                    try await renewTokenProtocol.renewUploadToken()
+                    try await renewTokenObject.renewUploadToken()
                 }
             }
 
