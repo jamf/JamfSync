@@ -226,8 +226,8 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
         keepAwake.disableSleep(reason: "Starting upload")
         defer { keepAwake.enableSleep() }
 
-        let multipartUpload = MultipartUpload(initiateUploadData: initiateUploadData, renewTokenProtocol: self)
-        
+        let multipartUpload = MultipartUpload(initiateUploadData: initiateUploadData, renewTokenProtocol: self, progress: progress)
+
         let uploadId = try await multipartUpload.startMultipartUpload(fileUrl: fileUrl, fileSize: fileSize)
 
         try await multipartUpload.processMultipartUpload(whichChunk: 1, uploadId: uploadId, fileUrl: fileUrl)

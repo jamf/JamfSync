@@ -12,6 +12,7 @@ protocol RenewTokenProtocol {
 class MultipartUpload {
     var initiateUploadData: JsonInitiateUpload
     let renewTokenObject: RenewTokenProtocol
+    let progress: SynchronizationProgress
     var uploadTime = UploadTime(start: 0, end: 0)
     var partNumberEtagList: [CompletedChunk] = []
     var totalChunks = 0
@@ -21,9 +22,10 @@ class MultipartUpload {
     let operationQueue = OperationQueue()
     var urlSession: URLSession?
     
-    init(initiateUploadData: JsonInitiateUpload, renewTokenProtocol: RenewTokenProtocol) {
+    init(initiateUploadData: JsonInitiateUpload, renewTokenProtocol: RenewTokenProtocol, progress: SynchronizationProgress) {
         self.initiateUploadData = initiateUploadData
         self.renewTokenObject = renewTokenProtocol
+        self.progress = progress
     }
     
     func createUrlSession(sessionDelegate: CloudSessionDelegate) -> URLSession {
@@ -131,8 +133,6 @@ class MultipartUpload {
         var remainingParts    = Array(1...totalChunks)
         var failedParts       = [Int]()
         var chunkIndex        = 0
-        
-//        let synchronizationProgress = SynchronizationProgress()
 
         partNumberEtagList.removeAll()
 
@@ -151,7 +151,7 @@ class MultipartUpload {
             }
 
             do {
-                try await uploadChunk(whichChunk: chunkIndex, uploadId: uploadId, fileUrl: fileUrl)
+                try await uploadChunk(whichChunk: chunkIndex, uploadId: uploadId, fileUrl: fileUrl, progress: progress)
                 uploadedChunks += 1
                 failedParts.removeAll(where: { $0 == chunkIndex })
                 LogManager.shared.logMessage(message: "Uploaded chunk \(chunkIndex), \(totalChunks - uploadedChunks) remaining", level: .debug)
@@ -168,29 +168,29 @@ class MultipartUpload {
         }
     }
 
-    private func uploadChunk(whichChunk: Int, uploadId: String, fileUrl: URL) async throws {
+    private func uploadChunk(whichChunk: Int, uploadId: String, fileUrl: URL, progress: SynchronizationProgress) async throws {
         LogManager.shared.logMessage(message: "Start processing part \(whichChunk)", level: .debug)
 
         let chunk = try getChunk(fileUrl: fileUrl, part: whichChunk)
 
         guard chunk.count > 0 else { return }
         
-//        let sessionDelegate = CloudSessionDelegate(progress: progress)
-//        urlSession = createUrlSession(sessionDelegate: sessionDelegate)
-//        guard let urlSession else { throw DistributionPointError.programError }
+        let sessionDelegate = CloudSessionDelegate(progress: progress)
+        urlSession = createUrlSession(sessionDelegate: sessionDelegate)
+        guard let urlSession else { throw DistributionPointError.programError }
 
         let request = try createMultipartUploadRequest(fileUrl: fileUrl, httpMethod: "PUT", urlQuery: "partNumber=\(whichChunk)&uploadId=\(uploadId)")
 
-        let urlSession: URLSession = {
-            let configuration = URLSessionConfiguration.ephemeral
-            configuration.httpShouldSetCookies = true
-            configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-            configuration.urlCache = nil
-            configuration.timeoutIntervalForRequest = 3600.0
-            configuration.timeoutIntervalForResource = 3600.0
-//            configuration.urlCache = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
-            return URLSession(configuration: configuration)
-        }()
+//        let urlSession: URLSession = {
+//            let configuration = URLSessionConfiguration.ephemeral
+//            configuration.httpShouldSetCookies = true
+//            configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+//            configuration.urlCache = nil
+//            configuration.timeoutIntervalForRequest = 3600.0
+//            configuration.timeoutIntervalForResource = 3600.0
+////            configuration.urlCache = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
+//            return URLSession(configuration: configuration)
+//        }()
 
         URLCache.shared.removeAllCachedResponses()
         
