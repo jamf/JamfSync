@@ -42,6 +42,7 @@ class SynchronizationProgress: ObservableObject {
             }
         } else {
             Task { @MainActor in
+                print("[updateFileTransferInfo] totalBytesTransferred: \(totalBytesTransferred)    bytesTransferred: \(bytesTransferred)")
                 setFileTransferVars(totalBytesTransferred: totalBytesTransferred, bytesTransferred: bytesTransferred)
             }
         }
@@ -50,6 +51,7 @@ class SynchronizationProgress: ObservableObject {
     func finalProgressValues(totalBytesTransferred: Int64, currentTotalSizeTransferred: Int64) {
         if printToConsole {
             // NOTE: MainActor isn't called when processing the command line arguments since no UI is shown yet
+            print("[SynchronizationProgress.finalProgressValues()] currentFileSizeTransferred: \(currentFileSizeTransferred ?? 0)   size: \(currentFile?.size ?? 0)")
             setFinalProgressValues(totalBytesTransferred: totalBytesTransferred, currentTotalSizeTransferred: currentTotalSizeTransferred)
             if showProgressOnConsole {
                 printProgressToConsole()
@@ -62,6 +64,7 @@ class SynchronizationProgress: ObservableObject {
     }
 
     func fileProgress() -> Double? {
+        print("[SynchronizationProgress.fileProgress()] currentFileSizeTransferred: \(currentFileSizeTransferred ?? 0)   size: \(currentFile?.size ?? 0)")
         if let currentFileSizeTransferred, let currentFile {
             let size = (currentFile.size ?? 0) + Int64(overheadSizePerFile)
             if size > 0 {
@@ -104,6 +107,7 @@ class SynchronizationProgress: ObservableObject {
     }
 
     private func setFileTransferVars(totalBytesTransferred: Int64, bytesTransferred: Int64) {
+        print("[setFileTransferVars] totalBytesTransferred: \(totalBytesTransferred)    bytesTransferred: \(bytesTransferred)")
         currentFileSizeTransferred = totalBytesTransferred
         currentTotalSizeTransferred += bytesTransferred
     }
