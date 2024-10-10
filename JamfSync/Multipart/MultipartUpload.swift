@@ -13,7 +13,7 @@ class MultipartUpload {
     var initiateUploadData: JsonInitiateUpload
     let renewTokenObject: RenewTokenProtocol
     let progress: SynchronizationProgress
-    var uploadTime = UploadTime(start: 0, end: 0)
+    var uploadTime = UploadTime()
     var partNumberEtagList: [CompletedChunk] = []
     var totalChunks = 0
     let maxUploadSize = 32212255000
@@ -45,11 +45,11 @@ class MultipartUpload {
         let filename = fileUrl.lastPathComponent
         LogManager.shared.logMessage(message: "Starting upload of \(filename)", level: .debug)
 
-        let request = try createMultipartUploadRequest(fileUrl: fileUrl, httpMethod: "POST", urlQuery: "uploads=", stage: "create")
+        let request = try createMultipartUploadRequest(fileUrl: fileUrl, httpMethod: "POST", urlQuery: "uploads=", start: true)
 
         URLCache.shared.removeAllCachedResponses()
 
-        uploadTime.start = Int(Date().timeIntervalSince1970)
+        uploadTime.start = Date().timeIntervalSince1970
         let (responseData, response) = try await URLSession.shared.data(for: request)
         let responseDataString = String(data: responseData, encoding: .utf8) ?? ""
         if let httpResponse = response as? HTTPURLResponse {
@@ -83,7 +83,7 @@ class MultipartUpload {
         return rawValue
     }
 
-    private func createMultipartUploadRequest(fileUrl: URL, httpMethod: String, urlQuery: String? = nil, stage: String? = nil, contentType: String? = nil) throws -> URLRequest {
+    private func createMultipartUploadRequest(fileUrl: URL, httpMethod: String, urlQuery: String? = nil, start: Bool = false, contentType: String? = nil) throws -> URLRequest {
         let filename = fileUrl.lastPathComponent
         var urlHostAllowedPlus = CharacterSet.urlHostAllowed
         urlHostAllowedPlus.remove(charactersIn: "+")
@@ -91,15 +91,16 @@ class MultipartUpload {
 
         let bucket          = initiateUploadData.bucketName ?? ""
         let region          = initiateUploadData.region ?? ""
-        let key             = (initiateUploadData.path ?? "") + encodedPackageName + (stage == "create" ? "?uploads":"") // "?uploads"
+        let key             = (initiateUploadData.path ?? "") + encodedPackageName + (start ? "?uploads" : "")
         let accessKeyId     = initiateUploadData.accessKeyID ?? ""
         let secretAccessKey = initiateUploadData.secretAccessKey ?? ""
         let sessionToken    = initiateUploadData.sessionToken ?? ""
         var urlQueryString  = ""
         if let urlQuery {
-            urlQueryString = (stage == "create" ? "&\(urlQuery)":"?\(urlQuery)")
+            urlQueryString = start ? "&\(urlQuery)" : "?\(urlQuery)"
         }
-        let jcdsServerURL   = ( region == "us-east-1" ) ? URL(string: "https://\(bucket).s3.amazonaws.com/\(key)\(urlQueryString)"):URL(string: "https://\(bucket).s3-\(region).amazonaws.com/\(key)\(urlQueryString)")
+        let regionString = region == "us-east-1" ? "" : "-\(region)"
+        let jcdsServerURL   = URL(string: "https://\(bucket).s3\(regionString).amazonaws.com/\(key)\(urlQueryString)")
 
         let currentDate = Date()
         let dateFormatter = DateFormatter()
@@ -121,7 +122,7 @@ class MultipartUpload {
         }
 
         request.httpMethod = httpMethod
-        let signatureProvided = "\(awsSignature256(for: sessionToken, httpMethod: request.httpMethod!, date: dateString, accessKeyId: accessKeyId, secretKey: secretAccessKey, bucket: bucket, key: key, queryParameters: urlQuery ?? "", region: region/*, fileUrl: fileUrl, contentType: contentType*/, currentDate: "\(currentDate)"))"
+        let signatureProvided = "\(awsSignature256(for: sessionToken, httpMethod: request.httpMethod!, date: dateString, accessKeyId: accessKeyId, secretKey: secretAccessKey, bucket: bucket, key: key, queryParameters: urlQuery ?? "", region: region, currentDate: "\(currentDate)"))"
 
         request.addValue("AWS4-HMAC-SHA256 Credential=\(accessKeyId)/\(dateString.prefix(8))/\(region)/s3/aws4_request,SignedHeaders=date;host;x-amz-content-sha256;x-amz-date;x-amz-security-token,Signature=\(signatureProvided)", forHTTPHeaderField: "Authorization")
 
@@ -156,7 +157,7 @@ class MultipartUpload {
                 failedParts.removeAll(where: { $0 == chunkIndex })
                 LogManager.shared.logMessage(message: "Uploaded chunk \(chunkIndex), \(totalChunks - uploadedChunks) remaining", level: .debug)
             } catch {
-                if (failedParts.firstIndex(where: { $0 == chunkIndex }) != nil) {
+                if failedParts.firstIndex(where: { $0 == chunkIndex }) != nil {
                     LogManager.shared.logMessage(message: "Part \(chunkIndex) has previously failed, aborting upload.", level: .debug)
                     throw DistributionPointError.uploadFailure
                 } else {
@@ -171,30 +172,19 @@ class MultipartUpload {
     private func uploadChunk(whichChunk: Int, uploadId: String, fileUrl: URL, progress: SynchronizationProgress) async throws {
         LogManager.shared.logMessage(message: "Start processing part \(whichChunk)", level: .debug)
 
-        let chunk = try getChunk(fileUrl: fileUrl, part: whichChunk)
+        let chunkData = try getChunkData(fileUrl: fileUrl, part: whichChunk)
 
-        guard chunk.count > 0 else { return }
-        
+        guard chunkData.count > 0 else { return }
+
         let sessionDelegate = CloudSessionDelegate(progress: progress)
         urlSession = createUrlSession(sessionDelegate: sessionDelegate)
         guard let urlSession else { throw DistributionPointError.programError }
 
         let request = try createMultipartUploadRequest(fileUrl: fileUrl, httpMethod: "PUT", urlQuery: "partNumber=\(whichChunk)&uploadId=\(uploadId)")
 
-//        let urlSession: URLSession = {
-//            let configuration = URLSessionConfiguration.ephemeral
-//            configuration.httpShouldSetCookies = true
-//            configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-//            configuration.urlCache = nil
-//            configuration.timeoutIntervalForRequest = 3600.0
-//            configuration.timeoutIntervalForResource = 3600.0
-////            configuration.urlCache = URLCache(memoryCapacity: 0, diskCapacity: 0, diskPath: nil)
-//            return URLSession(configuration: configuration)
-//        }()
-
         URLCache.shared.removeAllCachedResponses()
         
-        let (responseData, response) = try await urlSession.upload(for: request, from: chunk)
+        let (responseData, response) = try await urlSession.upload(for: request, from: chunkData)
         if let httpResponse = response as? HTTPURLResponse {
             if !(200...299).contains(httpResponse.statusCode) {
                 LogManager.shared.logMessage(message: "Failed to upload part \(whichChunk) for \(fileUrl). Status code: \(httpResponse.statusCode)", level: .debug)
@@ -202,8 +192,9 @@ class MultipartUpload {
                 throw ServerCommunicationError.uploadFailed(statusCode: httpResponse.statusCode, message: responseDataString)
             }
             let allHeaders = httpResponse.allHeaderFields
-            print("[multipartUpload] partNumber: \(whichChunk) - Etag: \(allHeaders["Etag"] ?? "")")
-            partNumberEtagList.append(CompletedChunk(partNumber: whichChunk, eTag: (allHeaders["Etag"] as? String) ?? ""))
+            let etag = allHeaders["Etag"] as? String ?? ""
+            LogManager.shared.logMessage(message: "[multipartUpload] partNumber: \(whichChunk) - Etag: \(etag)", level: .debug)
+            partNumberEtagList.append(CompletedChunk(partNumber: whichChunk, eTag: etag))
         } else {
             LogManager.shared.logMessage(message: "No response for part \(whichChunk) for \(fileUrl).", level: .debug)
         }
@@ -229,7 +220,7 @@ class MultipartUpload {
             }
         }
 
-        uploadTime.end = Int(Date().timeIntervalSince1970)
+        uploadTime.end = Date().timeIntervalSince1970
         LogManager.shared.logMessage(message: "Finished uploading \(packageToUpload)", level: .info)
         LogManager.shared.logMessage(message: "Upload of \(packageToUpload) completed in \(uploadTime.total())", level: .info)
     }
@@ -252,7 +243,7 @@ class MultipartUpload {
             """
     }
 
-    private func getChunk(fileUrl: URL, part: Int) throws -> Data {
+    private func getChunkData(fileUrl: URL, part: Int) throws -> Data {
         let fileHandle = try FileHandle(forReadingFrom: fileUrl)
 
         fileHandle.seek(toFileOffset: UInt64((part - 1) * chunkSize))
@@ -297,14 +288,12 @@ class MultipartUpload {
         UNSIGNED-PAYLOAD
         """
         LogManager.shared.logMessage(message: "CanonicalRequest: \(canonicalRequest)", level: .debug)
-//        print("[awsSignature256] ")
 
         let canonicalRequestData = Data(canonicalRequest.utf8)
         let canonicalRequestDataHashed = SHA256.hash(data: canonicalRequestData)
         let canonicalRequestString = canonicalRequestDataHashed.compactMap { String(format: "%02x", $0) }.joined()
-
+        
         let scope = "\(date.prefix(8))/\(region)/s3/aws4_request"
-        // STRING TO SIGN
         let stringToSign = """
             AWS4-HMAC-SHA256
             \(date)

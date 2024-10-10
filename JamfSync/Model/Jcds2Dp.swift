@@ -200,10 +200,10 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
         if let data = response.data {
             let decoder = JSONDecoder()
             let renewedCredentials = try? decoder.decode(JsonInitiateUpload.self, from: data)
-            initiateUploadData?.accessKeyID = renewedCredentials?.accessKeyID as? String ?? ""
-            initiateUploadData?.expiration = renewedCredentials?.expiration as? Int ?? 0
-            initiateUploadData?.secretAccessKey = renewedCredentials?.secretAccessKey as? String ?? ""
-            initiateUploadData?.sessionToken = renewedCredentials?.sessionToken as? String ?? ""
+            initiateUploadData?.accessKeyID = renewedCredentials?.accessKeyID
+            initiateUploadData?.expiration = renewedCredentials?.expiration
+            initiateUploadData?.secretAccessKey = renewedCredentials?.secretAccessKey
+            initiateUploadData?.sessionToken = renewedCredentials?.sessionToken
         }
     }
 
