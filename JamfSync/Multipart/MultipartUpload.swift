@@ -22,9 +22,9 @@ class MultipartUpload {
     let operationQueue = OperationQueue()
     var urlSession: URLSession?
     
-    init(initiateUploadData: JsonInitiateUpload, renewTokenProtocol: RenewTokenProtocol, progress: SynchronizationProgress) {
+    init(initiateUploadData: JsonInitiateUpload, renewTokenObject: RenewTokenProtocol, progress: SynchronizationProgress) {
         self.initiateUploadData = initiateUploadData
-        self.renewTokenObject = renewTokenProtocol
+        self.renewTokenObject = renewTokenObject
         self.progress = progress
     }
     
