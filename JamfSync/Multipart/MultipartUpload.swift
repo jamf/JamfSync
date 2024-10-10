@@ -130,6 +130,7 @@ class MultipartUpload {
     }
 
     func processMultipartUpload(whichChunk: Int, uploadId: String, fileUrl: URL) async throws {
+        let minTokenRemainingTime = 5
         var uploadedChunks    = 0
         var remainingParts    = Array(1...totalChunks)
         var failedParts       = [Int]()
@@ -146,7 +147,7 @@ class MultipartUpload {
                 let timeLeft = (expireEpoch - currentEpoch)/60
 
                 LogManager.shared.logMessage(message: "Upload token time remaining: \(timeLeft) minutes", level: .debug)
-                if timeLeft < 5 {
+                if timeLeft < minTokenRemainingTime {
                     try await renewTokenObject.renewUploadToken()
                 }
             }
