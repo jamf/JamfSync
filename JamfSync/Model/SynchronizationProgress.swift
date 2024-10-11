@@ -36,13 +36,13 @@ class SynchronizationProgress: ObservableObject {
     func updateFileTransferInfo(totalBytesTransferred: Int64, bytesTransferred: Int64) {
         if printToConsole {
             // NOTE: MainActor isn't called when processing the command line arguments since no UI is shown yet
-            setFileTransferVars(totalBytesTransferred: totalBytesTransferred, bytesTransferred: bytesTransferred)
+            setFileTransferVars(totalBytesTransferred: totalBytesTransferred, bytesTransferred: bytesTransferred, progress: self)
             if showProgressOnConsole {
                 printProgressToConsole()
             }
         } else {
             Task { @MainActor in
-                setFileTransferVars(totalBytesTransferred: totalBytesTransferred, bytesTransferred: bytesTransferred)
+                setFileTransferVars(totalBytesTransferred: totalBytesTransferred, bytesTransferred: bytesTransferred, progress: self)
             }
         }
     }
@@ -50,6 +50,7 @@ class SynchronizationProgress: ObservableObject {
     func finalProgressValues(totalBytesTransferred: Int64, currentTotalSizeTransferred: Int64) {
         if printToConsole {
             // NOTE: MainActor isn't called when processing the command line arguments since no UI is shown yet
+            print("[SynchronizationProgress.finalProgressValues()] currentFileSizeTransferred: \(currentFileSizeTransferred ?? 0)   size: \(currentFile?.size ?? 0)")
             setFinalProgressValues(totalBytesTransferred: totalBytesTransferred, currentTotalSizeTransferred: currentTotalSizeTransferred)
             if showProgressOnConsole {
                 printProgressToConsole()
@@ -103,8 +104,15 @@ class SynchronizationProgress: ObservableObject {
         self.currentTotalSizeTransferred = currentTotalSizeTransferred
     }
 
-    private func setFileTransferVars(totalBytesTransferred: Int64, bytesTransferred: Int64) {
-        currentFileSizeTransferred = totalBytesTransferred
+    private func setFileTransferVars(totalBytesTransferred: Int64, bytesTransferred: Int64, progress: SynchronizationProgress) {
+        if progress.operation == "Downloading" {
+            currentFileSizeTransferred = totalBytesTransferred
+            if isAt100Percent() {
+                currentFileSizeTransferred = 0
+            }
+        } else {
+            currentFileSizeTransferred! += bytesTransferred
+        }
         currentTotalSizeTransferred += bytesTransferred
     }
 
