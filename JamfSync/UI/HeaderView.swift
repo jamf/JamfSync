@@ -55,7 +55,7 @@ struct HeaderView: View {
                         }
                     }
                 } else {
-                    Button("Files and associated packages", role: .destructive) {
+                    Button("Files and associated package records", role: .destructive) {
                         Task {
                             await startSynchronize(deleteFiles: true, deletePackages: true)
                         }
