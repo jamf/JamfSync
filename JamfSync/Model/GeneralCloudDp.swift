@@ -122,7 +122,7 @@ class GeneralCloudDp: DistributionPoint {
                 throw ServerCommunicationError.contentTooLarge
             default:
                 let responseDataString = String(data: responseData, encoding: .utf8)
-                throw ServerCommunicationError.dataRequestFailed(statusCode: httpResponse.statusCode, message: responseDataString)
+                throw ServerCommunicationError.uploadFailed(statusCode: httpResponse.statusCode, message: responseDataString)
             }
         }
     }

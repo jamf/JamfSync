@@ -475,15 +475,49 @@ class DistributionPoint: Identifiable {
     private func addOrUpdatePackageInJamfPro(dpFile: DpFile, jamfProInstance: JamfProInstance?) async throws {
         guard let jamfProInstance else { return }
         let checksum = try await retrieveFileChecksum(dpFile: dpFile)
-        if var package = jamfProInstance.findPackage(name: dpFile.name) {
-            package.checksums = dpFile.checksums
-            package.size = dpFile.size
-            try await jamfProInstance.updatePackage(package: package)
+        if let package = jamfProInstance.findPackage(name: dpFile.name) {
+            try await updatePackage(package: package, dpFile: dpFile, jamfProInstance: jamfProInstance)
         } else {
             if let checksum {
                 dpFile.checksums.updateChecksum(checksum)
             }
+            try await addPackage(dpFile: dpFile, jamfProInstance: jamfProInstance)
+        }
+    }
+
+    private func updatePackage(package: Package, dpFile: DpFile, jamfProInstance: JamfProInstance) async throws {
+        var packageVar = package
+        packageVar.checksums = dpFile.checksums
+        packageVar.size = dpFile.size
+        do {
+            try await jamfProInstance.updatePackage(package: packageVar)
+        } catch {
+            LogManager.shared.logMessage(message: "Failed to update package \(packageVar.fileName): \(error)", level: .error)
+            throw error
+        }
+    }
+
+    private func addPackage(dpFile: DpFile, jamfProInstance: JamfProInstance) async throws {
+        do {
             try await jamfProInstance.addPackage(dpFile: dpFile)
+        } catch let ServerCommunicationError.dataRequestFailed(statusCode, message) {
+            // There is some condition that happens rarely where Jamf Pro will report back that it's trying to add a package that already exists. This will try to reload packages and update the package if found.
+            try await duplicateFieldRemediation(dpFile: dpFile, jamfProInstance: jamfProInstance, statusCode: statusCode, message: message)
+        }
+    }
+
+    private func duplicateFieldRemediation(dpFile: DpFile, jamfProInstance: JamfProInstance, statusCode: Int, message: String?) async throws {
+        if statusCode == 400, let message, message.contains("DUPLICATE_FIELD") {
+            LogManager.shared.logMessage(message: "Failed to add package \(dpFile.name), reloading packages and trying to update instead.", level: .warning)
+            try await jamfProInstance.loadPackages()
+            if let package = jamfProInstance.findPackage(name: dpFile.name) {
+                try await updatePackage(package: package, dpFile: dpFile, jamfProInstance: jamfProInstance)
+                LogManager.shared.logMessage(message: "Updating package \(dpFile.name) was successful.", level: .info)
+            } else {
+                LogManager.shared.logMessage(message: "Package \(dpFile.name) was not found after reloading packages.", level: .error)
+            }
+        } else {
+            throw ServerCommunicationError.dataRequestFailed(statusCode: statusCode, message: message)
         }
     }
 
