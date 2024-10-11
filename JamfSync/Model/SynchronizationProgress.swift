@@ -50,7 +50,6 @@ class SynchronizationProgress: ObservableObject {
     func finalProgressValues(totalBytesTransferred: Int64, currentTotalSizeTransferred: Int64) {
         if printToConsole {
             // NOTE: MainActor isn't called when processing the command line arguments since no UI is shown yet
-            print("[SynchronizationProgress.finalProgressValues()] currentFileSizeTransferred: \(currentFileSizeTransferred ?? 0)   size: \(currentFile?.size ?? 0)")
             setFinalProgressValues(totalBytesTransferred: totalBytesTransferred, currentTotalSizeTransferred: currentTotalSizeTransferred)
             if showProgressOnConsole {
                 printProgressToConsole()
@@ -111,7 +110,7 @@ class SynchronizationProgress: ObservableObject {
                 currentFileSizeTransferred = 0
             }
         } else {
-            currentFileSizeTransferred! += bytesTransferred
+            currentFileSizeTransferred? += bytesTransferred
         }
         currentTotalSizeTransferred += bytesTransferred
     }

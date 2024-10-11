@@ -24,7 +24,6 @@ class SynchronizeTask {
         try await srcDp.retrieveFileList()
         try await dstDp.prepareDp()
         try await dstDp.retrieveFileList()
-        print("[synchronize]")
         try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: forceSync, progress: progress)
         if !srcDp.isCanceled && selectedItems.count == 0 {
             if deleteFiles {

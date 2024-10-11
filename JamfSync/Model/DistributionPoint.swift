@@ -322,9 +322,7 @@ class DistributionPoint: Identifiable {
         if willDownloadFiles {
             downloadMultiple = 2
         }
-        print("[copyFilesToDst] Synchronizing \(filesToSync.count) to \(dstDp.name)")
         progress.totalSize = calculateTotalTransferSize(filesToSync: filesToSync) * downloadMultiple
-        print("[copyFilesToDst] progress.totalSize: \(progress.totalSize ?? 0)")
         var currentTotalSizeTransferred: Int64 = 0
         var lastFile: DpFile?
         var lastFileTansferred = false
