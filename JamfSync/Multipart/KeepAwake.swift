@@ -2,7 +2,6 @@
 //  Copyright 2024, Jamf
 //
 
-
 import Foundation
 import IOKit.pwr_mgt
 

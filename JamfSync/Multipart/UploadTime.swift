@@ -2,33 +2,16 @@
 //  Copyright 2024, Jamf
 //
 
-class UploadTime {
-    var start: Int
-    var end: Int
+import Foundation
 
-    init(start: Int, end: Int) {
-        self.start = start
-        self.end = end
-    }
+class UploadTime {
+    var start: TimeInterval = 0.0
+    var end: TimeInterval = 0.0
 
     func total() -> String {
-        let totalSeconds = end - start
-        var totalTime = ""
-        if totalSeconds >= 3600 {
-            let hours = totalSeconds / 3600
-            let unit = (hours == 1 ) ? "hour ":"hours "
-            totalTime = "\(hours) \(unit)"
-        }
-        if totalSeconds >= 60 {
-            let minutes = (totalSeconds % 3600) / 60
-            let unit = (minutes == 1 ) ? "minute ":"minutes "
-            totalTime = totalTime + "\(minutes) \(unit)"
-        }
-        if totalSeconds >= 0 {
-            let seconds = (totalSeconds % 3600) % 60
-            let unit = (seconds == 1 ) ? "second":"seconds"
-            totalTime = totalTime + "\(seconds) \(unit)"
-        }
-        return totalTime
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .full
+        formatter.allowedUnits = [.hour, .minute, .second]
+        return formatter.string(from: end - start) ?? ""
     }
 }
