@@ -215,7 +215,6 @@ class JamfProInstance: SavableItem {
 
         if throwHttpError, let response = response as? HTTPURLResponse {
             if !(200...299).contains(response.statusCode) {
-                LogManager.shared.logMessage(message: "Failed to transmit data for \(url). Status code: \(response.statusCode)", level: .error)
                 let responseDataString = String(data: data, encoding: .utf8)
                 throw ServerCommunicationError.dataRequestFailed(statusCode: response.statusCode, message: responseDataString)
             }

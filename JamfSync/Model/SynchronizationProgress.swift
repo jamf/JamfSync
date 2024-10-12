@@ -110,6 +110,9 @@ class SynchronizationProgress: ObservableObject {
                 currentFileSizeTransferred = 0
             }
         } else {
+            if currentFileSizeTransferred == nil {
+                currentFileSizeTransferred = 0
+            }
             currentFileSizeTransferred? += bytesTransferred
         }
         currentTotalSizeTransferred += bytesTransferred
