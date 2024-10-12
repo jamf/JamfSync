@@ -9,7 +9,8 @@ class JamfProPackageUApi: JamfProPackageApi {
         guard let url = jamfProInstance.url else { throw ServerCommunicationError.noJamfProUrl }
 
         var packages: [Package] = []
-        let packagesUrl = url.appendingPathComponent("/api/v1/packages")
+        let pageParameters = [URLQueryItem(name: "page", value: "0"), URLQueryItem(name: "page-size", value: "2000"), URLQueryItem(name: "sort", value: "id%3Aasc")]
+        let packagesUrl = url.appendingPathComponent("/api/v1/packages").appending(queryItems: pageParameters)
 
         let response = try await jamfProInstance.dataRequest(url: packagesUrl, httpMethod: "GET")
         if let data = response.data {
@@ -17,6 +18,8 @@ class JamfProPackageUApi: JamfProPackageApi {
             do {
                 if let jsonPackages = try decoder.decode(JsonUapiPackages?.self, from: data) {
                     packages.removeAll()
+                    LogManager.shared.logMessage(message: "\(jamfProInstance.url?.absoluteString ?? "unknown server") - found \(jsonPackages.totalCount) packages", level: .debug)
+                    LogManager.shared.logMessage(message: "\(jamfProInstance.url?.absoluteString ?? "unknown server") - retrieved \(jsonPackages.results.count) packages", level: .debug)
                     for package in jsonPackages.results {
                         if let package = convertToPackage(jsonPackage: package) {
                             packages.append(package)

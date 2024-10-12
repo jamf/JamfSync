@@ -17,6 +17,7 @@ class JamfProPackageClassicApi: JamfProPackageApi {
             if let jsonPackages = try? decoder.decode(JsonCapiPackages.self, from: data) {
                 packages.removeAll()
                 for package in jsonPackages.packages {
+                    print("[JamfProPackageClassicApi] \(package.name)")
                     if let package = try await loadPackage(package: package, jamfProInstance: jamfProInstance) {
                         packages.append(package)
                     }
