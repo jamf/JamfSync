@@ -26,7 +26,7 @@ class JamfProPackageUApi: JamfProPackageApi {
     /// Adds a package
     /// - Parameters:
     ///     - dbFile: The file information for the package
-    ///     - jamfProInstance: The Jamf Pro server from which to load packages
+    ///     - jamfProInstance: The Jamf Pro server from which to add packages
     func addPackage(dpFile: DpFile, jamfProInstance: JamfProInstance) async throws {
         guard let url = jamfProInstance.url else { throw ServerCommunicationError.noJamfProUrl }
 
