@@ -5,55 +5,28 @@
 import Foundation
 
 class JamfProPackageUApi: JamfProPackageApi {
-    fileprivate func getPackagesByPage(jamfProInstance: JamfProInstance, page: Int, pageSize: Int) async throws -> (Int, [Package]) {
-        guard let url = jamfProInstance.url else { throw ServerCommunicationError.noJamfProUrl }
-        
-        var packages: [Package] = []
-        var totalPackages = 0
-        
-        let pageParameters = [URLQueryItem(name: "page", value: "\(page)"), URLQueryItem(name: "page-size", value: "\(pageSize)"), URLQueryItem(name: "sort", value: "id%3Aasc")]
-        let packagesUrl = url.appendingPathComponent("/api/v1/packages").appending(queryItems: pageParameters)
-        
-        let response = try await jamfProInstance.dataRequest(url: packagesUrl, httpMethod: "GET")
-        if let data = response.data {
-            let decoder = JSONDecoder()
-            do {
-                if let jsonPackages = try decoder.decode(JsonUapiPackages?.self, from: data) {
-                    packages.removeAll()
-                    totalPackages = jsonPackages.totalCount
-                    LogManager.shared.logMessage(message: "\(jamfProInstance.url?.absoluteString ?? "unknown server") - page \(page) retrieved \(jsonPackages.results.count) of \(jsonPackages.totalCount) packages", level: .debug)
-                    for package in jsonPackages.results {
-                        if let package = convertToPackage(jsonPackage: package) {
-                            packages.append(package)
-                        }
-                    }
-                }
-            } catch {
-                LogManager.shared.logMessage(message: "Failed to load package info from page \(page): \(error)", level: .error)
-            }
-        }
-        return (totalPackages, packages)
-    }
-    
+
+    /// Loads all the packages from the server
+    /// - Parameters:
+    ///     - jamfProInstance: The Jamf Pro server from which to load packages
+    /// - Returns: Returns an array of packages
     func loadPackages(jamfProInstance: JamfProInstance) async throws -> [Package] {
-        guard let _ = jamfProInstance.url else { throw ServerCommunicationError.noJamfProUrl }
-
-        var packages: [Package] = []
-        
         let pageSize = 200
-        var totalPackages = 0
-
-        (totalPackages, packages) = try await getPackagesByPage(jamfProInstance: jamfProInstance, page: 0, pageSize: pageSize)
-        
-        let pages = Int((Double(totalPackages)/Double(pageSize)).rounded(.up))
-        for whichPage in 1..<Int(pages) {
-            let (_, fetchedPackages) = try await getPackagesByPage(jamfProInstance: jamfProInstance, page: whichPage, pageSize: pageSize)
-            packages.append(contentsOf: fetchedPackages)
+        var pageOfPackages = try await loadPageOfPackages(pageNbr: 0, pageSize: pageSize, jamfProInstance: jamfProInstance)
+        var packages = pageOfPackages.packages
+        let pages = (pageOfPackages.totalPackages + (pageSize - 1)) / pageSize
+        for pageNbr in 1..<pages {
+            pageOfPackages = try await loadPageOfPackages(pageNbr: pageNbr, pageSize: pageSize, jamfProInstance: jamfProInstance)
+            packages += pageOfPackages.packages
         }
 
         return packages
     }
 
+    /// Adds a package
+    /// - Parameters:
+    ///     - dbFile: The file information for the package
+    ///     - jamfProInstance: The Jamf Pro server from which to load packages
     func addPackage(dpFile: DpFile, jamfProInstance: JamfProInstance) async throws {
         guard let url = jamfProInstance.url else { throw ServerCommunicationError.noJamfProUrl }
 
@@ -108,6 +81,36 @@ class JamfProPackageUApi: JamfProPackageApi {
     }
 
     // MARK: Private functions
+
+    private func loadPageOfPackages(pageNbr: Int, pageSize: Int, jamfProInstance: JamfProInstance) async throws -> (totalPackages: Int, packages: [Package]) {
+        guard let url = jamfProInstance.url else { throw ServerCommunicationError.noJamfProUrl }
+
+        var packages: [Package] = []
+        let sortByIdInAscendingOrder = "id%3Aasc"
+        let pageParameters = [URLQueryItem(name: "page", value: "\(pageNbr)"), URLQueryItem(name: "page-size", value: "\(pageSize)"), URLQueryItem(name: "sort", value: sortByIdInAscendingOrder)]
+        let packagesUrl = url.appendingPathComponent("/api/v1/packages").appending(queryItems: pageParameters)
+
+        var totalPackages = 0
+        let response = try await jamfProInstance.dataRequest(url: packagesUrl, httpMethod: "GET")
+        if let data = response.data {
+            let decoder = JSONDecoder()
+            do {
+                if let jsonPackages = try decoder.decode(JsonUapiPackages?.self, from: data) {
+                    totalPackages = jsonPackages.totalCount
+                    LogManager.shared.logMessage(message: "\(jamfProInstance.url?.absoluteString ?? "unknown server") - page \(pageNbr) retrieved \(jsonPackages.results.count) of \(totalPackages) packages", level: .debug)
+                    for package in jsonPackages.results {
+                        if let package = convertToPackage(jsonPackage: package) {
+                            packages.append(package)
+                        }
+                    }
+                    return (totalPackages: totalPackages, packages: packages)
+                }
+            } catch {
+                LogManager.shared.logMessage(message: "Failed to load package info from page \(pageNbr): \(error)", level: .error)
+            }
+        }
+        return (totalPackages: totalPackages, packages: packages)
+    }
 
     private func createBoundaryForMultipartUpload() -> String {
         let alphNumChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
