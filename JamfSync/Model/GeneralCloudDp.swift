@@ -45,7 +45,7 @@ class GeneralCloudDp: DistributionPoint {
 
         var localUrl = moveFrom
         if let moveFrom {
-            let tempDirectory = try temporaryFiles.jamfSyncTempDirectory()
+            let tempDirectory = try temporaryFileManager.jamfSyncTempDirectory()
             localUrl = tempDirectory.appendingPathComponent(srcFile.name)
             if let localUrl {
                 try fileManager.moveRetainingDestinationPermisssions(at: moveFrom, to: localUrl)
@@ -124,7 +124,7 @@ class GeneralCloudDp: DistributionPoint {
     }
 
     private func prepareFileForMultipartUpload(fileUrl: URL, boundary: String) throws -> URL {
-        let folder = try temporaryFiles.createTemporaryDirectory(directoryName: "CloudUploads")
+        let folder = try temporaryFileManager.createTemporaryDirectory(directoryName: "CloudUploads")
         let tempFileUrl = folder.appendingPathComponent(fileUrl.lastPathComponent)
         let filename = fileUrl.lastPathComponent
 

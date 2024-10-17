@@ -4,11 +4,11 @@
 
 import Foundation
 
-enum TemporaryFilesError: Error {
+enum TemporaryFileManagerError: Error {
     case failedToCreateTempDirectory
 }
 
-class TemporaryFiles {
+class TemporaryFileManager {
     let jamfSyncDirectoryName = "JamfSync"
     var tempDirectory: URL?
     let fileManager = FileManager.default
@@ -22,13 +22,13 @@ class TemporaryFiles {
 
     func jamfSyncTempDirectory() throws -> URL {
         try createTemporaryDirectory()
-        guard let tempDirectory else { throw TemporaryFilesError.failedToCreateTempDirectory }
+        guard let tempDirectory else { throw TemporaryFileManagerError.failedToCreateTempDirectory }
         return tempDirectory
     }
 
     func moveToTemporaryDirectory(src: URL, dstName: String) throws -> URL {
         try createTemporaryDirectory()
-        guard let tempDirectory else { throw TemporaryFilesError.failedToCreateTempDirectory }
+        guard let tempDirectory else { throw TemporaryFileManagerError.failedToCreateTempDirectory }
 
         let dstFileUrl = tempDirectory.appending(component: dstName)
         try fileManager.moveItem(at: src, to: dstFileUrl)

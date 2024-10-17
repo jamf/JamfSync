@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed the wording for the delete prompt to be a little less ambiguous.
 - Potentially fixed a DUPLICATE_FIELD error that would sometimes happen.
 
-## [1.3.2] - 2024-07-02 
+## [1.3.2] - 2024-07-02
 ### Bug fixes
 - Fixed an issue where it would fail to copy a file from a JCDS DP to a file share DP.
 

@@ -70,7 +70,7 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
     override func transferFile(srcFile: DpFile, moveFrom: URL? = nil, progress: SynchronizationProgress) async throws {
         var localUrl = moveFrom
         if let moveFrom {
-            let tempDirectory = try temporaryFiles.createTemporaryDirectory(directoryName: "JcdsUploads")
+            let tempDirectory = try temporaryFileManager.createTemporaryDirectory(directoryName: "JcdsUploads")
             localUrl = tempDirectory.appendingPathComponent(srcFile.name)
             if let localUrl {
                 try fileManager.moveRetainingDestinationPermisssions(at: moveFrom, to: localUrl)
@@ -159,7 +159,7 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
 
         if let downloadLocation = sessionDelegate.downloadLocation {
             // Need to move this to our own temp directory since otherwise it can get deleted by the system before we're done with it.
-            let newLocation = try temporaryFiles.moveToTemporaryDirectory(src: downloadLocation, dstName: downloadLocation.lastPathComponent)
+            let newLocation = try temporaryFileManager.moveToTemporaryDirectory(src: downloadLocation, dstName: downloadLocation.lastPathComponent)
             return newLocation
         }
 
