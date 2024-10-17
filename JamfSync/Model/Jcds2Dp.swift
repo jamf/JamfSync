@@ -69,15 +69,11 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
 
     override func transferFile(srcFile: DpFile, moveFrom: URL? = nil, progress: SynchronizationProgress) async throws {
         var localUrl = moveFrom
-        var tempDirectory: URL?
         if let moveFrom {
-            tempDirectory = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent("JamfSync")
-            if let tempDirectory {
-                try fileManager.createDirectory(at: tempDirectory, withIntermediateDirectories: false)
-                localUrl = tempDirectory.appendingPathComponent(srcFile.name)
-                if let localUrl {
-                    try fileManager.moveRetainingDestinationPermisssions(at: moveFrom, to: localUrl)
-                }
+            let tempDirectory = try temporaryFiles.createTemporaryDirectory(directoryName: "JcdsUploads")
+            localUrl = tempDirectory.appendingPathComponent(srcFile.name)
+            if let localUrl {
+                try fileManager.moveRetainingDestinationPermisssions(at: moveFrom, to: localUrl)
             }
         }
 
@@ -87,13 +83,6 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
                     try fileManager.removeItem(at: localUrl)
                 } catch {
                     LogManager.shared.logMessage(message: "Failed to remove temporary download file \(localUrl): \(error)", level: .warning)
-                }
-            }
-            if let tempDirectory {
-                do {
-                    try fileManager.removeItem(at: tempDirectory)
-                } catch {
-                    LogManager.shared.logMessage(message: "Failed to remove temporary directory \(tempDirectory): \(error)", level: .warning)
                 }
             }
         }

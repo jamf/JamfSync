@@ -124,8 +124,7 @@ class GeneralCloudDp: DistributionPoint {
     }
 
     private func prepareFileForMultipartUpload(fileUrl: URL, boundary: String) throws -> URL {
-        let folder = URL(filePath: NSTemporaryDirectory()).appending(path: "JamfSyncUploads")
-        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let folder = try temporaryFiles.createTemporaryDirectory(directoryName: "CloudUploads")
         let tempFileUrl = folder.appendingPathComponent(fileUrl.lastPathComponent)
         let filename = fileUrl.lastPathComponent
 

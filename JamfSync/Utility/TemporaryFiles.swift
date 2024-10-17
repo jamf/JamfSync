@@ -20,6 +20,12 @@ class TemporaryFiles {
         try? fileManager.removeItem(at: tempDirectory)
     }
 
+    func jamfSyncTempDirectory() throws -> URL {
+        try createTemporaryDirectory()
+        guard let tempDirectory else { throw TemporaryFilesError.failedToCreateTempDirectory }
+        return tempDirectory
+    }
+
     func moveToTemporaryDirectory(src: URL, dstName: String) throws -> URL {
         try createTemporaryDirectory()
         guard let tempDirectory else { throw TemporaryFilesError.failedToCreateTempDirectory }
@@ -29,28 +35,31 @@ class TemporaryFiles {
         return dstFileUrl
     }
 
-    func jamfSyncTempDirectory() throws -> URL {
-        try createTemporaryDirectory()
-        guard let tempDirectory else { throw TemporaryFilesError.failedToCreateTempDirectory }
-        return tempDirectory
+    func createTemporaryDirectory(directoryName: String) throws -> URL {
+        var baseUrl: URL
+        if let tempDirectory {
+            baseUrl = tempDirectory
+        } else {
+            baseUrl = URL.temporaryDirectory
+        }
+        let newTempDirectory = baseUrl.appending(component: directoryName)
+        var isDirectory : ObjCBool = true
+        let exists = FileManager.default.fileExists(atPath: newTempDirectory.path(), isDirectory: &isDirectory)
+        if exists {
+            if isDirectory.boolValue {
+                return newTempDirectory
+            } else {
+                try fileManager.removeItem(at: newTempDirectory)
+            }
+        }
+        try fileManager.createDirectory(at: newTempDirectory, withIntermediateDirectories: true)
+        return newTempDirectory
     }
 
     // MARK - Private functions
 
     private func createTemporaryDirectory() throws {
         guard tempDirectory == nil else { return }
-        let newTempDirectory = URL.temporaryDirectory.appending(component: jamfSyncDirectoryName)
-        var isDirectory : ObjCBool = true
-        let exists = FileManager.default.fileExists(atPath: newTempDirectory.path(), isDirectory: &isDirectory)
-        if exists {
-            if isDirectory.boolValue {
-                tempDirectory = newTempDirectory
-                return
-            } else {
-                try fileManager.removeItem(at: newTempDirectory)
-            }
-        }
-        try fileManager.createDirectory(at: newTempDirectory, withIntermediateDirectories: true)
-        tempDirectory = newTempDirectory
+        tempDirectory = try createTemporaryDirectory(directoryName: jamfSyncDirectoryName)
     }
 }
