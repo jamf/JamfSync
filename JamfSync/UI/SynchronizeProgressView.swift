@@ -32,7 +32,8 @@ struct SynchronizeProgressView: View {
                     .padding()
             }
             .onReceive(timer) { (_) in
-                swap(&self.leftOffset, &self.rightOffset)
+                swap(&self.leftOffset,
+                     &self.rightOffset)
             }
 
             if let currentFile = progress.currentFile, let fileProgress = progress.fileProgress()  {

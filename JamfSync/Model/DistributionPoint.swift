@@ -24,6 +24,7 @@ enum DistributionPointError: Error {
     case downloadingNotSupported
     case uploadingNotSupported
     case uploadFailure
+    case maxUploadSizeExceeded
 }
 
 enum ReadWriteCapable {
@@ -41,6 +42,9 @@ enum ReadWriteCapable {
 }
 
 class DistributionPoint: Identifiable {
+    /// Manages temporary files
+    let temporaryFileManager = TemporaryFileManager()
+
     /// The unique id of the distribution point.
     var id = UUID()
 
