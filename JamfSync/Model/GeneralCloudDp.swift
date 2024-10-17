@@ -44,15 +44,11 @@ class GeneralCloudDp: DistributionPoint {
         guard let jamfProInstanceId, let jamfProInstance = findJamfProInstance(id: jamfProInstanceId) else { throw ServerCommunicationError.noJamfProUrl }
 
         var localUrl = moveFrom
-        var tempDirectory: URL?
         if let moveFrom {
-            tempDirectory = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent("JamfSync")
-            if let tempDirectory {
-                try fileManager.createDirectory(at: tempDirectory, withIntermediateDirectories: false)
-                localUrl = tempDirectory.appendingPathComponent(srcFile.name)
-                if let localUrl {
-                    try fileManager.moveRetainingDestinationPermisssions(at: moveFrom, to: localUrl)
-                }
+            let tempDirectory = try temporaryFiles.jamfSyncTempDirectory()
+            localUrl = tempDirectory.appendingPathComponent(srcFile.name)
+            if let localUrl {
+                try fileManager.moveRetainingDestinationPermisssions(at: moveFrom, to: localUrl)
             }
         }
 
@@ -62,13 +58,6 @@ class GeneralCloudDp: DistributionPoint {
                     try fileManager.removeItem(at: localUrl)
                 } catch {
                     LogManager.shared.logMessage(message: "Failed to remove temporary download file \(localUrl): \(error)", level: .warning)
-                }
-            }
-            if let tempDirectory {
-                do {
-                    try fileManager.removeItem(at: tempDirectory)
-                } catch {
-                    LogManager.shared.logMessage(message: "Failed to remove temporary directory \(tempDirectory): \(error)", level: .warning)
                 }
             }
         }

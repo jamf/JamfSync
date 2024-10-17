@@ -169,7 +169,9 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
         self.dispatchGroup = nil
 
         if let downloadLocation = sessionDelegate.downloadLocation {
-            return downloadLocation
+            // Need to move this to our own temp directory since otherwise it can get deleted by the system before we're done with it.
+            let newLocation = try temporaryFiles.moveToTemporaryDirectory(src: downloadLocation, dstName: downloadLocation.lastPathComponent)
+            return newLocation
         }
 
         throw DistributionPointError.downloadFromCloudFailed

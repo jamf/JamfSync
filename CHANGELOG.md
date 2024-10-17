@@ -4,13 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.3] - 2024-09-20
+## [1.3.3] - 2024-10-17
 ### Bug fixes
 - Added multipart uploads to solve an issue with >5GB uploads to JCDS distribution points.
+- Fixed an issue that would cause a synchronization from JCDS to Cloud to fail.
 - Changed the wording for the delete prompt to be a little less ambiguous.
-- Added a potential fix for a DUPLICATE_FIELD error that would sometimes happen.
+- Potentially fixed a DUPLICATE_FIELD error that would sometimes happen.
 
-## [1.3.2] - 2024-07-02
+## [1.3.2] - 2024-07-02 
 ### Bug fixes
 - Fixed an issue where it would fail to copy a file from a JCDS DP to a file share DP.
 
