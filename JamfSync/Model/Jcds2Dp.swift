@@ -22,7 +22,7 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
         self.willDownloadFiles = true
     }
 
-    override func retrieveFileList() async throws {
+    override func retrieveFileList(limitFileTypes: Bool = true) async throws {
         guard let jamfProInstanceId, let jamfProInstance = findJamfProInstance(id: jamfProInstanceId), let url = jamfProInstance.url else { throw ServerCommunicationError.noJamfProUrl }
         let cloudFilesUrl = url.appendingPathComponent("/api/v1/jcds/files")
 
@@ -45,16 +45,18 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
                         LogManager.shared.logMessage(message: "Missing name for cloud file for Jamf Pro instance: \(jamfProInstanceName ?? "")", level: .error)
                         continue
                     }
-                    let checksums = Checksums()
-                    if let sha3 = cloudFile.sha3 {
-                        checksums.updateChecksum(Checksum(type: .SHA3_512, value: sha3))
-                    }
-                    if let md5 = cloudFile.md5 {
-                        checksums.updateChecksum(Checksum(type: .MD5, value: md5))
-                    }
-                    let dpFile = DpFile(name: filename, size: cloudFile.length ?? 0, checksums: checksums)
+                    if !limitFileTypes || isAcceptableForDp(url: URL(fileURLWithPath: filename)) {
+                        let checksums = Checksums()
+                        if let sha3 = cloudFile.sha3 {
+                            checksums.updateChecksum(Checksum(type: .SHA3_512, value: sha3))
+                        }
+                        if let md5 = cloudFile.md5 {
+                            checksums.updateChecksum(Checksum(type: .MD5, value: md5))
+                        }
+                        let dpFile = DpFile(name: filename, size: cloudFile.length ?? 0, checksums: checksums)
 
-                    dpFiles.files.append(dpFile)
+                        dpFiles.files.append(dpFile)
+                    }
                 }
             }
         }

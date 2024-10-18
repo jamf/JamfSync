@@ -4,13 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.3] - 2024-10-17
+## [1.3.3] - 2024-10-18
 ### Bug fixes
-- Added multipart uploads to solve an issue with >5GB uploads to JCDS distribution points.
+- Added multipart uploads to solve an issue with >5GB uploads to JCDS distribution points. (GitHub issue #4 "Not able to upload huge files like 14GB.")
+- Changed the wording for the delete prompt to be a little less ambiguous. (GitHub issue #11: "Delete dialog ambiguity")
+- Fixed an issue where Cancel didn't stop uploading to a JCDS distribution point. (GitHub issue #15: "The file upload action cannot be canceled")
+- Fixed an issue where it would attempt to synchronize files that are not allowed by Jamf Pro. (GitHub issue #25: "UNSUPPORTED_FILE_TYPE")
+- Fixed a problem where it would only load 100 packages from Jamf Pro. This fix likely also fixed a DUPLICATE_FIELD error that would sometimes happen. (GitHub issue #28: "DUPLICATE_FIELD packageName")
 - Fixed an issue that would cause a synchronization from JCDS to Cloud to fail.
-- Changed the wording for the delete prompt to be a little less ambiguous.
-- Potentially fixed a DUPLICATE_FIELD error that would sometimes happen.
-- Fixed an issue where Cancel didn't stop uploading to a JCDS distribution point.
 - Fixed an issue where the progress view wouldn't go away if the synchronization completed while the cancel confirmation was shown.
 
 ## [1.3.2] - 2024-07-02

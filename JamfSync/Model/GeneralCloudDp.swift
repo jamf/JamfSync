@@ -24,13 +24,15 @@ class GeneralCloudDp: DistributionPoint {
         self.deleteByRemovingPackage = true
     }
 
-    override func retrieveFileList() async throws {
+    override func retrieveFileList(limitFileTypes: Bool = true) async throws {
         guard let jamfProInstanceId, let jamfProInstance = findJamfProInstance(id: jamfProInstanceId) else { throw ServerCommunicationError.noJamfProUrl }
 
         // Can't currently read the file list in non JCDS2 cloud instances, so we have to assume that the packages in Jamf Pro are present
         dpFiles.removeAll()
         for package in jamfProInstance.packages {
-            dpFiles.files.append(DpFile(name: package.fileName, size: package.size, checksums: package.checksums))
+            if !limitFileTypes || isAcceptableForDp(url: URL(fileURLWithPath: package.fileName)) {
+                dpFiles.files.append(DpFile(name: package.fileName, size: package.size, checksums: package.checksums))
+            }
         }
 
         filesLoaded = true

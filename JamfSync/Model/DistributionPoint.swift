@@ -123,7 +123,9 @@ class DistributionPoint: Identifiable {
 
     /// Retrieves a list of files that are associated with the distribution point. The dpFiles
     /// Each type of distribution point must override this and provide its own implementation.
-    func retrieveFileList() async throws {
+    /// - Parameters:
+    ///     - limitFileTypes: Whether to limit file types to only the allowed types for Jamf Pro
+    func retrieveFileList(limitFileTypes: Bool = true) async throws {
         // This function must be overridden by a child class
         throw DistributionPointError.programError
     }
@@ -411,7 +413,7 @@ class DistributionPoint: Identifiable {
         return dpFiles
     }
 
-    private func isAcceptableForDp(url: URL) -> Bool {
+    func isAcceptableForDp(url: URL) -> Bool {
         guard url.pathExtension != "dmg" else { return true } // Include .dmg files
         guard !url.lastPathComponent.hasSuffix(".pkg.zip") && !url.lastPathComponent.hasSuffix(".mpkg.zip") else { return true } // Include zip files that have ".pkg.zip" or ".mpkg.zip"
         guard url.pathExtension == "pkg" || url.pathExtension == "mpkg" else { return false } // Exclude if not ".pkg" or ".mpkg"
