@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed an issue that would cause a synchronization from JCDS to Cloud to fail.
 - Changed the wording for the delete prompt to be a little less ambiguous.
 - Potentially fixed a DUPLICATE_FIELD error that would sometimes happen.
+- Fixed an issue where Cancel didn't stop uploading to a JCDS distribution point.
 
 ## [1.3.2] - 2024-07-02
 ### Bug fixes
