@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed the wording for the delete prompt to be a little less ambiguous.
 - Potentially fixed a DUPLICATE_FIELD error that would sometimes happen.
 - Fixed an issue where Cancel didn't stop uploading to a JCDS distribution point.
+- Fixed an issue where the progress view wouldn't go away if the synchronization completed while the cancel confirmation was shown.
 
 ## [1.3.2] - 2024-07-02
 ### Bug fixes
