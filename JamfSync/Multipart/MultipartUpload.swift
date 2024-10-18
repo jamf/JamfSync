@@ -18,7 +18,8 @@ class MultipartUpload {
     var totalChunks = 0
     let maxUploadSize = 32212255000
     let chunkSize = 1024 * 1024 * 10
-    
+    var isCanceled = false
+
     let operationQueue = OperationQueue()
     var urlSession: URLSession?
     
@@ -35,6 +36,7 @@ class MultipartUpload {
     }
     
     func startMultipartUpload(fileUrl: URL, fileSize: Int64) async throws -> String {
+        isCanceled = false
         totalChunks = Int(truncatingIfNeeded: (fileSize + Int64(chunkSize) - 1) / Int64(chunkSize))
         if fileSize > maxUploadSize {
             LogManager.shared.logMessage(message: "Maximum upload file size (30GB) exceeded. File size: \(fileSize)", level: .error)
@@ -138,7 +140,7 @@ class MultipartUpload {
 
         partNumberEtagList.removeAll()
 
-        while uploadedChunks < totalChunks {
+        while uploadedChunks < totalChunks && !isCanceled {
             chunkIndex = remainingParts.removeFirst()
             LogManager.shared.logMessage(message: "Call for part: \(chunkIndex)", level: .debug)
 
@@ -168,6 +170,12 @@ class MultipartUpload {
                 }
             }
         }
+    }
+
+    func cancel() {
+        isCanceled = true
+        urlSession?.invalidateAndCancel()
+        urlSession = nil
     }
 
     private func uploadChunk(whichChunk: Int, uploadId: String, fileUrl: URL, progress: SynchronizationProgress) async throws {

@@ -13,6 +13,7 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
     var downloadTask: URLSessionDownloadTask?
     var dispatchGroup: DispatchGroup?
     var keepAwake = KeepAwake()
+    var multipartUpload: MultipartUpload?
 
     init(jamfProInstanceId: UUID? = nil, jamfProInstanceName: String? = nil) {
         super.init(name: "JCDS")
@@ -105,6 +106,8 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
         downloadTask = nil
         urlSession?.invalidateAndCancel()
         urlSession = nil
+        multipartUpload?.cancel()
+        multipartUpload = nil
         dispatchGroup?.leave()
     }
 
@@ -217,7 +220,8 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
         keepAwake.disableSleep(reason: "Starting upload")
         defer { keepAwake.enableSleep() }
 
-        let multipartUpload = MultipartUpload(initiateUploadData: initiateUploadData, renewTokenObject: self, progress: progress)
+        multipartUpload = MultipartUpload(initiateUploadData: initiateUploadData, renewTokenObject: self, progress: progress)
+        guard let multipartUpload else { throw DistributionPointError.programError }
 
         let uploadId = try await multipartUpload.startMultipartUpload(fileUrl: fileUrl, fileSize: fileSize)
 
@@ -225,5 +229,6 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
         LogManager.shared.logMessage(message: "All chunks uploaded successfully", level: .debug)
 
         try await multipartUpload.completeMultipartUpload(fileUrl: fileUrl, uploadId: uploadId)
+        self.multipartUpload = nil
     }
 }
