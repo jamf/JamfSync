@@ -75,12 +75,12 @@ class FileShareDp: DistributionPoint {
         }
     }
 
-    override func retrieveFileList() async throws {
+    override func retrieveFileList(limitFileTypes: Bool = true) async throws {
         try await mount()
         guard let localPath else { 
             throw DistributionPointError.cannotGetFileList
         }
-        try await retrieveLocalFileList(localPath: localPath)
+        try await retrieveLocalFileList(localPath: localPath, limitFileTypes: limitFileTypes)
     }
 
     override func transferFile(srcFile: DpFile, moveFrom: URL? = nil, progress: SynchronizationProgress) async throws {

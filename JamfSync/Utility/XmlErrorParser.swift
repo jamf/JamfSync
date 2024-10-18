@@ -23,13 +23,7 @@ class XmlErrorParser : NSObject, XMLParserDelegate {
     var requestId: String?
     var hostId: String?
 
-    func parser(
-        _ parser: XMLParser,
-        didStartElement elementName: String,
-        namespaceURI: String?,
-        qualifiedName qName: String?,
-        attributes attributeDict: [String : String] = [:]
-    ) {
+    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
         switch elementName {
         case "Code":
             field = .code
@@ -48,12 +42,9 @@ class XmlErrorParser : NSObject, XMLParserDelegate {
         }
     }
 
-    func parser(
-        _ parser: XMLParser,
-        foundCharacters string: String
-    ) {
+    func parser(_ parser: XMLParser, foundCharacters string: String) {
         let value = string.trimmingCharacters(in: .whitespacesAndNewlines)
-        if (!value.isEmpty) {
+        if !value.isEmpty {
             switch field {
             case .code:
                 code = value
@@ -73,10 +64,7 @@ class XmlErrorParser : NSObject, XMLParserDelegate {
         }
     }
 
-    func parser(
-        _ parser: XMLParser,
-        parseErrorOccurred parseError: Error
-    ) {
+    func parser(_ parser: XMLParser, parseErrorOccurred parseError: Error) {
         self.parseError = parseError
     }
 }

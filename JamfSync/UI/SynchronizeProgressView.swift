@@ -32,7 +32,8 @@ struct SynchronizeProgressView: View {
                     .padding()
             }
             .onReceive(timer) { (_) in
-                swap(&self.leftOffset, &self.rightOffset)
+                swap(&self.leftOffset,
+                     &self.rightOffset)
             }
 
             if let currentFile = progress.currentFile, let fileProgress = progress.fileProgress()  {
@@ -63,6 +64,12 @@ struct SynchronizeProgressView: View {
                     Button("Yes", role: .destructive) {
                         synchronizeTask.cancel()
                         shouldPresentConfirmationSheet = false
+                        // If the task finished while this was open, close it immediately, otherwise let SynchronizeTask cloase it. It needs to wait briefly for the confirmation sheet to be dismissed first.
+                        if synchronizeTask.activeDp == nil {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+                                dismiss()
+                            })
+                        }
                     }
                     Button("No", role: .cancel) {
                         shouldPresentConfirmationSheet = false

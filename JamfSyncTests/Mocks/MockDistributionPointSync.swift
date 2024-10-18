@@ -23,7 +23,7 @@ class MockDistributionPointSync: DistributionPoint {
         prepareDpCalled = true
     }
 
-    override func retrieveFileList() async throws {
+    override func retrieveFileList(limitFileTypes: Bool = true) async throws {
         if let retrieveFileListError {
             throw retrieveFileListError
         }
