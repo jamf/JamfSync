@@ -16,8 +16,8 @@ class FolderDp: DistributionPoint {
         return true
     }
 
-    override func retrieveFileList() async throws {
-        try await retrieveLocalFileList(localPath: filePath)
+    override func retrieveFileList(limitFileTypes: Bool = true) async throws {
+        try await retrieveLocalFileList(localPath: filePath, limitFileTypes: limitFileTypes)
     }
 
     override func deleteFile(file: DpFile, progress: SynchronizationProgress) async throws {

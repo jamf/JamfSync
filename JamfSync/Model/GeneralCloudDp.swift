@@ -24,13 +24,15 @@ class GeneralCloudDp: DistributionPoint {
         self.deleteByRemovingPackage = true
     }
 
-    override func retrieveFileList() async throws {
+    override func retrieveFileList(limitFileTypes: Bool = true) async throws {
         guard let jamfProInstanceId, let jamfProInstance = findJamfProInstance(id: jamfProInstanceId) else { throw ServerCommunicationError.noJamfProUrl }
 
         // Can't currently read the file list in non JCDS2 cloud instances, so we have to assume that the packages in Jamf Pro are present
         dpFiles.removeAll()
         for package in jamfProInstance.packages {
-            dpFiles.files.append(DpFile(name: package.fileName, size: package.size, checksums: package.checksums))
+            if !limitFileTypes || isAcceptableForDp(url: URL(fileURLWithPath: package.fileName)) {
+                dpFiles.files.append(DpFile(name: package.fileName, size: package.size, checksums: package.checksums))
+            }
         }
 
         filesLoaded = true
@@ -44,15 +46,11 @@ class GeneralCloudDp: DistributionPoint {
         guard let jamfProInstanceId, let jamfProInstance = findJamfProInstance(id: jamfProInstanceId) else { throw ServerCommunicationError.noJamfProUrl }
 
         var localUrl = moveFrom
-        var tempDirectory: URL?
         if let moveFrom {
-            tempDirectory = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent("JamfSync")
-            if let tempDirectory {
-                try fileManager.createDirectory(at: tempDirectory, withIntermediateDirectories: false)
-                localUrl = tempDirectory.appendingPathComponent(srcFile.name)
-                if let localUrl {
-                    try fileManager.moveRetainingDestinationPermisssions(at: moveFrom, to: localUrl)
-                }
+            let tempDirectory = try temporaryFileManager.jamfSyncTempDirectory()
+            localUrl = tempDirectory.appendingPathComponent(srcFile.name)
+            if let localUrl {
+                try fileManager.moveRetainingDestinationPermisssions(at: moveFrom, to: localUrl)
             }
         }
 
@@ -62,13 +60,6 @@ class GeneralCloudDp: DistributionPoint {
                     try fileManager.removeItem(at: localUrl)
                 } catch {
                     LogManager.shared.logMessage(message: "Failed to remove temporary download file \(localUrl): \(error)", level: .warning)
-                }
-            }
-            if let tempDirectory {
-                do {
-                    try fileManager.removeItem(at: tempDirectory)
-                } catch {
-                    LogManager.shared.logMessage(message: "Failed to remove temporary directory \(tempDirectory): \(error)", level: .warning)
                 }
             }
         }
@@ -135,8 +126,7 @@ class GeneralCloudDp: DistributionPoint {
     }
 
     private func prepareFileForMultipartUpload(fileUrl: URL, boundary: String) throws -> URL {
-        let folder = URL(filePath: NSTemporaryDirectory()).appending(path: "JamfSyncUploads")
-        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let folder = try temporaryFileManager.createTemporaryDirectory(directoryName: "CloudUploads")
         let tempFileUrl = folder.appendingPathComponent(fileUrl.lastPathComponent)
         let filename = fileUrl.lastPathComponent
 

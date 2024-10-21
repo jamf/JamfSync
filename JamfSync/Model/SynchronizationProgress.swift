@@ -36,13 +36,13 @@ class SynchronizationProgress: ObservableObject {
     func updateFileTransferInfo(totalBytesTransferred: Int64, bytesTransferred: Int64) {
         if printToConsole {
             // NOTE: MainActor isn't called when processing the command line arguments since no UI is shown yet
-            setFileTransferVars(totalBytesTransferred: totalBytesTransferred, bytesTransferred: bytesTransferred)
+            setFileTransferVars(totalBytesTransferred: totalBytesTransferred, bytesTransferred: bytesTransferred, progress: self)
             if showProgressOnConsole {
                 printProgressToConsole()
             }
         } else {
             Task { @MainActor in
-                setFileTransferVars(totalBytesTransferred: totalBytesTransferred, bytesTransferred: bytesTransferred)
+                setFileTransferVars(totalBytesTransferred: totalBytesTransferred, bytesTransferred: bytesTransferred, progress: self)
             }
         }
     }
@@ -103,8 +103,18 @@ class SynchronizationProgress: ObservableObject {
         self.currentTotalSizeTransferred = currentTotalSizeTransferred
     }
 
-    private func setFileTransferVars(totalBytesTransferred: Int64, bytesTransferred: Int64) {
-        currentFileSizeTransferred = totalBytesTransferred
+    private func setFileTransferVars(totalBytesTransferred: Int64, bytesTransferred: Int64, progress: SynchronizationProgress) {
+        if progress.operation == "Downloading" {
+            currentFileSizeTransferred = totalBytesTransferred
+            if isAt100Percent() {
+                currentFileSizeTransferred = 0
+            }
+        } else {
+            if currentFileSizeTransferred == nil {
+                currentFileSizeTransferred = 0
+            }
+            currentFileSizeTransferred? += bytesTransferred
+        }
         currentTotalSizeTransferred += bytesTransferred
     }
 

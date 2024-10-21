@@ -3,9 +3,8 @@
 //
 
 import Foundation
-import CryptoKit
 
-class Jcds2Dp: DistributionPoint {
+class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
     var dpIndex: Int?
     var initiateUploadData: JsonInitiateUpload?
     let expirationBuffer = 60 // If the uploading will expire in 60 seconds, initiate upload again
@@ -13,6 +12,8 @@ class Jcds2Dp: DistributionPoint {
     var urlSession: URLSession?
     var downloadTask: URLSessionDownloadTask?
     var dispatchGroup: DispatchGroup?
+    var keepAwake = KeepAwake()
+    var multipartUpload: MultipartUpload?
 
     init(jamfProInstanceId: UUID? = nil, jamfProInstanceName: String? = nil) {
         super.init(name: "JCDS")
@@ -21,7 +22,7 @@ class Jcds2Dp: DistributionPoint {
         self.willDownloadFiles = true
     }
 
-    override func retrieveFileList() async throws {
+    override func retrieveFileList(limitFileTypes: Bool = true) async throws {
         guard let jamfProInstanceId, let jamfProInstance = findJamfProInstance(id: jamfProInstanceId), let url = jamfProInstance.url else { throw ServerCommunicationError.noJamfProUrl }
         let cloudFilesUrl = url.appendingPathComponent("/api/v1/jcds/files")
 
@@ -44,16 +45,18 @@ class Jcds2Dp: DistributionPoint {
                         LogManager.shared.logMessage(message: "Missing name for cloud file for Jamf Pro instance: \(jamfProInstanceName ?? "")", level: .error)
                         continue
                     }
-                    let checksums = Checksums()
-                    if let sha3 = cloudFile.sha3 {
-                        checksums.updateChecksum(Checksum(type: .SHA3_512, value: sha3))
-                    }
-                    if let md5 = cloudFile.md5 {
-                        checksums.updateChecksum(Checksum(type: .MD5, value: md5))
-                    }
-                    let dpFile = DpFile(name: filename, size: cloudFile.length ?? 0, checksums: checksums)
+                    if !limitFileTypes || isAcceptableForDp(url: URL(fileURLWithPath: filename)) {
+                        let checksums = Checksums()
+                        if let sha3 = cloudFile.sha3 {
+                            checksums.updateChecksum(Checksum(type: .SHA3_512, value: sha3))
+                        }
+                        if let md5 = cloudFile.md5 {
+                            checksums.updateChecksum(Checksum(type: .MD5, value: md5))
+                        }
+                        let dpFile = DpFile(name: filename, size: cloudFile.length ?? 0, checksums: checksums)
 
-                    dpFiles.files.append(dpFile)
+                        dpFiles.files.append(dpFile)
+                    }
                 }
             }
         }
@@ -69,15 +72,11 @@ class Jcds2Dp: DistributionPoint {
 
     override func transferFile(srcFile: DpFile, moveFrom: URL? = nil, progress: SynchronizationProgress) async throws {
         var localUrl = moveFrom
-        var tempDirectory: URL?
         if let moveFrom {
-            tempDirectory = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent("JamfSync")
-            if let tempDirectory {
-                try fileManager.createDirectory(at: tempDirectory, withIntermediateDirectories: false)
-                localUrl = tempDirectory.appendingPathComponent(srcFile.name)
-                if let localUrl {
-                    try fileManager.moveRetainingDestinationPermisssions(at: moveFrom, to: localUrl)
-                }
+            let tempDirectory = try temporaryFileManager.createTemporaryDirectory(directoryName: "JcdsUploads")
+            localUrl = tempDirectory.appendingPathComponent(srcFile.name)
+            if let localUrl {
+                try fileManager.moveRetainingDestinationPermisssions(at: moveFrom, to: localUrl)
             }
         }
 
@@ -87,13 +86,6 @@ class Jcds2Dp: DistributionPoint {
                     try fileManager.removeItem(at: localUrl)
                 } catch {
                     LogManager.shared.logMessage(message: "Failed to remove temporary download file \(localUrl): \(error)", level: .warning)
-                }
-            }
-            if let tempDirectory {
-                do {
-                    try fileManager.removeItem(at: tempDirectory)
-                } catch {
-                    LogManager.shared.logMessage(message: "Failed to remove temporary directory \(tempDirectory): \(error)", level: .warning)
                 }
             }
         }
@@ -116,6 +108,8 @@ class Jcds2Dp: DistributionPoint {
         downloadTask = nil
         urlSession?.invalidateAndCancel()
         urlSession = nil
+        multipartUpload?.cancel()
+        multipartUpload = nil
         dispatchGroup?.leave()
     }
 
@@ -169,7 +163,9 @@ class Jcds2Dp: DistributionPoint {
         self.dispatchGroup = nil
 
         if let downloadLocation = sessionDelegate.downloadLocation {
-            return downloadLocation
+            // Need to move this to our own temp directory since otherwise it can get deleted by the system before we're done with it.
+            let newLocation = try temporaryFileManager.moveToTemporaryDirectory(src: downloadLocation, dstName: downloadLocation.lastPathComponent)
+            return newLocation
         }
 
         throw DistributionPointError.downloadFromCloudFailed
@@ -191,181 +187,50 @@ class Jcds2Dp: DistributionPoint {
             self.initiateUploadData = try? decoder.decode(JsonInitiateUpload.self, from: data)
         }
     }
+    
+    func renewUploadToken() async throws {
+        guard let jamfProInstanceId, let jamfProInstance = findJamfProInstance(id: jamfProInstanceId), let url = jamfProInstance.url else { throw ServerCommunicationError.noJamfProUrl }
+
+        let initiateUploadUrl = url.appendingPathComponent("/api/v1/jcds/renew-credentials")
+        let response = try await jamfProInstance.dataRequest(url: initiateUploadUrl, httpMethod: "POST")
+        if let data = response.data {
+            let decoder = JSONDecoder()
+            let renewedCredentials = try? decoder.decode(JsonInitiateUpload.self, from: data)
+            initiateUploadData?.accessKeyID = renewedCredentials?.accessKeyID
+            initiateUploadData?.expiration = renewedCredentials?.expiration
+            initiateUploadData?.secretAccessKey = renewedCredentials?.secretAccessKey
+            initiateUploadData?.sessionToken = renewedCredentials?.sessionToken
+        }
+    }
 
     private func uploadToCloud(file: DpFile, moveFrom: URL?, progress: SynchronizationProgress) async throws {
-        guard let initiateUploadData, let bucketName = initiateUploadData.bucketName else { throw DistributionPointError.failedToInitiateCloudUpload }
+        guard let initiateUploadData else { throw DistributionPointError.failedToInitiateCloudUpload }
         var fileUrl: URL?
+        var fileSize: Int64?
         if let moveFrom {
             fileUrl = moveFrom
         } else {
             fileUrl = file.fileUrl
         }
-        guard let fileUrl else { throw DistributionPointError.badFileUrl }
 
-        let encodedPackageName = file.name.addingPercentEncoding(withAllowedCharacters: .rfc3986Unreserved) ?? ""
-        let key = (initiateUploadData.path ?? "") + encodedPackageName
-        guard let jcdsServerUrl = URL(string: "https://\(bucketName).s3.amazonaws.com/\(key)") else { throw DistributionPointError.badUploadUrl }
-        guard let contentType = contentType(filename: file.name) else { throw DistributionPointError.invalidFileType }
-
-        let sessionDelegate = CloudSessionDelegate(progress: progress)
-        urlSession = createUrlSession(sessionDelegate: sessionDelegate)
-        guard let urlSession else { throw DistributionPointError.programError }
-        
-        let currentDate = Date()
-        let requestTimeStamp = timeStamp(date: currentDate)
-
-        let request = try createAwsUploadRequest(uploadData: initiateUploadData, jcdsServerUrl: jcdsServerUrl, key: key, contentType: contentType, currentDate: "\(currentDate)", requestTimeStamp: requestTimeStamp)
-            
-        let (responseData, response) = try await urlSession.upload(for: request, fromFile: fileUrl, delegate: sessionDelegate)
-        if let httpResponse = response as? HTTPURLResponse {
-            LogManager.shared.logMessage(message: "Upload returned \(String(data: responseData, encoding: .utf8) ?? "")", level: .debug)
-            switch(httpResponse.statusCode) {
-            case 200...299:
-                LogManager.shared.logMessage(message: "Successfully uploaded \(file.name)", level: .verbose)
-            default:
-                let message = parseErrorData(data: responseData)
-                throw ServerCommunicationError.uploadFailed(statusCode: httpResponse.statusCode, message: message)
-            }
+        if let fileUrl, fileSize == nil {
+            fileSize = sizeOfFile(fileUrl: fileUrl)
         }
-    }
 
-    private func parseErrorData(data: Data) -> String? {
-        var message: String?
-        let xmlParser = XMLParser(data: data)
-        let xmlErrorParser = XmlErrorParser()
-        xmlParser.delegate = xmlErrorParser
-        xmlParser.parse()
-        if xmlParser.parserError == nil {
-            message = "\(xmlErrorParser.code ?? ""): \(xmlErrorParser.message ?? "") - max allowed size = \(xmlErrorParser.maxAllowedSize ?? "")"
-        }
-        return message
-    }
+        guard let fileUrl, let fileSize else { throw DistributionPointError.badFileUrl }
 
-    private func createAwsUploadRequest(uploadData: JsonInitiateUpload, jcdsServerUrl: URL, key: String, contentType: String, currentDate: String, requestTimeStamp: String) throws -> URLRequest {
-        
-        var request = URLRequest(url: jcdsServerUrl, cachePolicy: .reloadIgnoringLocalCacheData)
-        
-        guard let securityToken = uploadData.sessionToken, let accessKeyID = uploadData.accessKeyID, let bucketName = uploadData.bucketName, let region = uploadData.region else {
-            throw DistributionPointError.createAwsUploadRequestFailed
-        }
-        
-        request.httpMethod = "PUT"
-        request.addValue(currentDate, forHTTPHeaderField: "date")
-        request.addValue("\(bucketName).s3.amazonaws.com", forHTTPHeaderField: "host")
-        request.addValue("UNSIGNED-PAYLOAD", forHTTPHeaderField: "x-amz-content-sha256")
-        request.addValue(requestTimeStamp, forHTTPHeaderField: "x-amz-date")
-        request.addValue(securityToken, forHTTPHeaderField: "x-amz-security-token")
-        
-        let (signedHeaders, signatureProvided) = try awsSignatureV4(uploadData: uploadData, httpMethod: "PUT", requestHeaders: request.allHTTPHeaderFields ?? [:], date: requestTimeStamp, key: key, hashedPayload: "", contentType: contentType, currentDate: currentDate)
-        
-        request.addValue("AWS4-HMAC-SHA256 Credential=\(String(describing: accessKeyID))/\(requestTimeStamp.prefix(8))/\(region)/s3/aws4_request,SignedHeaders=\(signedHeaders),Signature=\(signatureProvided)", forHTTPHeaderField: "Authorization")
+        keepAwake.disableSleep(reason: "Starting upload")
+        defer { keepAwake.enableSleep() }
 
-        request.timeoutInterval = JamfProInstance.uploadTimeoutValue
+        multipartUpload = MultipartUpload(initiateUploadData: initiateUploadData, renewTokenObject: self, progress: progress)
+        guard let multipartUpload else { throw DistributionPointError.programError }
 
-        return request
-    }
-    
-    private func awsSignatureV4(uploadData: JsonInitiateUpload, httpMethod: String, requestHeaders: [String: String], date: String, key: String, hashedPayload: String, contentType: String, currentDate: String) throws -> (String, String) {
-        
-        guard let secretAccessKey = uploadData.secretAccessKey, let region = uploadData.region else {
-            throw DistributionPointError.awsSignatureFailed
-        }
-        
-        var allowedUrlCharacters = CharacterSet() // used to encode AWS URI headers
-        allowedUrlCharacters.formUnion(.alphanumerics)
-        allowedUrlCharacters.insert(charactersIn: "/-._~")
-        
-        let (sortedHeaders, signedHeaders) = headersToStrings(requestHeaders: requestHeaders)
+        let uploadId = try await multipartUpload.startMultipartUpload(fileUrl: fileUrl, fileSize: fileSize)
 
-        var canonicalUri = key.removingPercentEncoding
-        canonicalUri = canonicalUri?.addingPercentEncoding(withAllowedCharacters: allowedUrlCharacters) ?? ""
+        try await multipartUpload.processMultipartUpload(whichChunk: 1, uploadId: uploadId, fileUrl: fileUrl)
+        LogManager.shared.logMessage(message: "All chunks uploaded successfully", level: .debug)
 
-        let canonicalRequest = """
-        \(httpMethod.uppercased())
-        /\(canonicalUri ?? "")
-        
-        \(sortedHeaders)
-        
-        \(signedHeaders)
-        \(requestHeaders["x-amz-content-sha256"] ?? "UNSIGNED-PAYLOAD")
-        """
-        
-        let canonicalRequestData = Data(canonicalRequest.utf8)
-        let canonicalRequestDataHashed = SHA256.hash(data: canonicalRequestData)
-        let canonicalRequestString = canonicalRequestDataHashed.compactMap { String(format: "%02x", $0) }.joined()
-        
-        let scope = "\(date.prefix(8))/\(region)/s3/aws4_request"
-        
-        let stringToSign = """
-            AWS4-HMAC-SHA256
-            \(date)
-            \(scope)
-            \(canonicalRequestString)
-            """
-                
-        let hexOfFinalSignature = hmac_sha256(date: "\(date.prefix(8))", secretAccessKey: secretAccessKey, region: region, stringToSign: stringToSign)
-        
-        return (signedHeaders, hexOfFinalSignature)
-    }
-    
-    func headersToStrings(requestHeaders: [String: String]) -> (String, String) {
-        var sortedHeaders = ""
-        var signedHeaders = ""
-        for (key, value) in requestHeaders.sorted(by: { $0.0 < $1.0 }) {
-            sortedHeaders.append("\(key.lowercased()):\(value)\n")
-            signedHeaders.append("\(key.lowercased());")
-        }
-        sortedHeaders = String(sortedHeaders.dropLast())
-        signedHeaders = String(signedHeaders.dropLast())
-        return (sortedHeaders, signedHeaders)
-    }
-    
-    func hmac_sha256(date: String, secretAccessKey: String, region: String, stringToSign: String) -> String {
-       
-        let aws4SecretKey = Data("AWS4\(secretAccessKey)".utf8)
-        let dateStampData = Data(date.utf8)
-        let regionNameData = Data(region.utf8)
-        let serviceNameData = Data("s3".utf8)
-        let aws4_requestData = Data("aws4_request".utf8)
-        let stringToSignData = Data(stringToSign.utf8)
-        
-        var symmetricKey = SymmetricKey(data: aws4SecretKey)
-        let dateKey = HMAC<SHA256>.authenticationCode(for: dateStampData, using: symmetricKey)
-
-        symmetricKey = SymmetricKey(data: Data(dateKey))
-        let dateRegionKey = HMAC<SHA256>.authenticationCode(for: regionNameData, using: symmetricKey)
-
-        symmetricKey = SymmetricKey(data: Data(dateRegionKey))
-        let dateRegionServiceKey = HMAC<SHA256>.authenticationCode(for: serviceNameData, using: symmetricKey)
-
-        symmetricKey = SymmetricKey(data: Data(dateRegionServiceKey))
-        let signingKey = HMAC<SHA256>.authenticationCode(for: aws4_requestData, using: symmetricKey)
-        
-        symmetricKey = SymmetricKey(data: Data(signingKey))
-        let finalSigningSHA256 = HMAC<SHA256>.authenticationCode(for: stringToSignData, using: symmetricKey)
-        let hmac_sha256String = Data(finalSigningSHA256).map { String(format: "%02x", $0) }.joined()
-        
-        return hmac_sha256String
-    }
-
-    private func timeStamp(date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyyMMdd'T'HHmmss'Z'"
-        dateFormatter.timeZone = TimeZone(identifier: "UTC")
-        return dateFormatter.string(from: date)
-    }
-
-    private func contentType(filename: String) -> String? {
-        let ext = URL(fileURLWithPath: filename).pathExtension
-        switch ext {
-        case "pkg", "mpkg":
-            return "application/x-newton-compatible-pkg"
-        case "dmg":
-            return "application/octet-stream"
-        case "zip":
-            return "application/zip"
-        default:
-            return nil
-        }
+        try await multipartUpload.completeMultipartUpload(fileUrl: fileUrl, uploadId: uploadId)
+        self.multipartUpload = nil
     }
 }
