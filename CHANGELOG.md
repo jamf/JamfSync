@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a problem where it would only load 100 packages from Jamf Pro. This fix likely also fixed a DUPLICATE_FIELD error that would sometimes happen. (GitHub issue #28: "DUPLICATE_FIELD packageName")
 - Fixed an issue that would cause a synchronization from JCDS to Cloud to fail.
 - Fixed an issue where the progress view wouldn't go away if the synchronization completed while the cancel confirmation was shown.
+- Changed the wording when it fails to unmount a file share to indicate that it may have been unmounted externally.
 
 ## [1.3.2] - 2024-07-02
 ### Bug fixes
