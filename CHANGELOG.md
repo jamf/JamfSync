@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.3] - 2024-10-18
+## [1.3.3] - 2024-10-21
 ### Bug fixes
 - Added multipart uploads to solve an issue with >5GB uploads to JCDS distribution points. (GitHub issue #4 "Not able to upload huge files like 14GB.")
 - Changed the wording for the delete prompt to be a little less ambiguous. (GitHub issue #11: "Delete dialog ambiguity")

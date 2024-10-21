@@ -39,7 +39,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         if group.wait(timeout: DispatchTime.now() + timeout) != .success {
             let alert = NSAlert()
             alert.messageText = "Unmounting distribution points may have failed."
-            alert.informativeText = "This could be because a distribution point may have been unmounted externally. Otherwise you may need to unmount these manually using Finder or locate the volume name in /Volumes and run \"diskutil unmount /Volumes/name\" from terminal."
+            alert.informativeText = "This may be because a distribution point was unmounted externally. Otherwise you may need to unmount these manually using Finder or locate the volume name in /Volumes and run \"diskutil unmount /Volumes/name\" from terminal."
             alert.addButton(withTitle: "OK")
             alert.alertStyle = .warning
             alert.runModal()
