@@ -219,9 +219,6 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
 
         guard let fileUrl, let fileSize else { throw DistributionPointError.badFileUrl }
 
-        keepAwake.disableSleep(reason: "Starting upload")
-        defer { keepAwake.enableSleep() }
-
         multipartUpload = MultipartUpload(initiateUploadData: initiateUploadData, renewTokenObject: self, progress: progress)
         guard let multipartUpload else { throw DistributionPointError.programError }
 

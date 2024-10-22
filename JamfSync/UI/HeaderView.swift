@@ -96,8 +96,10 @@ struct HeaderView: View {
             do {
                 guard let srcDp else { throw DistributionPointError.programError }
                 
-                keepAwake.disableSleep(reason: "Starting upload")
+                keepAwake.disableSleep(reason: "Starting Sync")
                 defer { keepAwake.enableSleep() }
+                keepAwake.disableDiskIdle(reason: "Starting Sync")
+                defer { keepAwake.enableIdleDisk() }
                 
                 reloadFiles = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: DataModel.shared.selectedDpFilesFromSelectionIds(packageListViewModel: DataModel.shared.srcPackageListViewModel), jamfProInstance: DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId), forceSync: DataModel.shared.forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
             } catch {
