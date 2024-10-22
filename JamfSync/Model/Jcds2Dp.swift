@@ -12,7 +12,6 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
     var urlSession: URLSession?
     var downloadTask: URLSessionDownloadTask?
     var dispatchGroup: DispatchGroup?
-    var keepAwake = KeepAwake()
     var multipartUpload: MultipartUpload?
 
     init(jamfProInstanceId: UUID? = nil, jamfProInstanceName: String? = nil) {

@@ -6,7 +6,6 @@ import SwiftUI
 
 struct HeaderView: View {
     var dataPersistence: DataPersistence
-    var keepAwake = KeepAwake()
     @StateObject var dataModel = DataModel.shared
     @State var changesMade = false
     @State var promptForSynchronizationOptions = false
@@ -95,11 +94,6 @@ struct HeaderView: View {
             DataModel.shared.synchronizationInProgress = true
             do {
                 guard let srcDp else { throw DistributionPointError.programError }
-                
-                keepAwake.disableSleep(reason: "Starting Sync")
-                defer { keepAwake.enableSleep() }
-                keepAwake.disableDiskIdle(reason: "Starting Sync")
-                defer { keepAwake.enableIdleDisk() }
                 
                 reloadFiles = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: DataModel.shared.selectedDpFilesFromSelectionIds(packageListViewModel: DataModel.shared.srcPackageListViewModel), jamfProInstance: DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId), forceSync: DataModel.shared.forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
             } catch {

@@ -19,6 +19,14 @@ class SynchronizeTask {
     ///     - progress: The progress object that should be updated as the synchronization progresses
     /// - Returns: Returns true if the file lists need to reload files, otherwise false
     func synchronize(srcDp: DistributionPoint, dstDp: DistributionPoint, selectedItems: [DpFile], jamfProInstance: JamfProInstance?, forceSync: Bool, deleteFiles: Bool, deletePackages: Bool, progress: SynchronizationProgress) async throws -> Bool {
+        
+        KeepAwake.shared.disableSleep(reason: "Starting Sync")
+        KeepAwake.shared.disableDiskIdle(reason: "Starting Sync")
+        defer {
+            KeepAwake.shared.enableSleep()
+            KeepAwake.shared.enableIdleDisk()
+        }
+        
         activeDp = srcDp
         try await srcDp.prepareDp()
         try await srcDp.retrieveFileList()

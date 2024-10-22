@@ -6,6 +6,7 @@ import Foundation
 
 extension FileManager {
     func moveRetainingDestinationPermisssions(at srcURL: URL, to dstURL: URL) throws {
+            
         LogManager.shared.logMessage(message: "Moving file from \(srcURL) to \(dstURL) while retaining permissions", level: .debug)
         try "Placeholder file with permissions of containing directory".write(to: dstURL, atomically: false, encoding: .utf8)
         do {
@@ -19,7 +20,12 @@ extension FileManager {
             try? self.removeItem(at: dstURL)
             try self.copyItem(at: srcURL, to: dstURL)
         }
-
+        
+        let fileAttributes: [FileAttributeKey: Any] = [
+            .posixPermissions: 0o644
+        ]
+        try FileManager.default.setAttributes(fileAttributes, ofItemAtPath: dstURL.path())
+        
         // The replaceItemAt function seems to move the original file, but the name and documentation for the function
         // doesn't imply that so we'll attempt to remove the file but ignore any errors. Also, the copyItem function does
         // not delete it.
