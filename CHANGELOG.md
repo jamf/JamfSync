@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.4] - 2024-10-22
 ### Bug fixes
 - Prevent the machine running Jamf Sync from going to sleep when copying files to an AFP/SMB share.
+- Fix permission issues when syncing to a file share (GitHub issue #18 "Permissions issue with packages when using Jamf Sync")
 
 ## [1.3.3] - 2024-10-21
 ### Bug fixes
