@@ -46,7 +46,7 @@ struct HeaderView: View {
                 dataModel.updateListViewModels()
             }
         }
-        .alert("Do you want to delete items from the destination that are not on the source?", isPresented: $promptForSynchronizationOptions) {
+        .alert(deletionMessage(), isPresented: $promptForSynchronizationOptions) {
             HStack {
                 if dataModel.findDp(id: dataModel.selectedDstDpId)?.jamfProInstanceId == nil {
                     Button("Yes", role: .destructive) {
@@ -75,6 +75,25 @@ struct HeaderView: View {
                 }
             }
         }
+    }
+
+    func deletionMessage() -> String {
+        var message = "Do you want to delete items from the destination that are not on the source?"
+        var warning = " WARNING: Deletions cannot be undone!"
+        if let dstDp = dataModel.findDp(id: dataModel.selectedDstDpId), let srcDp = dataModel.findDp(id: dataModel.selectedSrcDpId) {
+            let filesToRemove = dstDp.filesToRemove(srcDp: srcDp)
+            message += " There are \(filesToRemove.count) files "
+            if filesToRemove.count == dstDp.dpFiles.files.count {
+                warning = " WARNING: This is all of the files on the destination! Deletions cannot be undone!"
+            }
+            if let jamfProInstance = DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId) {
+                let packagesToRemove = jamfProInstance.packagesToRemove(srcDp: srcDp)
+                message += "and \(packagesToRemove.count) package records "
+            }
+            message += "that can be removed.\(warning)"
+        }
+
+        return message
     }
 
     func startSynchronize(deleteFiles: Bool, deletePackages: Bool) async {
