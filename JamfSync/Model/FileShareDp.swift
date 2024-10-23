@@ -131,7 +131,7 @@ class FileShareDp: DistributionPoint {
     private func loadKeychainData() {
         guard let address, let readWriteUsername else { return }
         let keychainHelper = KeychainHelper()
-        let serviceName = keychainHelper.fileShareServiceName(urlString: address)
+        let serviceName = keychainHelper.fileShareServiceName(username: readWriteUsername, urlString: address)
         Task {
             do {
                 let data = try await keychainHelper.getInformationFromKeychain(serviceName: serviceName, key: readWriteUsername)
