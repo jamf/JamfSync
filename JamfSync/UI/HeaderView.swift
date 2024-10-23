@@ -134,6 +134,9 @@ struct HeaderView: View {
     }
 
     func promptForDeletion() -> Bool {
+        if !dataModel.settingsViewModel.allowDeletionsAfterSynchronization {
+            return false
+        }
         if dataModel.srcPackageListViewModel.selectedDpFiles.count == 0 {
             if let srcDp = dataModel.findDp(id: dataModel.selectedSrcDpId), let dstDp = dataModel.findDp(id: dataModel.selectedDstDpId) {
                 // If there are any packages on the destination Jamf Pro server that would be removed, then prompt
