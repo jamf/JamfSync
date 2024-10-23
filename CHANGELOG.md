@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.3.4] - 2024-10-22
+### Enhancements
+- Added some more detail to the synchronization confirmation message about how much will be deleted if one of the deletion options is chosen and added a warning that deletion cannot be undone.
+
 ### Bug fixes
 - Prevent the machine running Jamf Sync from going to sleep when copying files to an AFP/SMB share.
 - Fix permission issues when syncing to a file share (GitHub issue #18 "Permissions issue with packages when using Jamf Sync")
