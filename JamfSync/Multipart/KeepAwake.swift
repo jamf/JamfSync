@@ -6,8 +6,6 @@ import Foundation
 import IOKit.pwr_mgt
 
 class KeepAwake {
-    static let shared = KeepAwake()
-
     var noSleepAssertionID: IOPMAssertionID = 0
     var noDiskIdleAssertionID: IOPMAssertionID = 1
     var sleepDisabled = false

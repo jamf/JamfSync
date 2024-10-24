@@ -6,6 +6,7 @@ import Foundation
 
 class SynchronizeTask {
     var activeDp: DistributionPoint?
+    var keepAwake = KeepAwake()
 
     /// Loops through the files to synchronize to calculate the total size of files to be transferred.
     /// - Parameters:
@@ -20,11 +21,11 @@ class SynchronizeTask {
     /// - Returns: Returns true if the file lists need to reload files, otherwise false
     func synchronize(srcDp: DistributionPoint, dstDp: DistributionPoint, selectedItems: [DpFile], jamfProInstance: JamfProInstance?, forceSync: Bool, deleteFiles: Bool, deletePackages: Bool, progress: SynchronizationProgress) async throws -> Bool {
         
-        KeepAwake.shared.disableSleep(reason: "Starting Sync")
-        KeepAwake.shared.disableDiskIdle(reason: "Starting Sync")
+        keepAwake.disableSleep(reason: "Starting Sync")
+        keepAwake.disableDiskIdle(reason: "Starting Sync")
         defer {
-            KeepAwake.shared.enableSleep()
-            KeepAwake.shared.enableIdleDisk()
+            keepAwake.enableSleep()
+            keepAwake.enableIdleDisk()
         }
         
         activeDp = srcDp
