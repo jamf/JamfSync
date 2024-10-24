@@ -42,7 +42,7 @@ actor FileShare {
             kNAUIOptionKey: kNAUIOptionNoUI
         ]
         let result = NetFSMountURLSync(url as CFURL,
-                                       nil,
+                                       mountDirectoryUrl as CFURL,
                                        username as CFString?,
                                        password as CFString?,
                                        uiOptions as! CFMutableDictionary?,
