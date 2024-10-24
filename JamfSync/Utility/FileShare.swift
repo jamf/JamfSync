@@ -50,8 +50,8 @@ actor FileShare {
                                        &mountPoints)
         guard result == 0 else {
             Task {
-                let serviceName = keychainHelper.fileShareServiceName(urlString: address)
-                try await keychainHelper.deleteKeychainItem(serviceName: "com.jamfsoftware.JamfSync.dp (\(address))", key: username)
+                let serviceName = keychainHelper.fileShareServiceName(username: username, urlString: address)
+                try await keychainHelper.deleteKeychainItem(serviceName: serviceName, key: username)
             }
             throw FileShareMountFailure.mountingFailed
         }
