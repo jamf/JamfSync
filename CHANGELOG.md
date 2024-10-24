@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.4] - 2024-10-22
 ### Enhancements
 - Added some more detail to the synchronization confirmation message about how much will be deleted if one of the deletion options is chosen and added a warning that deletion cannot be undone.
+- Prevent macOS prompt for credentials from appearing if authentication fails on a file share. Remove keychain entry with the wrong credentials.
 
 ### Bug fixes
 - Prevent the machine running Jamf Sync from going to sleep when copying files to an AFP/SMB share.
