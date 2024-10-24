@@ -40,7 +40,7 @@ class KeychainHelper {
         return "com.jamfsoftware.JamfSync.jps (\(urlString))"
     }
 
-    func fileShareServiceName(urlString: String) -> String {
-        return "com.jamfsoftware.JamfSync.dp (\(urlString))"
+    func fileShareServiceName(username: String, urlString: String) -> String {
+        return "com.jamfsoftware.JamfSync.dp (\(urlString)-\(username))"
     }
 }
