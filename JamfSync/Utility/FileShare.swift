@@ -29,8 +29,6 @@ actor FileShare {
         self.fileManager = fileManager
     }
     
-    let keychainHelper = KeychainHelper()
-
     func mount() throws {
         if mountPoint != nil {
             return // If already mounted, just return
@@ -49,10 +47,6 @@ actor FileShare {
                                        nil,
                                        &mountPoints)
         guard result == 0 else {
-            Task {
-                let serviceName = keychainHelper.fileShareServiceName(username: username, urlString: address)
-                try await keychainHelper.deleteKeychainItem(serviceName: serviceName, key: username)
-            }
             throw FileShareMountFailure.mountingFailed
         }
         
