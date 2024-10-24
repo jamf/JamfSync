@@ -28,6 +28,8 @@ actor FileShare {
         self.mountPoint = mountPoint
         self.fileManager = fileManager
     }
+    
+    let keychainHelper = KeychainHelper()
 
     func mount() throws {
         if mountPoint != nil {
@@ -36,14 +38,21 @@ actor FileShare {
         guard let url = URL(string: "\(type)://\(address)/\(shareName)"), let mountDirectoryUrl = URL(string: "/Volumes") else { throw FileShareMountFailure.mountingFailed }
 
         var mountPoints: Unmanaged<CFArray>?
+        let uiOptions: NSDictionary = [
+            kNAUIOptionKey: kNAUIOptionNoUI
+        ]
         let result = NetFSMountURLSync(url as CFURL,
-                                       mountDirectoryUrl as CFURL,
+                                       nil,
                                        username as CFString?,
                                        password as CFString?,
-                                       nil,
+                                       uiOptions as! CFMutableDictionary?,
                                        nil,
                                        &mountPoints)
         guard result == 0 else {
+            Task {
+                let serviceName = keychainHelper.fileShareServiceName(urlString: address)
+                try await keychainHelper.deleteKeychainItem(serviceName: "com.jamfsoftware.JamfSync.dp (\(address))", key: username)
+            }
             throw FileShareMountFailure.mountingFailed
         }
         
