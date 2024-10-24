@@ -176,6 +176,9 @@ struct PackageListView: View {
                 colorWhenMismatched = nil
             }
         }
+        if !dataModel.settingsViewModel.allowDeletionsAfterSynchronization {
+            colorWhenDeleted = nil
+        }
         switch fileItem.state {
         case .undefined:
             return nil

@@ -72,7 +72,7 @@ struct FileSharePasswordView: View {
         if let address = fileShareDp.address, let username = fileShareDp.readWriteUsername, let password = fileShareDp.readWritePassword, !password.isEmpty, let data = password.data(using: String.Encoding.utf8) {
             Task {
                 do {
-                    let serviceName = keychainHelper.fileShareServiceName(urlString: address)
+                    let serviceName = keychainHelper.fileShareServiceName(username: username, urlString: address)
                     try await keychainHelper.storeInformationToKeychain(serviceName: serviceName, key: username, data: data)
                 } catch {
                     LogManager.shared.logMessage(message: "Failed to save the password for \(address) to the keychain: \(error)", level: .error)

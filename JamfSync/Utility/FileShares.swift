@@ -33,8 +33,8 @@ actor FileShares {
         if fileShare == nil {
             fileShare = FileShare(type: type, address: address, shareName: shareName, username: username, password: password)
             if let fileShare { // This will always succeed but this is so we don't need to use !
-                fileShares.append(fileShare)
                 try await fileShare.mount()
+                fileShares.append(fileShare)
             }
         }
 

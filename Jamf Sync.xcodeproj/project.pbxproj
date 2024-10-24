@@ -63,6 +63,8 @@
 		84BC6E4D2AC38C6200CF6D39 /* FileShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6E4A2AC38C6200CF6D39 /* FileShare.swift */; };
 		84BC6E552AC4933500CF6D39 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 84BC6E542AC4933500CF6D39 /* README.md */; };
 		84BF5E3A2CC15FD3008B07A1 /* TemporaryFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BF5E392CC15FB4008B07A1 /* TemporaryFiles.swift */; };
+		84BF61A92CC93DFB008B07A1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BF61A82CC93DFB008B07A1 /* SettingsView.swift */; };
+		84BF61AB2CC94DD5008B07A1 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BF61AA2CC94DD5008B07A1 /* SettingsViewModel.swift */; };
 		84CAB0E52C25C47400582D59 /* FileManager+moveRetainingPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CAB0E42C25C47400582D59 /* FileManager+moveRetainingPermissions.swift */; };
 		84CCB5D22B4C852F00328291 /* SetupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CCB5D12B4C852F00328291 /* SetupViewModel.swift */; };
 		84CCB5D42B4C946200328291 /* LogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CCB5D32B4C946200328291 /* LogViewModel.swift */; };
@@ -180,6 +182,8 @@
 		84BC6E4A2AC38C6200CF6D39 /* FileShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileShare.swift; sourceTree = "<group>"; };
 		84BC6E542AC4933500CF6D39 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		84BF5E392CC15FB4008B07A1 /* TemporaryFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryFiles.swift; sourceTree = "<group>"; };
+		84BF61A82CC93DFB008B07A1 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		84BF61AA2CC94DD5008B07A1 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		84CAB0E42C25C47400582D59 /* FileManager+moveRetainingPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+moveRetainingPermissions.swift"; sourceTree = "<group>"; };
 		84CCB5D12B4C852F00328291 /* SetupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupViewModel.swift; sourceTree = "<group>"; };
 		84CCB5D32B4C946200328291 /* LogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewModel.swift; sourceTree = "<group>"; };
@@ -344,6 +348,7 @@
 				84E489962B59BBFD00FFFE59 /* PackageAnimationView.swift */,
 				84BC6E402AC3659600CF6D39 /* PackageListView.swift */,
 				840A79002ACB6E8200161D85 /* SaveableItemListView.swift */,
+				84BF61A82CC93DFB008B07A1 /* SettingsView.swift */,
 				84BC6E442AC37F4100CF6D39 /* SetupView.swift */,
 				84E489902B5867F800FFFE59 /* SourceDestinationView.swift */,
 				84FC415D2AD5A5C600DCB033 /* SynchronizeProgressView.swift */,
@@ -419,11 +424,12 @@
 		84CCB5CE2B4C83AC00328291 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				84CCB5D32B4C946200328291 /* LogViewModel.swift */,
-				84CCB5D12B4C852F00328291 /* SetupViewModel.swift */,
-				844E40D22B505404003D1940 /* PackageListViewModel.swift */,
-				844E40D42B50A07A003D1940 /* DpFileViewModel.swift */,
 				844E40D62B50A26A003D1940 /* DpFilesViewModel.swift */,
+				844E40D42B50A07A003D1940 /* DpFileViewModel.swift */,
+				84CCB5D32B4C946200328291 /* LogViewModel.swift */,
+				844E40D22B505404003D1940 /* PackageListViewModel.swift */,
+				84BF61AA2CC94DD5008B07A1 /* SettingsViewModel.swift */,
+				84CCB5D12B4C852F00328291 /* SetupViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -662,11 +668,13 @@
 				84D568622BD0722B00C91686 /* AboutView.swift in Sources */,
 				844E40D32B505404003D1940 /* PackageListViewModel.swift in Sources */,
 				84FC41662AD895F400DCB033 /* KeychainHelper.swift in Sources */,
+				84BF61A92CC93DFB008B07A1 /* SettingsView.swift in Sources */,
 				840A79032ACB75FC00161D85 /* SavableItem.swift in Sources */,
 				84B967642B74157C00D73F75 /* HelpMenu.swift in Sources */,
 				84BC6E372AC3631400CF6D39 /* FileShareDp.swift in Sources */,
 				84BC6E362AC3631400CF6D39 /* DpFile.swift in Sources */,
 				848C2D262BC47B3300036999 /* CharacterSet_rfc3986Unreserved.swift in Sources */,
+				84BF61AB2CC94DD5008B07A1 /* SettingsViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -857,7 +865,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.3.3;
+				MARKETING_VERSION = 1.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.jamfsync;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -889,7 +897,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.3.3;
+				MARKETING_VERSION = 1.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.jamfsync;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

@@ -36,7 +36,7 @@ struct JamfProServerView: View {
                     Text("URL:")
                         .frame(height: 16)
                         .padding(.bottom)
-                    Text("\(userNameClientIdPrompt()):")
+                    Text("\(usernameClientIdPrompt()):")
                         .frame(height: 16)
                         .padding(.bottom)
                     Text("\(passwordClientSecretPrompt()):")
@@ -49,7 +49,7 @@ struct JamfProServerView: View {
                     TextField("https://jamfproserver.com", text: $urlString)
                         .frame(height: 16)
                         .padding(.bottom)
-                    TextField("", text: $usernameOrClientId, prompt: Text(userNameClientIdPrompt()))
+                    TextField("", text: $usernameOrClientId, prompt: Text(usernameClientIdPrompt()))
                         .frame(height: 16)
                         .padding(.bottom)
                     HStack {
@@ -143,7 +143,7 @@ struct JamfProServerView: View {
             .frame(width: 600)
     }
 
-    func userNameClientIdPrompt() -> String {
+    func usernameClientIdPrompt() -> String {
         return useClientApi ? "Client Id" : "Username"
     }
 

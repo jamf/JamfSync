@@ -23,6 +23,7 @@ enum ReloadFiles {
 class DataModel: ObservableObject {
     static let noSelection = UUID()
     static let shared = DataModel()
+    @Published var settingsViewModel = SettingsViewModel()
     @Published var srcPackageListViewModel = PackageListViewModel(isSrc: true)
     @Published var dstPackageListViewModel = PackageListViewModel(isSrc: false)
     @Published var savableItems: SavableItems = SavableItems()
