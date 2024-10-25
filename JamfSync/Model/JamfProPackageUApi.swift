@@ -15,9 +15,11 @@ class JamfProPackageUApi: JamfProPackageApi {
         var pageOfPackages = try await loadPageOfPackages(pageNbr: 0, pageSize: pageSize, jamfProInstance: jamfProInstance)
         var packages = pageOfPackages.packages
         let pages = (pageOfPackages.totalPackages + (pageSize - 1)) / pageSize
-        for pageNbr in 1..<pages {
-            pageOfPackages = try await loadPageOfPackages(pageNbr: pageNbr, pageSize: pageSize, jamfProInstance: jamfProInstance)
-            packages += pageOfPackages.packages
+        if pages > 0 {
+            for pageNbr in 1..<pages {
+                pageOfPackages = try await loadPageOfPackages(pageNbr: pageNbr, pageSize: pageSize, jamfProInstance: jamfProInstance)
+                packages += pageOfPackages.packages
+            }
         }
 
         return packages

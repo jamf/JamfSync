@@ -20,6 +20,8 @@ class FileShareDp: DistributionPoint {
     var mountPoint: String?
     var localPath: String?
 
+    let keychainHelper = KeychainHelper()
+
     init(jamfProId: Int, name: String, address: String, isMaster: Bool, connectionType: ConnectionType, shareName: String, workgroupOrDomain: String, sharePort: Int, readOnlyUsername: String?, readOnlyPassword: String?, readWriteUsername: String?, readWritePassword: String?) {
         self.jamfProId = jamfProId
         self.address = address
@@ -109,19 +111,32 @@ class FileShareDp: DistributionPoint {
         Task { @MainActor in
             DataModel.shared.showSpinner = true
         }
-        fileShare = try await FileShares.shared.mountFileShare(type: connectionType, address: address, shareName: shareName, username: readWriteUsername, password: readWritePassword)
-        if let mountPoint = await fileShare?.mountPoint {
-            let mountPointUrl = URL(filePath: mountPoint)
-            let packagesUrl = mountPointUrl.appendingPathComponent("Packages", isDirectory: true)
-            localPath = packagesUrl.path().removingPercentEncoding
-            if let localPath, !fileManager.fileExists(atPath: localPath) {
-                do {
-                    try fileManager.createDirectory(at: packagesUrl, withIntermediateDirectories: false)
-                } catch {
-                    LogManager.shared.logMessage(message: "\"Packages\" directory does not exist on file share \(name) and it couldn't be created: \(error)", level: .error)
-                    throw error
+        do {
+            fileShare = try await FileShares.shared.mountFileShare(type: connectionType, address: address, shareName: shareName, username: readWriteUsername, password: readWritePassword)
+            if let mountPoint = await fileShare?.mountPoint {
+                let mountPointUrl = URL(filePath: mountPoint)
+                let packagesUrl = mountPointUrl.appendingPathComponent("Packages", isDirectory: true)
+                localPath = packagesUrl.path().removingPercentEncoding
+                if let localPath, !fileManager.fileExists(atPath: localPath) {
+                    do {
+                        try fileManager.createDirectory(at: packagesUrl, withIntermediateDirectories: false)
+                    } catch {
+                        LogManager.shared.logMessage(message: "\"Packages\" directory does not exist on file share \(name) and it couldn't be created: \(error)", level: .error)
+                        throw error
+                    }
                 }
             }
+        } catch {
+            let serviceName = keychainHelper.fileShareServiceName(username: readWriteUsername, urlString: address)
+            try await keychainHelper.deleteKeychainItem(serviceName: serviceName, key: readWriteUsername)
+            Task { @MainActor in
+                DataModel.shared.dpToPromptForPassword = self
+                DataModel.shared.shouldPromptForDpPassword = true
+            }
+            Task { @MainActor in
+                DataModel.shared.showSpinner = false
+            }
+            throw error
         }
         Task { @MainActor in
             DataModel.shared.showSpinner = false
@@ -131,7 +146,7 @@ class FileShareDp: DistributionPoint {
     private func loadKeychainData() {
         guard let address, let readWriteUsername else { return }
         let keychainHelper = KeychainHelper()
-        let serviceName = keychainHelper.fileShareServiceName(urlString: address)
+        let serviceName = keychainHelper.fileShareServiceName(username: readWriteUsername, urlString: address)
         Task {
             do {
                 let data = try await keychainHelper.getInformationFromKeychain(serviceName: serviceName, key: readWriteUsername)

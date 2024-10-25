@@ -70,6 +70,9 @@ struct JamfSyncApp: App {
                 }
             }
         }
+        Settings {
+            SettingsView(settingsViewModel: DataModel.shared.settingsViewModel)
+        }
     }
 
     func startingView() -> some View {

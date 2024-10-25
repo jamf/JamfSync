@@ -12,7 +12,6 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
     var urlSession: URLSession?
     var downloadTask: URLSessionDownloadTask?
     var dispatchGroup: DispatchGroup?
-    var keepAwake = KeepAwake()
     var multipartUpload: MultipartUpload?
 
     init(jamfProInstanceId: UUID? = nil, jamfProInstanceName: String? = nil) {
@@ -218,9 +217,6 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
         }
 
         guard let fileUrl, let fileSize else { throw DistributionPointError.badFileUrl }
-
-        keepAwake.disableSleep(reason: "Starting upload")
-        defer { keepAwake.enableSleep() }
 
         multipartUpload = MultipartUpload(initiateUploadData: initiateUploadData, renewTokenObject: self, progress: progress)
         guard let multipartUpload else { throw DistributionPointError.programError }

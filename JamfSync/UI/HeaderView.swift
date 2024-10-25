@@ -46,7 +46,7 @@ struct HeaderView: View {
                 dataModel.updateListViewModels()
             }
         }
-        .alert("Do you want to delete items from the destination that are not on the source?", isPresented: $promptForSynchronizationOptions) {
+        .alert(deletionMessage(), isPresented: $promptForSynchronizationOptions) {
             HStack {
                 if dataModel.findDp(id: dataModel.selectedDstDpId)?.jamfProInstanceId == nil {
                     Button("Yes", role: .destructive) {
@@ -77,6 +77,25 @@ struct HeaderView: View {
         }
     }
 
+    func deletionMessage() -> String {
+        var message = "Do you want to delete items from the destination that are not on the source?"
+        var warning = " WARNING: Deletions cannot be undone!"
+        if let dstDp = dataModel.findDp(id: dataModel.selectedDstDpId), let srcDp = dataModel.findDp(id: dataModel.selectedSrcDpId) {
+            let filesToRemove = dstDp.filesToRemove(srcDp: srcDp)
+            message += " There are \(filesToRemove.count) files "
+            if filesToRemove.count == dstDp.dpFiles.files.count {
+                warning = " WARNING: This is all of the files on the destination! Deletions cannot be undone!"
+            }
+            if let jamfProInstance = DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId) {
+                let packagesToRemove = jamfProInstance.packagesToRemove(srcDp: srcDp)
+                message += "and \(packagesToRemove.count) package records "
+            }
+            message += "that can be removed.\(warning)"
+        }
+
+        return message
+    }
+
     func startSynchronize(deleteFiles: Bool, deletePackages: Bool) async {
         if let srcDp = dataModel.findDp(id: dataModel.selectedSrcDpId), let dstDp = dataModel.findDp(id: dataModel.selectedDstDpId) {
             SynchronizeProgressView(srcDp: srcDp, dstDp: dstDp, deleteFiles: deleteFiles, deletePackages: deletePackages, processToExecute: { (synchronizeTask, deleteFiles, deletePackages, progress, synchronizationProgressView) in
@@ -94,6 +113,7 @@ struct HeaderView: View {
             DataModel.shared.synchronizationInProgress = true
             do {
                 guard let srcDp else { throw DistributionPointError.programError }
+                
                 reloadFiles = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: DataModel.shared.selectedDpFilesFromSelectionIds(packageListViewModel: DataModel.shared.srcPackageListViewModel), jamfProInstance: DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId), forceSync: DataModel.shared.forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
             } catch {
                 LogManager.shared.logMessage(message: "Failed to synchronize \(srcDp?.name ?? "nil") to \(dstDp.name): \(error)", level: .error)
@@ -114,6 +134,9 @@ struct HeaderView: View {
     }
 
     func promptForDeletion() -> Bool {
+        if !dataModel.settingsViewModel.allowDeletionsAfterSynchronization {
+            return false
+        }
         if dataModel.srcPackageListViewModel.selectedDpFiles.count == 0 {
             if let srcDp = dataModel.findDp(id: dataModel.selectedSrcDpId), let dstDp = dataModel.findDp(id: dataModel.selectedDstDpId) {
                 // If there are any packages on the destination Jamf Pro server that would be removed, then prompt

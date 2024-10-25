@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2024-10-25
+### Features
+- Added a settings view and a setting for allowing deletions after synchronization. This defaults to off so it's less likely for someone to delete files unintentionally.
+### Enhancements
+- Added some more detail to the synchronization confirmation message about how much will be deleted if one of the deletion options is chosen and added a warning that deletion cannot be undone.
+- Prevent macOS prompt for credentials from appearing if authentication fails on a file share and removes the keychain entry with the wrong credentials.
+### Bug fixes
+- Prevent the machine running Jamf Sync from going to sleep when copying files to an AFP/SMB share.
+- Fix permission issues when syncing to a file share (GitHub issue #18 "Permissions issue with packages when using Jamf Sync")
+- Fixed an issue where it could crash if the Jamf Pro instance didn't have any packages.
+
 ## [1.3.3] - 2024-10-21
 ### Bug fixes
 - Added multipart uploads to solve an issue with >5GB uploads to JCDS distribution points. (GitHub issue #4 "Not able to upload huge files like 14GB.")
