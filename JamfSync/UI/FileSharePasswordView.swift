@@ -9,6 +9,8 @@ struct FileSharePasswordView: View {
 
     @Binding var fileShareDp: FileShareDp?
     @Binding var canceled: Bool
+    @State var rwUsername = ""
+    
     @State var saveInKeychain = true
     @State var password = ""
     let keychainHelper = KeychainHelper()
@@ -19,33 +21,35 @@ struct FileSharePasswordView: View {
                 .font(.title)
             Text("Enter the password for \(fileShareDp?.selectionName() ?? ""): \(fileShareDp?.address ?? "")")
                 .padding(.bottom)
-
-            HStack {
-                VStack(alignment: .trailing) {
-                    Text("Password:")
-                        .frame(height: 16)
-                }
-                VStack {
-                    HStack {
-                        SecureField(text: $password, prompt: Text("Password")) {
-                            Text("Title")
-                        }
-                        Toggle(isOn: $saveInKeychain) {
-                            Text("Save in Keychain")
-                        }
-                    }
-                    .frame(height: 16)
-                }
+            
+            Form {
+                Section(header: Text("Account:")  // Label
+                    .font(.headline)
+                    .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                ) {
+                    TextField("", text: $rwUsername, prompt: Text(""))
+                        .disabled(true)
+                       .frame(width: 420, height: 30, alignment: .leading)
+                       .padding(.leading, 10)
+                       .padding(.trailing, 20)
+               }
+               .textCase(nil)
+                
+                    Section(header: Text("Password:")  // Label
+                        .font(.headline)
+                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                    ) {
+                        SecureField("", text: $password, prompt: Text(""))
+                           .frame(width: 420, height: 30, alignment: .leading)
+                   }
+                   .textCase(nil)
             }
-
             HStack {
-                Spacer()
-                Button("Cancel") {
-                    canceled = true
-                    dismiss()
+                Toggle(isOn: $saveInKeychain) {
+                    Text("Save in Keychain")
                 }
-                .keyboardShortcut(.cancelAction)
-                .padding([.top, .trailing])
+                .padding(.leading, 80)
+                Spacer()
                 Button("OK") {
                     canceled = false
                     fileShareDp?.readWritePassword = password
@@ -54,13 +58,15 @@ struct FileSharePasswordView: View {
                     dismiss()
                 }
                 .keyboardShortcut(.defaultAction)
-                .padding(.top)
-                Spacer()
+                .padding(.trailing, 80)
             }
+            .padding([.bottom], 10)
         }
         .onAppear() {
             saveInKeychain = UserSettings.shared.saveDistributionPointPwInKeychain
             password = fileShareDp?.readWritePassword ?? ""
+            rwUsername = "\(fileShareDp?.readWriteUsername ?? "")"
+            if rwUsername == "'''" { rwUsername =  ""}
         }
         .padding()
         .frame(width: 600)
