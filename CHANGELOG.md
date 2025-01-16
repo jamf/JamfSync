@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-1-16
+### Features
+- Added the option in settings to restrict deletions after synchronization and manual deletions either entirely or to allow only deleting files or allowing deletion of both files and packages.
+
 ## [1.4.0] - 2024-10-25
 ### Features
 - Added a settings view and a setting for allowing deletions after synchronization. This defaults to off so it's less likely for someone to delete files unintentionally.
