@@ -4,6 +4,16 @@
 
 import Foundation
 
+enum DeletionOptions: String, CaseIterable {
+    case none = "None"
+    case filesOnly = "Files Only"
+    case filesAndAssociatedPackages = "Files and Associated Packages"
+
+    static func optionFromString(_ string: String) -> DeletionOptions? {
+        return DeletionOptions.allCases.first { $0.rawValue == string }
+    }
+}
+
 class UserSettings {
     static let shared = UserSettings()
 
@@ -11,13 +21,15 @@ class UserSettings {
     private let saveDistributionPointPwInKeychainKey = "saveDistributionPointPwInKeychain"
     private let firstRunKey = "firstRun"
     private let allowDeletionsAfterSynchronizationKey = "allowDeletionsAfterSynchronization"
+    private let allowManualDeletionsKey = "allowManualDeletions"
 
     init() {
         UserDefaults.standard.register(defaults: [
             saveServerPwInKeychainKey: true,
             saveDistributionPointPwInKeychainKey: true,
             firstRunKey: true,
-            allowDeletionsAfterSynchronizationKey: false
+            allowDeletionsAfterSynchronizationKey: DeletionOptions.none.rawValue,
+            allowManualDeletionsKey: DeletionOptions.filesAndAssociatedPackages.rawValue
             ])
     }
 
@@ -36,8 +48,31 @@ class UserSettings {
         set(value) { UserDefaults.standard.set(value, forKey: firstRunKey) }
     }
 
-    var allowDeletionsAfterSynchronization: Bool {
-        get { return UserDefaults.standard.bool(forKey: allowDeletionsAfterSynchronizationKey) }
-        set(value) { UserDefaults.standard.set(value, forKey: allowDeletionsAfterSynchronizationKey) }
+    var allowDeletionsAfterSynchronization: DeletionOptions {
+        get {
+            if let stringValue = UserDefaults.standard.string(forKey: allowDeletionsAfterSynchronizationKey), let deleteOption = DeletionOptions.optionFromString(stringValue) {
+                return deleteOption
+            } else {
+                return DeletionOptions.none
+            }
+        }
+
+        set(value) {
+            UserDefaults.standard.set(value.rawValue, forKey: allowDeletionsAfterSynchronizationKey)
+        }
+    }
+
+    var allowManualDeletions: DeletionOptions {
+        get {
+            if let stringValue = UserDefaults.standard.string(forKey: allowManualDeletionsKey), let deleteOption = DeletionOptions.optionFromString(stringValue) {
+                return deleteOption
+            } else {
+                return DeletionOptions.filesAndAssociatedPackages
+            }
+        }
+
+        set(value) {
+            UserDefaults.standard.set(value.rawValue, forKey: allowManualDeletionsKey)
+        }
     }
 }

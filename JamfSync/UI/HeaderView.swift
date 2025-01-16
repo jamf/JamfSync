@@ -48,21 +48,26 @@ struct HeaderView: View {
         }
         .alert(deletionMessage(), isPresented: $promptForSynchronizationOptions) {
             HStack {
-                if dataModel.findDp(id: dataModel.selectedDstDpId)?.jamfProInstanceId == nil {
+                let dp = dataModel.findDp(id: dataModel.selectedDstDpId)
+                if dp?.jamfProInstanceId == nil {
                     Button("Yes", role: .destructive) {
                         Task {
                             await startSynchronize(deleteFiles: true, deletePackages: false)
                         }
                     }
                 } else {
-                    Button("Files and associated package records", role: .destructive) {
-                        Task {
-                            await startSynchronize(deleteFiles: true, deletePackages: true)
+                    if includeFilesAndAssociatedPackagesOption(dp: dp) {
+                        Button("Files and associated package records", role: .destructive) {
+                            Task {
+                                await startSynchronize(deleteFiles: true, deletePackages: true)
+                            }
                         }
                     }
-                    Button("Files only", role: .destructive) {
-                        Task {
-                            await startSynchronize(deleteFiles: true, deletePackages: false)
+                    if includeFilesOnlyOption(dp: dp) {
+                        Button("Files only", role: .destructive) {
+                            Task {
+                                await startSynchronize(deleteFiles: true, deletePackages: false)
+                            }
                         }
                     }
                 }
@@ -77,6 +82,20 @@ struct HeaderView: View {
         }
     }
 
+    func includeFilesAndAssociatedPackagesOption(dp: DistributionPoint?) -> Bool {
+        if let dp, dp.deleteByRemovingPackage {
+            return dataModel.settingsViewModel.allowDeletionsAfterSynchronization != .none
+        }
+        return dataModel.settingsViewModel.allowDeletionsAfterSynchronization == .filesAndAssociatedPackages
+    }
+
+    func includeFilesOnlyOption(dp: DistributionPoint?) -> Bool {
+        if let dp, dp.deleteByRemovingPackage {
+            return false
+        }
+        return dataModel.settingsViewModel.allowDeletionsAfterSynchronization != .none
+    }
+
     func deletionMessage() -> String {
         var message = "Do you want to delete items from the destination that are not on the source?"
         var warning = " WARNING: Deletions cannot be undone!"
@@ -86,6 +105,7 @@ struct HeaderView: View {
             if filesToRemove.count == dstDp.dpFiles.files.count {
                 warning = " WARNING: This is all of the files on the destination! Deletions cannot be undone!"
             }
+            warning += packageDeletionWarning(dp: dstDp)
             if let jamfProInstance = DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId) {
                 let packagesToRemove = jamfProInstance.packagesToRemove(srcDp: srcDp)
                 message += "and \(packagesToRemove.count) package records "
@@ -94,6 +114,13 @@ struct HeaderView: View {
         }
 
         return message
+    }
+
+    func packageDeletionWarning(dp: DistributionPoint?) -> String {
+        if let dp, dp.deleteByRemovingPackage, dataModel.settingsViewModel.allowDeletionsAfterSynchronization == .filesOnly {
+            return "\n\nNOTE: \"Allow deletions after synchronization\" in Settings is set to \"Files Only\", however, for the \"\(dp.selectionName())\" distribution point, files cannot be deleted without also deleting the associated package records."
+        }
+        return ""
     }
 
     func startSynchronize(deleteFiles: Bool, deletePackages: Bool) async {
@@ -134,7 +161,7 @@ struct HeaderView: View {
     }
 
     func promptForDeletion() -> Bool {
-        if !dataModel.settingsViewModel.allowDeletionsAfterSynchronization {
+        if dataModel.settingsViewModel.allowDeletionsAfterSynchronization == .none {
             return false
         }
         if dataModel.srcPackageListViewModel.selectedDpFiles.count == 0 {
@@ -142,7 +169,7 @@ struct HeaderView: View {
                 // If there are any packages on the destination Jamf Pro server that would be removed, then prompt
                 if let jamfProInstance = DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId) {
                     if jamfProInstance.packagesToRemove(srcDp: srcDp).count > 0 {
-                        return true
+                        return dataModel.settingsViewModel.allowDeletionsAfterSynchronization != .none
                     }
                 }
 

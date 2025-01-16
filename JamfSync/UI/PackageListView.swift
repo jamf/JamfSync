@@ -120,39 +120,41 @@ struct PackageListView: View {
                     .help("Add file(s)")
                     .padding(.bottom)
 
-                    Button {
-                        packageListViewModel.shouldPresentConfirmationSheet = true
-                    } label: {
-                        Image(systemName: "minus")
-                    }
-                    .disabled(!packageListViewModel.enableFileDeleteButton(selectedDpFiles: packageListViewModel.selectedDpFiles))
-                    .help("Remove selected file(s)")
-                    .padding([.bottom, .trailing])
-                    .alert("Are you sure you want to delete the \(packageListViewModel.selectedDpFiles.count) selected items?", isPresented: $packageListViewModel.shouldPresentConfirmationSheet) {
-                        HStack {
-                            if let dp = packageListViewModel.retrieveSelectedDp() {
-                                if let jamfProInstanceId = dp.jamfProInstanceId, let _ = dataModel.findJamfProInstance(id: jamfProInstanceId) {
-                                    Button("Files and associated package records", role: .destructive) {
-                                        Task {
-                                            packageListViewModel.deleteSelectedFilesFromDp(packagesToo: true)
+                    if dataModel.settingsViewModel.allowManualDeletions != .none {
+                        Button {
+                            packageListViewModel.shouldPresentConfirmationSheet = true
+                        } label: {
+                            Image(systemName: "minus")
+                        }
+                        .disabled(!packageListViewModel.enableFileDeleteButton(selectedDpFiles: packageListViewModel.selectedDpFiles))
+                        .help("Remove selected file(s)")
+                        .padding([.bottom, .trailing])
+                        .alert(alertMessage(), isPresented: $packageListViewModel.shouldPresentConfirmationSheet) {
+                            HStack {
+                                if let dp = packageListViewModel.retrieveSelectedDp() {
+                                    if let jamfProInstanceId = dp.jamfProInstanceId, let _ = dataModel.findJamfProInstance(id: jamfProInstanceId), dataModel.settingsViewModel.allowManualDeletions == .filesAndAssociatedPackages {
+                                        Button("Files and associated package records", role: .destructive) {
+                                            Task {
+                                                packageListViewModel.deleteSelectedFilesFromDp(packagesToo: true)
+                                            }
                                         }
-                                    }
-                                    if !dp.deleteByRemovingPackage {
-                                        Button("Files only", role: .destructive) {
+                                        if !dp.deleteByRemovingPackage {
+                                            Button("Files only", role: .destructive) {
+                                                Task {
+                                                    packageListViewModel.deleteSelectedFilesFromDp(packagesToo: false)
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        Button("Yes", role: .destructive) {
                                             Task {
                                                 packageListViewModel.deleteSelectedFilesFromDp(packagesToo: false)
                                             }
                                         }
                                     }
-                                } else {
-                                    Button("Yes", role: .destructive) {
-                                        Task {
-                                            packageListViewModel.deleteSelectedFilesFromDp(packagesToo: false)
-                                        }
-                                    }
                                 }
-                            }
-                            Button("Cancel", role: .cancel) {
+                                Button("Cancel", role: .cancel) {
+                                }
                             }
                         }
                     }
@@ -162,6 +164,14 @@ struct PackageListView: View {
         .onReceive(publisher) { notification in
             packageListViewModel.dpFiles.files.sort(using: sortOrder)
         }
+    }
+
+    func alertMessage() -> String {
+        var packageDeletionWarning = ""
+        if let dp = packageListViewModel.retrieveSelectedDp(), dp.deleteByRemovingPackage, dataModel.settingsViewModel.allowManualDeletions == .filesOnly {
+            packageDeletionWarning = "\n\nNOTE: \"Allow manual deletions\" in Settings is set to \"Files Only\", however, for the \"\(dp.selectionName())\" distribution point, files cannot be deleted without also deleting the associated package records."
+        }
+        return "Are you sure you want to delete the \(packageListViewModel.selectedDpFiles.count) selected items?\(packageDeletionWarning)"
     }
 
     func stateImage(fileItem: DpFileViewModel?) -> (systemName: String, color: Color?)? {
@@ -176,7 +186,7 @@ struct PackageListView: View {
                 colorWhenMismatched = nil
             }
         }
-        if !dataModel.settingsViewModel.allowDeletionsAfterSynchronization {
+        if dataModel.settingsViewModel.allowDeletionsAfterSynchronization == .none {
             colorWhenDeleted = nil
         }
         switch fileItem.state {
