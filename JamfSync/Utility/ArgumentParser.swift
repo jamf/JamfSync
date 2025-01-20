@@ -63,7 +63,7 @@ class ArgumentParser: NSObject {
             case "-p", "--progress", "-progress":
                 showProgress = true
                 someArgumentsPassed = true
-            case "--dryRun", "-dryRun":
+            case "-dr", "--dryRun", "-dryRun":
                 dryRun = true
                 someArgumentsPassed = true
         case "-NSDocumentRevisionsDebugMode":
@@ -100,7 +100,7 @@ class ArgumentParser: NSObject {
         print("\t-r --removeFilesNotOnSource:\t\tDelete files on the destination that are not on the source. No delete is done if ommitted.")
         print("\t-rp --removePackagesNotOnSource:\t\tDelete packages on the destination's Jamf Pro instance that are not on the source. No delete is done if ommitted.")
         print("\t-p --progress:\t\tShow the progress of files being copied.")
-        print("\t-p --dryRun:\t\tGo through the motions and show what would be done, but don't actually do anything.")
+        print("\t-dr --dryRun:\t\tGo through the motions and show what would be done, but don't actually do anything.")
         print("\t-v --version:\t\tDisplay the version number and build number.")
         print("\t-h --help:\t\tShows this help text.")
         print("NOTE: If a distribution point name is the same on multiple Jamf Pro instances, use \"dpName:jamfProName\" for the name.")

@@ -63,7 +63,7 @@ struct HeaderView: View {
                     .background(Color.clear)
                     .help("Info about Dry Run")
                     .popover(isPresented: $showInfoPopover) {
-                        Text("Goes through the motions when you click Synchronize and shows actions in the log that would normally taken, prefaced by \"[Dry Run]\" , but doesn't actually transfer or remove anything.")
+                        Text("Goes through the motions when you click Synchronize and shows actions in the log that would normally happen, prefaced by \"[Dry Run]\", but doesn't actually transfer or remove anything.")
                             .multilineTextAlignment(.leading)
                             .padding()
                             .frame(maxWidth: 400, idealHeight: 100)
