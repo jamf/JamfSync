@@ -76,19 +76,23 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "-s"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "Folder1"
-            isEnabled = "NO">
+            argument = "&quot;Demo Folder 2&quot;"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-d"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "JCDS:Stage"
-            isEnabled = "NO">
+            argument = "Cloud:HarryTest"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--dryRun"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "HarryJCDS2-2:JCDS"

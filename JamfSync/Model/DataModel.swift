@@ -32,6 +32,7 @@ class DataModel: ObservableObject {
     @Published var selectedSrcDpId = DataModel.noSelection
     @Published var selectedDstDpId = DataModel.noSelection
     @Published var forceSync = false
+    @Published var dryRun = false
     @Published var showSpinner = false
     @Published var shouldPromptForDpPassword = false
     @Published var dpToPromptForPassword: FileShareDp?

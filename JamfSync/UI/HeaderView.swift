@@ -10,6 +10,7 @@ struct HeaderView: View {
     @State var changesMade = false
     @State var promptForSynchronizationOptions = false
     @State var canceled = false
+    @State var showInfoPopover = false
 
     var body: some View {
         HStack {
@@ -38,12 +39,36 @@ struct HeaderView: View {
             .padding([.trailing])
             .disabled(dataModel.synchronizationDisabled())
 
-            Toggle(isOn: $dataModel.forceSync) {
-                Text("Force Sync")
-            }
-            .toggleStyle(.checkbox)
-            .onChange(of: dataModel.forceSync) {
-                dataModel.updateListViewModels()
+            VStack(alignment: .leading) {
+                Toggle(isOn: $dataModel.forceSync) {
+                    Text("Force Sync")
+                }
+                .toggleStyle(.checkbox)
+                .onChange(of: dataModel.forceSync) {
+                    dataModel.updateListViewModels()
+                }
+
+                HStack {
+                    Toggle(isOn: $dataModel.dryRun) {
+                        Text("Dry Run")
+                    }
+                    .toggleStyle(.checkbox)
+                    
+                    Button {
+                        showInfoPopover = true
+                    } label: {
+                        Image(systemName: "info.circle")
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .background(Color.clear)
+                    .help("Info about Dry Run")
+                    .popover(isPresented: $showInfoPopover) {
+                        Text("Goes through the motions when you click Synchronize and shows actions in the log that would normally taken, prefaced by \"[Dry Run]\" , but doesn't actually transfer or remove anything.")
+                            .multilineTextAlignment(.leading)
+                            .padding()
+                            .frame(maxWidth: 400, idealHeight: 100)
+                    }
+                }
             }
         }
         .alert(deletionMessage(), isPresented: $promptForSynchronizationOptions) {
@@ -126,14 +151,14 @@ struct HeaderView: View {
     func startSynchronize(deleteFiles: Bool, deletePackages: Bool) async {
         if let srcDp = dataModel.findDp(id: dataModel.selectedSrcDpId), let dstDp = dataModel.findDp(id: dataModel.selectedDstDpId) {
             SynchronizeProgressView(srcDp: srcDp, dstDp: dstDp, deleteFiles: deleteFiles, deletePackages: deletePackages, processToExecute: { (synchronizeTask, deleteFiles, deletePackages, progress, synchronizationProgressView) in
-                    synchronize(srcDp: srcDp, dstDp: dstDp, synchronizeTask: synchronizeTask, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, synchronizeProgressView: synchronizationProgressView) })
+                synchronize(srcDp: srcDp, dstDp: dstDp, synchronizeTask: synchronizeTask, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, synchronizeProgressView: synchronizationProgressView, dryRun: DataModel.shared.dryRun) })
                 .openInNewWindow { window in
                 window.title = "Synchronization Progress"
             }
         }
     }
 
-    func synchronize(srcDp: DistributionPoint?, dstDp: DistributionPoint, synchronizeTask: SynchronizeTask, deleteFiles: Bool, deletePackages: Bool, progress: SynchronizationProgress, synchronizeProgressView: SynchronizeProgressView) {
+    func synchronize(srcDp: DistributionPoint?, dstDp: DistributionPoint, synchronizeTask: SynchronizeTask, deleteFiles: Bool, deletePackages: Bool, progress: SynchronizationProgress, synchronizeProgressView: SynchronizeProgressView, dryRun: Bool) {
         Task {
             var reloadFiles = false
             DataModel.shared.cancelUpdateListViewModels()
@@ -141,7 +166,7 @@ struct HeaderView: View {
             do {
                 guard let srcDp else { throw DistributionPointError.programError }
                 
-                reloadFiles = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: DataModel.shared.selectedDpFilesFromSelectionIds(packageListViewModel: DataModel.shared.srcPackageListViewModel), jamfProInstance: DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId), forceSync: DataModel.shared.forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+                reloadFiles = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: DataModel.shared.selectedDpFilesFromSelectionIds(packageListViewModel: DataModel.shared.srcPackageListViewModel), jamfProInstance: DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId), forceSync: DataModel.shared.forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: dryRun)
             } catch {
                 LogManager.shared.logMessage(message: "Failed to synchronize \(srcDp?.name ?? "nil") to \(dstDp.name): \(error)", level: .error)
             }

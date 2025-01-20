@@ -151,14 +151,16 @@ class JamfProInstance: SavableItem {
     /// - Parameters:
     ///     - srcDp: The destination distribution point to search and delete packages that are missing.
     ///     - progress: The progress object that should be updated as the deletion progresses.
-    func deletePackagesNotOnSource(srcDp: DistributionPoint, progress: SynchronizationProgress) async throws {
+    func deletePackagesNotOnSource(srcDp: DistributionPoint, progress: SynchronizationProgress, dryRun: Bool) async throws {
         guard let packageApi else { throw DistributionPointError.programError }
         let packagesToRemove = packagesToRemove(srcDp: srcDp)
         for package in packagesToRemove {
             if let jamfProId = package.jamfProId {
-                LogManager.shared.logMessage(message: "Deleting package \(package.fileName) from \(displayName())", level: .verbose)
-                try await packageApi.deletePackage(packageId: jamfProId, jamfProInstance: self)
-                packages.removeAll(where: { $0.fileName == package.fileName })
+                LogManager.shared.logMessage(message: "Deleting package \(package.fileName) from \(displayName())", level: .verbose, dryRun: dryRun)
+                if !dryRun {
+                    try await packageApi.deletePackage(packageId: jamfProId, jamfProInstance: self)
+                    packages.removeAll(where: { $0.fileName == package.fileName })
+                }
             }
         }
     }

@@ -4,9 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.5.0] - 2025-1-16
+## [1.5.0] - 2025-1-20
 ### Features
 - Added the option in settings to restrict deletions after synchronization and manual deletions either entirely or to allow only deleting files or allowing deletion of both files and packages.
+- Added a --dryRun command line flag so you can see what will be copied and deleted without actually doing anything, and also added a dry run checkbox to the main view.
 
 ## [1.4.0] - 2024-10-25
 ### Features
