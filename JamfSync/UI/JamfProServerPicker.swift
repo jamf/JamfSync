@@ -41,7 +41,7 @@ struct JamfProServerPicker: View {
             }
         }
         .padding()
-        .frame(width: 725, height: 400)
+        .frame(width: 600, height: 400)
         .onAppear() {
             var jamfProInstances: [JamfProInstance] = []
             for saveableItem in savableItems.items {

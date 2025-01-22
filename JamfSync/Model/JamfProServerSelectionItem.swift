@@ -12,7 +12,7 @@ struct JamfProServerSelectionItem: Identifiable {
 
     init(jamfProInstance: JamfProInstance) {
         self.jamfProInstance = jamfProInstance
-        self.selectionName = jamfProInstance.displayName()
+        self.selectionName = "\(jamfProInstance.displayName()) (\(jamfProInstance.displayInfo()))"
         self.isActive = jamfProInstance.isActive
     }
 }
