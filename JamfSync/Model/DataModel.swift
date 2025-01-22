@@ -38,9 +38,11 @@ class DataModel: ObservableObject {
     @Published var dpToPromptForPassword: FileShareDp?
     @Published var shouldPromptForJamfProPassword = false
     @Published var shouldPresentSetupSheet = false
+    @Published var shouldPresentServerSelectionSheet = false
     @Published var synchronizationInProgress = false
     private var dps: [DistributionPoint] = []
     var firstLoad = true
+    var promptedForJamfProInstances = false
     var jamfProServersToPromptForPassword: [JamfProInstance] = []
     var loadingInProgressGroup: DispatchGroup?
     private var updateListViewModelsTask: Task<Void, Error>?
@@ -48,7 +50,12 @@ class DataModel: ObservableObject {
 
     func load(dataPersistence: DataPersistence) {
         savableItems = dataPersistence.loadSavableItems()
-        loadDps()
+        if firstLoad && !promptedForJamfProInstances && settingsViewModel.promptForJamfProInstances {
+            shouldPresentServerSelectionSheet = true
+            promptedForJamfProInstances = true
+        } else {
+            loadDps()
+        }
     }
 
     func loadDps() {
@@ -62,14 +69,18 @@ class DataModel: ObservableObject {
                 }
             }
             jamfProServersToPromptForPassword.removeAll()
-            if firstLoad && savableItems.items.count == 0 {
-                Task { @MainActor in
-                    shouldPresentSetupSheet = true
-                    showSpinner = false
-                }
+
+            if firstLoad {
                 firstLoad = false
-                return
+                if savableItems.items.count == 0 {
+                    Task { @MainActor in
+                        shouldPresentSetupSheet = true
+                        showSpinner = false
+                    }
+                    return
+                }
             }
+
             for savableItem in savableItems.items {
                 do {
                     var loadDps = true

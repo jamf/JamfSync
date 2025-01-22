@@ -36,6 +36,8 @@
 		846499E82B6BFCA900A8EA7B /* Jcds2DpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499E72B6BFCA900A8EA7B /* Jcds2DpTests.swift */; };
 		8468917E2BCEC4BB00B9FCA4 /* OutputStream_write.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8468917D2BCEC4BB00B9FCA4 /* OutputStream_write.swift */; };
 		84761CA02AFEE259006BBF72 /* FileHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84761C9F2AFEE259006BBF72 /* FileHash.swift */; };
+		847864EA2D3F030500A95E94 /* JamfProServerPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847864E92D3F030500A95E94 /* JamfProServerPicker.swift */; };
+		847864EE2D4052AD00A95E94 /* JamfProServerSelectionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847864ED2D40529D00A95E94 /* JamfProServerSelectionItem.swift */; };
 		848C2D262BC47B3300036999 /* CharacterSet_rfc3986Unreserved.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C2D252BC47B3300036999 /* CharacterSet_rfc3986Unreserved.swift */; };
 		848C2D282BC48A3800036999 /* GeneralCloudDp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C2D272BC48A3800036999 /* GeneralCloudDp.swift */; };
 		849809DB2CB8575B001F94C9 /* UploadTimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849809DA2CB8575B001F94C9 /* UploadTimeTests.swift */; };
@@ -151,6 +153,8 @@
 		8468917D2BCEC4BB00B9FCA4 /* OutputStream_write.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputStream_write.swift; sourceTree = "<group>"; };
 		847298EE2BDC5566002D4652 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		84761C9F2AFEE259006BBF72 /* FileHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileHash.swift; sourceTree = "<group>"; };
+		847864E92D3F030500A95E94 /* JamfProServerPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamfProServerPicker.swift; sourceTree = "<group>"; };
+		847864ED2D40529D00A95E94 /* JamfProServerSelectionItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamfProServerSelectionItem.swift; sourceTree = "<group>"; };
 		848C2D252BC47B3300036999 /* CharacterSet_rfc3986Unreserved.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterSet_rfc3986Unreserved.swift; sourceTree = "<group>"; };
 		848C2D272BC48A3800036999 /* GeneralCloudDp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralCloudDp.swift; sourceTree = "<group>"; };
 		849809DA2CB8575B001F94C9 /* UploadTimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadTimeTests.swift; sourceTree = "<group>"; };
@@ -341,6 +345,7 @@
 				84E4898E2B58679600FFFE59 /* HeaderView.swift */,
 				84B967632B74157C00D73F75 /* HelpMenu.swift */,
 				84E2AE712AF58CDC00AE8284 /* JamfProPasswordView.swift */,
+				847864E92D3F030500A95E94 /* JamfProServerPicker.swift */,
 				84BC6E462AC380D200CF6D39 /* JamfProServerView.swift */,
 				84BC6DF32AC3122100CF6D39 /* JamfSyncApp.swift */,
 				84E489922B58681D00FFFE59 /* LogMessageView.swift */,
@@ -374,6 +379,7 @@
 				84DD58362BC58E0D00E8DA23 /* JamfProPackageApi.swift */,
 				84DD58382BC58F2E00E8DA23 /* JamfProPackageClassicApi.swift */,
 				84DD583C2BC5C9A600E8DA23 /* JamfProPackageUApi.swift */,
+				847864ED2D40529D00A95E94 /* JamfProServerSelectionItem.swift */,
 				84BC6E2F2AC3631400CF6D39 /* Jcds2Dp.swift */,
 				84BC6E2D2AC3631400CF6D39 /* JsonObjects.swift */,
 				84E2AE732AF85DFE00AE8284 /* LogManager.swift */,
@@ -610,6 +616,7 @@
 				84BC6E322AC3631400CF6D39 /* Checksum.swift in Sources */,
 				84BC6E452AC37F4100CF6D39 /* SetupView.swift in Sources */,
 				844E40D12B4F46FD003D1940 /* Checksums.swift in Sources */,
+				847864EE2D4052AD00A95E94 /* JamfProServerSelectionItem.swift in Sources */,
 				84CCB5D22B4C852F00328291 /* SetupViewModel.swift in Sources */,
 				84CCB5D42B4C946200328291 /* LogViewModel.swift in Sources */,
 				848C2D282BC48A3800036999 /* GeneralCloudDp.swift in Sources */,
@@ -658,6 +665,7 @@
 				84F3331D2B48BEEF0037E4E5 /* FileShares.swift in Sources */,
 				84BC6E3A2AC3631400CF6D39 /* Jcds2Dp.swift in Sources */,
 				844CF9D32AC4C76A00576E1A /* JamfProInstance.swift in Sources */,
+				847864EA2D3F030500A95E94 /* JamfProServerPicker.swift in Sources */,
 				84761CA02AFEE259006BBF72 /* FileHash.swift in Sources */,
 				84BC6E332AC3631400CF6D39 /* DistributionPoint.swift in Sources */,
 				844E40D72B50A26A003D1940 /* DpFilesViewModel.swift in Sources */,

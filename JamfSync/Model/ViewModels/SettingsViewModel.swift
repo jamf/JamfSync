@@ -9,6 +9,7 @@ class SettingsViewModel: ObservableObject {
 
     @Published var allowDeletionsAfterSynchronization: DeletionOptions = .none
     @Published var allowManualDeletions: DeletionOptions = .filesAndAssociatedPackages
+    @Published var promptForJamfProInstances = false
 
     init() {
         loadSettings()
@@ -17,10 +18,12 @@ class SettingsViewModel: ObservableObject {
     func loadSettings() {
         allowDeletionsAfterSynchronization = userSettings.allowDeletionsAfterSynchronization
         allowManualDeletions = userSettings.allowManualDeletions
+        promptForJamfProInstances = userSettings.promptForJamfProInstances
     }
 
     func saveSettings() {
         userSettings.allowDeletionsAfterSynchronization = allowDeletionsAfterSynchronization
         userSettings.allowManualDeletions = allowManualDeletions
+        userSettings.promptForJamfProInstances = promptForJamfProInstances
     }
 }

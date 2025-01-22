@@ -22,6 +22,7 @@ class UserSettings {
     private let firstRunKey = "firstRun"
     private let allowDeletionsAfterSynchronizationKey = "allowDeletionsAfterSynchronization"
     private let allowManualDeletionsKey = "allowManualDeletions"
+    private let promptForJamfProInstancesKey = "promptForJamfProInstances"
 
     init() {
         UserDefaults.standard.register(defaults: [
@@ -29,7 +30,8 @@ class UserSettings {
             saveDistributionPointPwInKeychainKey: true,
             firstRunKey: true,
             allowDeletionsAfterSynchronizationKey: DeletionOptions.none.rawValue,
-            allowManualDeletionsKey: DeletionOptions.filesAndAssociatedPackages.rawValue
+            allowManualDeletionsKey: DeletionOptions.filesAndAssociatedPackages.rawValue,
+            promptForJamfProInstancesKey: false
             ])
     }
 
@@ -74,5 +76,10 @@ class UserSettings {
         set(value) {
             UserDefaults.standard.set(value.rawValue, forKey: allowManualDeletionsKey)
         }
+    }
+
+    var promptForJamfProInstances: Bool {
+        get { return UserDefaults.standard.bool(forKey: promptForJamfProInstancesKey) }
+        set(value) { UserDefaults.standard.set(value, forKey: promptForJamfProInstancesKey) }
     }
 }

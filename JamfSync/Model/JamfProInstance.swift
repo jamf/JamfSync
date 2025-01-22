@@ -24,6 +24,7 @@ class JamfProInstance: SavableItem {
     let tokenExpirationBuffer = 5 // If the token will expire in 5 seconds, just get another one
     var url: URL?
     var useClientApi = false
+    var isActive = true
     var packageApi: JamfProPackageApi?
     var usernameOrClientId: String = ""
     var passwordOrClientSecret: String = ""
@@ -40,11 +41,12 @@ class JamfProInstance: SavableItem {
     static let normalTimeoutValue = 60.0
     static let uploadTimeoutValue = 3600.0
 
-    init(name: String = "", url: URL? = nil, useClientApi: Bool = false, usernameOrClientId: String = "", passwordOrClientSecret: String = "") {
+    init(name: String = "", url: URL? = nil, useClientApi: Bool = false, usernameOrClientId: String = "", passwordOrClientSecret: String = "", isActive: Bool = true) {
         self.url = url
         self.useClientApi = useClientApi
         self.usernameOrClientId = usernameOrClientId
         self.passwordOrClientSecret = passwordOrClientSecret
+        self.isActive = isActive
         super.init(name: name)
         self.iconName = Self.iconName
     }
@@ -58,6 +60,7 @@ class JamfProInstance: SavableItem {
             self.useClientApi = srcJamfProInstance.useClientApi
             self.usernameOrClientId = srcJamfProInstance.usernameOrClientId
             self.passwordOrClientSecret = srcJamfProInstance.passwordOrClientSecret
+            self.isActive = srcJamfProInstance.isActive
             self.cloudDp = srcJamfProInstance.cloudDp
         }
         self.iconName = Self.iconName
@@ -69,6 +72,7 @@ class JamfProInstance: SavableItem {
             self.url = srcJamfProInstance.url
             self.useClientApi = srcJamfProInstance.useClientApi
             self.usernameOrClientId = srcJamfProInstance.usernameOrClientId ?? ""
+            self.isActive = srcJamfProInstance.isActive
         }
         self.iconName = Self.iconName
     }
@@ -79,6 +83,7 @@ class JamfProInstance: SavableItem {
             srcJamfProInstanceData.url = url
             srcJamfProInstanceData.useClientApi = useClientApi
             srcJamfProInstanceData.usernameOrClientId = usernameOrClientId
+            srcJamfProInstanceData.isActive = isActive
         }
     }
 
@@ -89,6 +94,7 @@ class JamfProInstance: SavableItem {
             self.useClientApi = srcJamfProInstance.useClientApi
             self.usernameOrClientId = srcJamfProInstance.usernameOrClientId
             self.passwordOrClientSecret = srcJamfProInstance.passwordOrClientSecret
+            self.isActive = srcJamfProInstance.isActive
             self.urlSession = srcJamfProInstance.urlSession
             self.cloudDp = srcJamfProInstance.cloudDp
         }
@@ -112,7 +118,7 @@ class JamfProInstance: SavableItem {
     }
 
     override func loadDps() async throws {
-        guard !usernameOrClientId.isEmpty, !passwordOrClientSecret.isEmpty else { return }
+        guard !usernameOrClientId.isEmpty, !passwordOrClientSecret.isEmpty, isActive else { return }
         jamfProVersion = try? await retrieveJamfProVersion()
         await determinePackageApi()
         try await loadPackages()
@@ -507,5 +513,6 @@ extension JamfProInstanceData {
         self.url = instance.url
         self.useClientApi = instance.useClientApi
         self.usernameOrClientId = instance.usernameOrClientId
+        self.isActive = instance.isActive
     }
 }

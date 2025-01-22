@@ -69,6 +69,7 @@ struct HeaderView: View {
                             .frame(maxWidth: 400, idealHeight: 100)
                     }
                 }
+                .padding(.top, 5)
             }
         }
         .alert(deletionMessage(), isPresented: $promptForSynchronizationOptions) {
