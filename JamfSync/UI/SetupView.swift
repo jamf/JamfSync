@@ -100,6 +100,9 @@ struct SetupView: View {
                 Spacer()
             }
         }
+        .onAppear() {
+            changesMade = false
+        }
         .padding()
         .frame(width: 725, height: 400 )
     }

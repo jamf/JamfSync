@@ -43,6 +43,7 @@ struct JamfProServerPicker: View {
         .padding()
         .frame(width: 600, height: 400)
         .onAppear() {
+            changesMade = false
             var jamfProInstances: [JamfProInstance] = []
             for saveableItem in savableItems.items {
                 if let jamfProInstance = saveableItem as? JamfProInstance {

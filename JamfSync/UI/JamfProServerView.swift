@@ -14,6 +14,7 @@ struct JamfProServerView: View {
     @State var passwordOrClientSecret = ""
     @State var urlString = ""
     @State var useClientApi = false
+    @State var isActive = true
     @State var saveInKeychain = true
     @State var showTestAlert = false
     @State var testResultMessage = ""
@@ -66,6 +67,11 @@ struct JamfProServerView: View {
 
             Toggle(isOn: $useClientApi) {
                 Text("Use Client API")
+            }
+            .toggleStyle(.checkbox)
+
+            Toggle(isOn: $isActive) {
+                Text("Active")
             }
             .toggleStyle(.checkbox)
 
@@ -195,6 +201,7 @@ struct JamfProServerView: View {
         passwordOrClientSecret = jamfProInstance.passwordOrClientSecret
         urlString = jamfProInstance.url?.absoluteString ?? ""
         useClientApi = jamfProInstance.useClientApi
+        isActive = jamfProInstance.isActive
         saveInKeychain = UserSettings.shared.saveServerPwInKeychain
     }
 
@@ -204,10 +211,10 @@ struct JamfProServerView: View {
         jamfProInstance.passwordOrClientSecret = passwordOrClientSecret
         jamfProInstance.url = URL(string: urlString)
         jamfProInstance.useClientApi = useClientApi
+        jamfProInstance.isActive = isActive
         UserSettings.shared.saveServerPwInKeychain = saveInKeychain
     }
 }
-
 
 struct JamfProServerView_Previews: PreviewProvider {
     static var previews: some View {

@@ -82,6 +82,12 @@ class DataModel: ObservableObject {
             }
 
             for savableItem in savableItems.items {
+                if let jamfProInstance = savableItem as? JamfProInstance, !jamfProInstance.isActive {
+                    // Skip inactive Jamf Pro instances, but load the keychain data anyway
+                    await jamfProInstance.loadKeychainData()
+                    continue
+                }
+
                 do {
                     var loadDps = true
                     if let jamfProInstance = savableItem as? JamfProInstance {
