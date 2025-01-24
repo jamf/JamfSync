@@ -30,14 +30,14 @@ class MockDistributionPointSync: DistributionPoint {
         retrieveFileListCalled = true
     }
 
-    override func copyFiles(selectedItems: [DpFile], dstDp: DistributionPoint, jamfProInstance: JamfProInstance?, forceSync: Bool, progress: SynchronizationProgress) async throws {
+    override func copyFiles(selectedItems: [DpFile], dstDp: DistributionPoint, jamfProInstance: JamfProInstance?, forceSync: Bool, progress: SynchronizationProgress, dryRun: Bool) async throws {
         if let copyFilesError {
             throw copyFilesError
         }
         copyFilesCalled = true
     }
 
-    override func deleteFilesNotOnSource(srcDp: DistributionPoint, progress: SynchronizationProgress) async throws {
+    override func deleteFilesNotOnSource(srcDp: DistributionPoint, progress: SynchronizationProgress, dryRun: Bool) async throws {
         if let deleteFilesNotOnSourceError {
             throw deleteFilesNotOnSourceError
         }

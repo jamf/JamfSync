@@ -243,7 +243,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress)
+            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -267,7 +267,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress)
+            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -292,7 +292,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress)
+            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -317,7 +317,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress)
+            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -342,7 +342,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: true, progress: synchronizationProgress)
+            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: true, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -367,7 +367,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress)
+            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -392,7 +392,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: true, progress: synchronizationProgress)
+            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: true, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -418,7 +418,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress)
+            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -444,7 +444,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress)
+            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -470,7 +470,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress)
+            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: nil, forceSync: false, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -498,7 +498,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: false, progress: synchronizationProgress)
+            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: false, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -527,7 +527,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: true, progress: synchronizationProgress)
+            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: true, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -556,7 +556,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: false, progress: synchronizationProgress)
+            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: false, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -585,7 +585,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: true, progress: synchronizationProgress)
+            try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: true, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -618,7 +618,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await dstDp.transferLocalFiles(fileUrls: filesToTransfer, jamfProInstance: jamfProInstance, progress: synchronizationProgress)
+            try await dstDp.transferLocalFiles(fileUrls: filesToTransfer, jamfProInstance: jamfProInstance, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -643,7 +643,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await dstDp.transferLocalFiles(fileUrls: filesToTransfer, jamfProInstance: jamfProInstance, progress: synchronizationProgress)
+            try await dstDp.transferLocalFiles(fileUrls: filesToTransfer, jamfProInstance: jamfProInstance, progress: synchronizationProgress, dryRun: false)
             expectationCompleted.fulfill()
         }
         wait(for: [expectationCompleted], timeout: 5)
@@ -668,7 +668,7 @@ final class DistributionPointTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await dstDp.deleteFilesNotOnSource(srcDp: srcDp, progress: synchronizationProgress)
+            try await dstDp.deleteFilesNotOnSource(srcDp: srcDp, progress: synchronizationProgress, dryRun: false)
 
             expectationCompleted.fulfill()
         }

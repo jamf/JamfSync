@@ -209,6 +209,7 @@ final class Jcds2DpTests: XCTestCase {
                 XCTFail("Should have returned with ServerCommunicationError.dataRequestFailed")
             } catch ServerCommunicationError.dataRequestFailed(let statusCode, let message) {
                 XCTAssertEqual(statusCode, 500)
+                XCTAssertNil(message)
             }
             expectationCompleted.fulfill()
         }

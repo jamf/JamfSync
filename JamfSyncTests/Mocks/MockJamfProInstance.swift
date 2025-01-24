@@ -30,7 +30,7 @@ class MockJamfProInstance: JamfProInstance {
         packagesUpdated.append(package)
     }
 
-    override func deletePackagesNotOnSource(srcDp: DistributionPoint, progress: SynchronizationProgress) async throws {
+    override func deletePackagesNotOnSource(srcDp: DistributionPoint, progress: SynchronizationProgress, dryRun: Bool) async throws {
         if let deletePackagesNotOnSourceError {
             throw deletePackagesNotOnSourceError
         }
