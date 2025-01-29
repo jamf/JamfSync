@@ -106,7 +106,7 @@ The files in the UI group are the SwiftUI files for the user interface. The data
 - ChecksumView: Shows what checksums have been calculated for a file and presents a string with the actual checksums when hovered over.
 - ConfirmationView: The view that is used to confirm various things
 - ContentView: The main view that drives everything.
-- FileSharePasswordView: Used to prompt for a file share password when it hasn't been stored in the keychain.
+- FileShareCredentialsView: Used to prompt for a file share password when it hasn't been stored in the keychain.
 - FolderView: The view when adding or editing a folder
 - HeaderView: The top portion of the ContentView that contains the Synchronization button and the Force Sync checkbox.
 - JamfProPasswordView: Used to prompt for the Jamf Pro password when it hasn't been stored in the keychain.

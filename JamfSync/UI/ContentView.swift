@@ -63,7 +63,7 @@ struct ContentView: View {
                 dataModel.updateListViewModels()
             }
         } content: {
-            FileSharePasswordView(fileShareDp: $dataModel.dpToPromptForPassword, canceled: $canceled)
+            FileShareCredentialsView(fileShareDp: $dataModel.dpToPromptForPassword, canceled: $canceled)
         }
         // Prompt for Jamf Pro password
         .sheet(isPresented: $dataModel.shouldPromptForJamfProPassword) {
