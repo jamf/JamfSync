@@ -17,7 +17,7 @@ struct FileShareCredentialsView: View {
     let keychainHelper = KeychainHelper()
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack {
             Text("File Share Credentials")
                 .font(.title)
             Text("Enter the credentials for \(fileShareDp?.selectionName() ?? ""): \(fileShareDp?.address ?? "")")
@@ -25,33 +25,22 @@ struct FileShareCredentialsView: View {
 
             HStack {
                 Text("Username:")
-                    .frame(height: 16)
                 TextField("", text: $username, prompt: Text("Username:"))
-                    .frame(height: 16)
             }
             .padding(.bottom)
 
             HStack {
                 Text("Password:")
-                    .frame(height: 16)
-                VStack {
-                    HStack {
-                        SecureField(text: $password, prompt: Text("Password")) {
-                            Text("Title")
-                        }
-                        Toggle(isOn: $saveInKeychain) {
-                            Text("Save in Keychain")
-                        }
-                    }
-                    .frame(height: 16)
+                SecureField(text: $password, prompt: Text("Password")) {
+                    Text("Title")
                 }
-            }
-            HStack {
                 Toggle(isOn: $saveInKeychain) {
                     Text("Save in Keychain")
                 }
-                .padding(.leading, 80)
-                Spacer()
+            }
+            .padding(.bottom)
+
+            HStack {
                 Button("Cancel") {
                     canceled = true
                     dismiss()
@@ -65,9 +54,7 @@ struct FileShareCredentialsView: View {
                     dismiss()
                 }
                 .keyboardShortcut(.defaultAction)
-                .padding(.trailing, 80)
             }
-            .padding([.bottom], 10)
         }
         .onAppear() {
             saveInKeychain = UserSettings.shared.saveDistributionPointPwInKeychain
