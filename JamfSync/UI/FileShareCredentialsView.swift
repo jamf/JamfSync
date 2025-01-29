@@ -9,8 +9,6 @@ struct FileShareCredentialsView: View {
 
     @Binding var fileShareDp: FileShareDp?
     @Binding var canceled: Bool
-    @State var rwUsername = ""
-    
     @State var saveInKeychain = true
     @State var username = ""
     @State var password = ""
@@ -60,8 +58,6 @@ struct FileShareCredentialsView: View {
             saveInKeychain = UserSettings.shared.saveDistributionPointPwInKeychain
             username = fileShareDp?.readWriteUsername ?? ""
             password = fileShareDp?.readWritePassword ?? ""
-            rwUsername = "\(fileShareDp?.readWriteUsername ?? "")"
-            if rwUsername == "'''" { rwUsername =  ""}
         }
         .padding()
         .frame(width: 600)
