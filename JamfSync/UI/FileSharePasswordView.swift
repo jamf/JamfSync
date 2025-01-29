@@ -23,19 +23,19 @@ struct FileSharePasswordView: View {
                 .padding(.bottom)
             
             Form {
-                Section(header: Text("Account:")  // Label
+                Section(header: Text("Account:")
                     .font(.headline)
                     .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 ) {
                     TextField("", text: $rwUsername, prompt: Text(""))
-                        .disabled(true)
+                        .disabled(false)
                        .frame(width: 420, height: 30, alignment: .leading)
                        .padding(.leading, 10)
                        .padding(.trailing, 20)
                }
                .textCase(nil)
                 
-                    Section(header: Text("Password:")  // Label
+                    Section(header: Text("Password:")
                         .font(.headline)
                         .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                     ) {
@@ -50,9 +50,14 @@ struct FileSharePasswordView: View {
                 }
                 .padding(.leading, 80)
                 Spacer()
+                Button("Cancel") {
+                    canceled = true
+                    dismiss()
+                }
                 Button("OK") {
                     canceled = false
                     fileShareDp?.readWritePassword = password
+                    fileShareDp?.readWriteUsername = rwUsername
                     storePasswordInKeychain()
                     UserSettings.shared.saveDistributionPointPwInKeychain = saveInKeychain
                     dismiss()
