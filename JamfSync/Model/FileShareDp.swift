@@ -19,6 +19,7 @@ class FileShareDp: DistributionPoint {
     var fileShare: FileShare?
     var mountPoint: String?
     var localPath: String?
+    var userSettings = UserSettings.shared
 
     let keychainHelper = KeychainHelper()
 
@@ -125,6 +126,7 @@ class FileShareDp: DistributionPoint {
                         throw error
                     }
                 }
+                saveUsernameInUserSettings(username: readWriteUsername)
             }
         } catch {
             let serviceName = keychainHelper.fileShareServiceName(username: readWriteUsername, urlString: address)
@@ -146,15 +148,35 @@ class FileShareDp: DistributionPoint {
     private func loadKeychainData() {
         guard let address, let readWriteUsername else { return }
         let keychainHelper = KeychainHelper()
-        let serviceName = keychainHelper.fileShareServiceName(username: readWriteUsername, urlString: address)
+        var serviceName = keychainHelper.fileShareServiceName(username: readWriteUsername, urlString: address)
         Task {
             do {
                 let data = try await keychainHelper.getInformationFromKeychain(serviceName: serviceName, key: readWriteUsername)
                 readWritePassword = String(data: data, encoding: .utf8)
             }
             catch {
-                // If it fails for any reason, just assume it's not available in the keychain. The user will need to go in and edit the password.
+                // Check to see if there is an alternate username in the settings and if so, see if there's a keychain entry for that
+                let distributionPointUsernames = userSettings.distributionPointUsernames
+                if let username = distributionPointUsernames[address], username != readWriteUsername {
+                    do {
+                        serviceName = keychainHelper.fileShareServiceName(username: username, urlString: address)
+                        let data = try await keychainHelper.getInformationFromKeychain(serviceName: serviceName, key: username)
+                        self.readWritePassword = String(data: data, encoding: .utf8)
+                        self.readWriteUsername = username
+                    } catch {
+                        // If it fails for any reason, just assume it's not available in the keychain. The user will need to go in and edit the password.
+                    }
+                }
             }
+        }
+    }
+
+    func saveUsernameInUserSettings(username: String) {
+        guard let address else { return }
+        var distributionPointUsernames = userSettings.distributionPointUsernames
+        if distributionPointUsernames[address] != username {
+            distributionPointUsernames[address] = username
+            userSettings.distributionPointUsernames = distributionPointUsernames
         }
     }
 }
