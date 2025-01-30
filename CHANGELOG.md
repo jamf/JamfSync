@@ -4,9 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.5.0] - 2025-1-16
+## [1.5.0] - 2025-1-29
 ### Features
 - Added the option in settings to restrict deletions after synchronization and manual deletions either entirely or to allow only deleting files or allowing deletion of both files and packages.
+- Changed the prompt for password for a file share to also include the username so it's possible to change it from what Jamf Pro uses. It will save the last username that was used successfully.
 
 ## [1.4.0] - 2024-10-25
 ### Features
