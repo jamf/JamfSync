@@ -23,6 +23,7 @@ class UserSettings {
     private let allowDeletionsAfterSynchronizationKey = "allowDeletionsAfterSynchronization"
     private let allowManualDeletionsKey = "allowManualDeletions"
     private let promptForJamfProInstancesKey = "promptForJamfProInstances"
+    private let distributionPointUsernamesKey = "distributionPointUsernames"
 
     init() {
         UserDefaults.standard.register(defaults: [
@@ -31,7 +32,8 @@ class UserSettings {
             firstRunKey: true,
             allowDeletionsAfterSynchronizationKey: DeletionOptions.none.rawValue,
             allowManualDeletionsKey: DeletionOptions.filesAndAssociatedPackages.rawValue,
-            promptForJamfProInstancesKey: false
+            promptForJamfProInstancesKey: false,
+            allowDeletionsAfterSynchronizationKey: [:]
             ])
     }
 
@@ -81,5 +83,10 @@ class UserSettings {
     var promptForJamfProInstances: Bool {
         get { return UserDefaults.standard.bool(forKey: promptForJamfProInstancesKey) }
         set(value) { UserDefaults.standard.set(value, forKey: promptForJamfProInstancesKey) }
+    }
+
+    var distributionPointUsernames: [String: String] {
+        get { return UserDefaults.standard.object(forKey: distributionPointUsernamesKey) as? [String: String] ?? [:] }
+        set(value) { UserDefaults.standard.set(value, forKey: distributionPointUsernamesKey) }
     }
 }
