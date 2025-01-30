@@ -33,7 +33,7 @@ class UserSettings {
             allowDeletionsAfterSynchronizationKey: DeletionOptions.none.rawValue,
             allowManualDeletionsKey: DeletionOptions.filesAndAssociatedPackages.rawValue,
             promptForJamfProInstancesKey: false,
-            allowDeletionsAfterSynchronizationKey: [:]
+            distributionPointUsernamesKey: [:]
             ])
     }
 
