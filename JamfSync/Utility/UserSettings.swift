@@ -11,13 +11,14 @@ class UserSettings {
     private let saveDistributionPointPwInKeychainKey = "saveDistributionPointPwInKeychain"
     private let firstRunKey = "firstRun"
     private let allowDeletionsAfterSynchronizationKey = "allowDeletionsAfterSynchronization"
+    private let distributionPointUsernamesKey = "distributionPointUsernames"
 
     init() {
         UserDefaults.standard.register(defaults: [
             saveServerPwInKeychainKey: true,
             saveDistributionPointPwInKeychainKey: true,
             firstRunKey: true,
-            allowDeletionsAfterSynchronizationKey: false
+            allowDeletionsAfterSynchronizationKey: [:]
             ])
     }
 
@@ -39,5 +40,10 @@ class UserSettings {
     var allowDeletionsAfterSynchronization: Bool {
         get { return UserDefaults.standard.bool(forKey: allowDeletionsAfterSynchronizationKey) }
         set(value) { UserDefaults.standard.set(value, forKey: allowDeletionsAfterSynchronizationKey) }
+    }
+
+    var distributionPointUsernames: [String: String] {
+        get { return UserDefaults.standard.object(forKey: distributionPointUsernamesKey) as? [String: String] ?? [:] }
+        set(value) { UserDefaults.standard.set(value, forKey: distributionPointUsernamesKey) }
     }
 }
