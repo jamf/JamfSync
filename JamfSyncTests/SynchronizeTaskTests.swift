@@ -25,7 +25,8 @@ final class SynchronizeTaskTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+            let result = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
+            XCTAssertFalse(result)
 
             expectationCompleted.fulfill()
         }
@@ -54,7 +55,8 @@ final class SynchronizeTaskTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+            let result = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
+            XCTAssertFalse(result)
 
             expectationCompleted.fulfill()
         }
@@ -82,7 +84,8 @@ final class SynchronizeTaskTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+            let result = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
+            XCTAssertFalse(result)
 
             expectationCompleted.fulfill()
         }
@@ -110,7 +113,8 @@ final class SynchronizeTaskTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+            let result = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
+            XCTAssertFalse(result)
 
             expectationCompleted.fulfill()
         }
@@ -138,7 +142,8 @@ final class SynchronizeTaskTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+            let result = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
+            XCTAssertFalse(result)
 
             expectationCompleted.fulfill()
         }
@@ -166,7 +171,8 @@ final class SynchronizeTaskTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+            let result = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
+            XCTAssertFalse(result)
 
             expectationCompleted.fulfill()
         }
@@ -194,7 +200,8 @@ final class SynchronizeTaskTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+            let result = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
+            XCTAssertFalse(result)
 
             expectationCompleted.fulfill()
         }
@@ -222,7 +229,8 @@ final class SynchronizeTaskTests: XCTestCase {
         let expectationCompleted = XCTestExpectation()
         Task {
             // When
-            try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+            let result = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
+            XCTAssertFalse(result)
 
             expectationCompleted.fulfill()
         }
@@ -252,7 +260,7 @@ final class SynchronizeTaskTests: XCTestCase {
         Task {
             do {
                 // When
-                try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+                _ = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
 
                 // Then
                 XCTFail("Should have thrown a TestErrors.SomethingWentHaywire exception")
@@ -279,7 +287,7 @@ final class SynchronizeTaskTests: XCTestCase {
         Task {
             do {
                 // When
-                try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+                _ = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
 
                 // Then
                 XCTFail("Should have thrown a TestErrors.SomethingWentHaywire exception")
@@ -306,7 +314,7 @@ final class SynchronizeTaskTests: XCTestCase {
         Task {
             do {
                 // When
-                try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+                _ = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
 
                 // Then
                 XCTFail("Should have thrown a TestErrors.SomethingWentHaywire exception")
@@ -333,7 +341,7 @@ final class SynchronizeTaskTests: XCTestCase {
         Task {
             do {
                 // When
-                try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+                _ = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
 
                 // Then
                 XCTFail("Should have thrown a TestErrors.SomethingWentHaywire exception")
@@ -360,7 +368,7 @@ final class SynchronizeTaskTests: XCTestCase {
         Task {
             do {
                 // When
-                try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+                _ = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
 
                 // Then
                 XCTFail("Should have thrown a TestErrors.SomethingWentHaywire exception")
@@ -387,7 +395,7 @@ final class SynchronizeTaskTests: XCTestCase {
         Task {
             do {
                 // When
-                try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+                _ = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
 
                 // Then
                 XCTFail("Should have thrown a TestErrors.SomethingWentHaywire exception")
@@ -414,7 +422,7 @@ final class SynchronizeTaskTests: XCTestCase {
         Task {
             do {
                 // When
-                try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+                _ = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: selectedItems, jamfProInstance: jamfProInstance, forceSync: forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: false)
 
                 // Then
                 XCTFail("Should have thrown a TestErrors.SomethingWentHaywire exception")

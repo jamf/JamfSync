@@ -19,8 +19,8 @@ class SynchronizeTask {
     ///     - deletePackages: Set to true if it should delete packages from the Jamf Pro instance associated with the destination distribution point
     ///     - progress: The progress object that should be updated as the synchronization progresses
     /// - Returns: Returns true if the file lists need to reload files, otherwise false
-    func synchronize(srcDp: DistributionPoint, dstDp: DistributionPoint, selectedItems: [DpFile], jamfProInstance: JamfProInstance?, forceSync: Bool, deleteFiles: Bool, deletePackages: Bool, progress: SynchronizationProgress) async throws -> Bool {
-        
+    func synchronize(srcDp: DistributionPoint, dstDp: DistributionPoint, selectedItems: [DpFile], jamfProInstance: JamfProInstance?, forceSync: Bool, deleteFiles: Bool, deletePackages: Bool, progress: SynchronizationProgress, dryRun: Bool) async throws -> Bool {
+
         keepAwake.disableSleep(reason: "Starting Sync")
         keepAwake.disableDiskIdle(reason: "Starting Sync")
         defer {
@@ -33,13 +33,13 @@ class SynchronizeTask {
         try await srcDp.retrieveFileList()
         try await dstDp.prepareDp()
         try await dstDp.retrieveFileList()
-        try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: forceSync, progress: progress)
+        try await srcDp.copyFiles(selectedItems: selectedItems, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: forceSync, progress: progress, dryRun: dryRun)
         if !srcDp.isCanceled && selectedItems.count == 0 {
             if deleteFiles {
-                try await dstDp.deleteFilesNotOnSource(srcDp: srcDp, progress: progress)
+                try await dstDp.deleteFilesNotOnSource(srcDp: srcDp, progress: progress, dryRun: dryRun)
             }
             if let jamfProInstance, deletePackages {
-                try await jamfProInstance.deletePackagesNotOnSource(srcDp: srcDp, progress: progress)
+                try await jamfProInstance.deletePackagesNotOnSource(srcDp: srcDp, progress: progress, dryRun: dryRun)
             }
         }
         activeDp = nil

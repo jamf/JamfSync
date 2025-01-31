@@ -32,14 +32,17 @@ class DataModel: ObservableObject {
     @Published var selectedSrcDpId = DataModel.noSelection
     @Published var selectedDstDpId = DataModel.noSelection
     @Published var forceSync = false
+    @Published var dryRun = false
     @Published var showSpinner = false
     @Published var shouldPromptForDpPassword = false
     @Published var dpToPromptForPassword: FileShareDp?
     @Published var shouldPromptForJamfProPassword = false
     @Published var shouldPresentSetupSheet = false
+    @Published var shouldPresentServerSelectionSheet = false
     @Published var synchronizationInProgress = false
     private var dps: [DistributionPoint] = []
     var firstLoad = true
+    var promptedForJamfProInstances = false
     var jamfProServersToPromptForPassword: [JamfProInstance] = []
     var loadingInProgressGroup: DispatchGroup?
     private var updateListViewModelsTask: Task<Void, Error>?
@@ -47,7 +50,12 @@ class DataModel: ObservableObject {
 
     func load(dataPersistence: DataPersistence) {
         savableItems = dataPersistence.loadSavableItems()
-        loadDps()
+        if firstLoad && !promptedForJamfProInstances && settingsViewModel.promptForJamfProInstances {
+            shouldPresentServerSelectionSheet = true
+            promptedForJamfProInstances = true
+        } else {
+            loadDps()
+        }
     }
 
     func loadDps() {
@@ -61,15 +69,25 @@ class DataModel: ObservableObject {
                 }
             }
             jamfProServersToPromptForPassword.removeAll()
-            if firstLoad && savableItems.items.count == 0 {
-                Task { @MainActor in
-                    shouldPresentSetupSheet = true
-                    showSpinner = false
-                }
+
+            if firstLoad {
                 firstLoad = false
-                return
+                if savableItems.items.count == 0 {
+                    Task { @MainActor in
+                        shouldPresentSetupSheet = true
+                        showSpinner = false
+                    }
+                    return
+                }
             }
+
             for savableItem in savableItems.items {
+                if let jamfProInstance = savableItem as? JamfProInstance, !jamfProInstance.isActive {
+                    // Skip inactive Jamf Pro instances, but load the keychain data anyway
+                    await jamfProInstance.loadKeychainData()
+                    continue
+                }
+
                 do {
                     var loadDps = true
                     if let jamfProInstance = savableItem as? JamfProInstance {

@@ -42,7 +42,7 @@ class CommandLineProcessing {
         progress.showProgressOnConsole = argumentParser.showProgress
         Task {
             do {
-                _ = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: [], jamfProInstance: self.dataModel.findJamfProInstance(id: dstDp.jamfProInstanceId), forceSync: argumentParser.forceSync, deleteFiles: argumentParser.removeFilesNotOnSrc, deletePackages: argumentParser.removePackagesNotOnSrc, progress: progress)
+                _ = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: [], jamfProInstance: self.dataModel.findJamfProInstance(id: dstDp.jamfProInstanceId), forceSync: argumentParser.forceSync, deleteFiles: argumentParser.removeFilesNotOnSrc, deletePackages: argumentParser.removePackagesNotOnSrc, progress: progress, dryRun: argumentParser.dryRun)
             } catch {
                 LogManager.shared.logMessage(message: "Failed to synchronize \(srcDp) to \(dstDp): \(error)", level: .error)
                 return false

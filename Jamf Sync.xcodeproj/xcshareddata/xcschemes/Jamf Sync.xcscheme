@@ -79,7 +79,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "Folder1"
+            argument = "&quot;Demo Folder 2&quot;"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
@@ -87,7 +87,11 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "JCDS:Stage"
+            argument = "Cloud:HarryTest"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--dryRun"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument

@@ -208,9 +208,9 @@ class DistributionPoint: Identifiable {
     ///     - jamfProInstance: The Jamf Pro instance of the destination distribution point, if it is associated with one
     ///     - forceSync: Set to true if it should copy files even if they are the same on both the source and destination
     ///     - progress: The progress object that should be updated as the synchronization progresses.
-    func copyFiles(selectedItems: [DpFile], dstDp: DistributionPoint, jamfProInstance: JamfProInstance?, forceSync: Bool, progress: SynchronizationProgress) async throws {
+    func copyFiles(selectedItems: [DpFile], dstDp: DistributionPoint, jamfProInstance: JamfProInstance?, forceSync: Bool, progress: SynchronizationProgress, dryRun: Bool) async throws {
         let filesToSync = filesToSynchronize(selectedItems: selectedItems, dstDp: dstDp, forceSync: forceSync)
-        try await copyFilesToDst(sourceName: selectionName(), willDownloadFiles: willDownloadFiles, filesToSync: filesToSync, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: forceSync, progress: progress)
+        try await copyFilesToDst(sourceName: selectionName(), willDownloadFiles: willDownloadFiles, filesToSync: filesToSync, dstDp: dstDp, jamfProInstance: jamfProInstance, forceSync: forceSync, progress: progress, dryRun: dryRun)
     }
 
     /// Transfers a list of local files to this distribution point.
@@ -219,21 +219,23 @@ class DistributionPoint: Identifiable {
     ///     - jamfProInstance: The Jamf Pro instance of this distribution point, if it is associated with one
     ///     - progress: The progress object that should be updated as the transfer progresses
     /// - Returns: Returns true if all files were copied, otherwise false
-    func transferLocalFiles(fileUrls: [URL], jamfProInstance: JamfProInstance?, progress: SynchronizationProgress) async throws {
+    func transferLocalFiles(fileUrls: [URL], jamfProInstance: JamfProInstance?, progress: SynchronizationProgress, dryRun: Bool) async throws {
         let dpFiles = convertFileUrlsToDpFiles(fileUrls: fileUrls)
-        try await copyFilesToDst(sourceName: "Selected local files", willDownloadFiles: false, filesToSync: dpFiles, dstDp: self, jamfProInstance: jamfProInstance, forceSync: true, progress: progress)
+        try await copyFilesToDst(sourceName: "Selected local files", willDownloadFiles: false, filesToSync: dpFiles, dstDp: self, jamfProInstance: jamfProInstance, forceSync: true, progress: progress, dryRun: dryRun)
     }
 
     /// Removes files from this destination distribution point that are not on thie source distribution point.
     /// - Parameters:
     ///     - srcDp: The destination distribution point to search and delete files that are missing.
     ///     - progress: The progress object that should be updated as the deletion progresses.
-    func deleteFilesNotOnSource(srcDp: DistributionPoint, progress: SynchronizationProgress) async throws {
+    func deleteFilesNotOnSource(srcDp: DistributionPoint, progress: SynchronizationProgress, dryRun: Bool) async throws {
         let filesToRemove = filesToRemove(srcDp: srcDp)
         for file in filesToRemove {
-            LogManager.shared.logMessage(message: "Deleting \(file.name) from \(selectionName())", level: .verbose)
-            try await deleteFile(file: file, progress: progress)
-            dpFiles.files.removeAll(where: { $0.name == file.name } ) // Update the list of files so it accurately reflects the change
+            LogManager.shared.logMessage(message: "Deleting \(file.name) from \(selectionName())", level: .verbose, dryRun: dryRun)
+            if !dryRun {
+                try await deleteFile(file: file, progress: progress)
+                dpFiles.files.removeAll(where: { $0.name == file.name } ) // Update the list of files so it accurately reflects the change
+            }
         }
     }
 
@@ -318,7 +320,7 @@ class DistributionPoint: Identifiable {
 
     // MARK: - Private functions
 
-    private func copyFilesToDst(sourceName: String, willDownloadFiles: Bool, filesToSync: [DpFile], dstDp: DistributionPoint, jamfProInstance: JamfProInstance?, forceSync: Bool, progress: SynchronizationProgress) async throws {
+    private func copyFilesToDst(sourceName: String, willDownloadFiles: Bool, filesToSync: [DpFile], dstDp: DistributionPoint, jamfProInstance: JamfProInstance?, forceSync: Bool, progress: SynchronizationProgress, dryRun: Bool) async throws {
         isCanceled = false
         filesWereZipped = false
         var someFileSucceeded = false
@@ -335,6 +337,7 @@ class DistributionPoint: Identifiable {
         for dpFile in filesToSync {
             lastFile = dpFile
             progress.initializeFileTransferInfoForFile(operation: "Copying", currentFile: dpFile, currentTotalSizeTransferred: currentTotalSizeTransferred)
+            LogManager.shared.logMessage(message: "Copying \(dpFile.name) to \(dstDp.selectionName())", level: .verbose, dryRun: dryRun)
 
             do {
                 lastFileTansferred = false
@@ -344,7 +347,9 @@ class DistributionPoint: Identifiable {
                     Task { @MainActor in
                         progress.operation = "Downloading"
                     }
-                    localFileUrl = try await downloadFile(file: dpFile, progress: progress)
+                    if !dryRun {
+                        localFileUrl = try await downloadFile(file: dpFile, progress: progress)
+                    }
                     Task { @MainActor in
                         progress.operation = "Uploading"
                     }
@@ -363,10 +368,12 @@ class DistributionPoint: Identifiable {
                 }
 
                 if dstDp.updatePackageInfoBeforeTransfer {
-                    try await addOrUpdatePackageInJamfPro(dpFile: dpFile, jamfProInstance: jamfProInstance)
+                    try await addOrUpdatePackageInJamfPro(dpFile: dpFile, jamfProInstance: jamfProInstance, dryRun: dryRun)
                 }
 
-                try await dstDp.transferFile(srcFile: dpFile, moveFrom: localFileUrl, progress: progress)
+                if !dryRun {
+                    try await dstDp.transferFile(srcFile: dpFile, moveFrom: localFileUrl, progress: progress)
+                }
                 lastFileTansferred = true
 
                 if let size = dpFile.size {
@@ -374,9 +381,11 @@ class DistributionPoint: Identifiable {
                 }
                 someFileSucceeded = true
 
-                addOrUpdateInDstList(dpFile: dpFile, dstDp: dstDp)
+                if !dryRun {
+                    addOrUpdateInDstList(dpFile: dpFile, dstDp: dstDp)
+                }
                 if !dstDp.updatePackageInfoBeforeTransfer {
-                    try await addOrUpdatePackageInJamfPro(dpFile: dpFile, jamfProInstance: jamfProInstance)
+                    try await addOrUpdatePackageInJamfPro(dpFile: dpFile, jamfProInstance: jamfProInstance, dryRun: dryRun)
                 }
             } catch {
                 if isCanceled { break }
@@ -391,15 +400,15 @@ class DistributionPoint: Identifiable {
         inProgressDstDp = nil
         if someFilesFailed {
             if someFileSucceeded {
-                LogManager.shared.logMessage(message: "Not all files were transferred from \(sourceName) to \(dstDp.selectionName())", level: .warning)
+                LogManager.shared.logMessage(message: "Not all files were transferred from \(sourceName) to \(dstDp.selectionName())", level: .warning, dryRun: dryRun)
             } else {
-                LogManager.shared.logMessage(message: "No files were transferred from \(sourceName) to \(dstDp.selectionName())", level: .error)
+                LogManager.shared.logMessage(message: "No files were transferred from \(sourceName) to \(dstDp.selectionName())", level: .error, dryRun: dryRun)
             }
         } else {
             if isCanceled {
-                LogManager.shared.logMessage(message: "Canceled synchronizing from \(sourceName) to \(dstDp.selectionName())", level: .warning)
+                LogManager.shared.logMessage(message: "Canceled synchronizing from \(sourceName) to \(dstDp.selectionName())", level: .warning, dryRun: dryRun)
             } else {
-                LogManager.shared.logMessage(message: "Finished synchronizing from \(sourceName) to \(dstDp.selectionName())", level: .info)
+                LogManager.shared.logMessage(message: "Finished synchronizing from \(sourceName) to \(dstDp.selectionName())", level: .info, dryRun: dryRun)
             }
         }
     }
@@ -478,16 +487,22 @@ class DistributionPoint: Identifiable {
         dstDp.dpFiles.files.append(dpFile)
     }
 
-    private func addOrUpdatePackageInJamfPro(dpFile: DpFile, jamfProInstance: JamfProInstance?) async throws {
+    private func addOrUpdatePackageInJamfPro(dpFile: DpFile, jamfProInstance: JamfProInstance?, dryRun: Bool) async throws {
         guard let jamfProInstance else { return }
         let checksum = try await retrieveFileChecksum(dpFile: dpFile)
         if let package = jamfProInstance.findPackage(name: dpFile.name) {
-            try await updatePackage(package: package, dpFile: dpFile, jamfProInstance: jamfProInstance)
+            if !dryRun {
+                try await updatePackage(package: package, dpFile: dpFile, jamfProInstance: jamfProInstance)
+            }
+            LogManager.shared.logMessage(message: "Updated package record for \(dpFile.name) to \(jamfProInstance.displayName())", level: .info, dryRun: dryRun)
         } else {
             if let checksum {
                 dpFile.checksums.updateChecksum(checksum)
             }
-            try await addPackage(dpFile: dpFile, jamfProInstance: jamfProInstance)
+            if !dryRun {
+                try await addPackage(dpFile: dpFile, jamfProInstance: jamfProInstance)
+            }
+            LogManager.shared.logMessage(message: "Added package record for \(dpFile.name) to \(jamfProInstance.displayName())", level: .verbose, dryRun: dryRun)
         }
     }
 

@@ -12,7 +12,11 @@ class LogManager: ObservableObject {
     let log = OSLog(subsystem: "com.jamf.jamfsync", category: "JamfSync")
     let logger = Logger(subsystem: "com.jamf.jamfsync", category: "JamfSync")
 
-    func logMessage(message: String, level: LogLevel) {
+    func logMessage(message: String, level: LogLevel, dryRun: Bool = false) {
+        var message = message
+        if dryRun {
+            message = "[Dry Run] \(message)"
+        }
         let logMessage = LogMessage(logLevel: level, message: message)
         let logMessageString = logMessageToString(logMessage)
         writeSystemLog(message: message, level: level)
