@@ -7,17 +7,39 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject var settingsViewModel: SettingsViewModel
     var body: some View {
-        VStack(alignment: .trailing) {
-            Toggle("Allow deletions after synchronization", isOn: $settingsViewModel.allowDeletionsAfterSynchronization)
-                .onChange(of: settingsViewModel.allowDeletionsAfterSynchronization, initial: false) {
+        VStack {
+            Picker("Allow deletions after synchronization:", selection: $settingsViewModel.allowDeletionsAfterSynchronization) {
+                ForEach(DeletionOptions.allCases, id: \.self) {
+                    Text($0.rawValue)
+                }
+            }
+            .onChange(of: settingsViewModel.allowDeletionsAfterSynchronization, initial: false) {
+                settingsViewModel.saveSettings()
+                DataModel.shared.updateListViewModels()
+            }
+            .padding()
+
+            Picker("Allow manual deletions:", selection: $settingsViewModel.allowManualDeletions) {
+                ForEach(DeletionOptions.allCases, id: \.self) {
+                    Text($0.rawValue)
+                }
+            }
+            .onChange(of: settingsViewModel.allowManualDeletions, initial: false) {
+                settingsViewModel.saveSettings()
+                DataModel.shared.updateListViewModels()
+            }
+            .padding([.leading, .trailing, .bottom])
+
+            Toggle("Prompt for Jamf Pro instances on startup", isOn: $settingsViewModel.promptForJamfProInstances)
+                .onChange(of: settingsViewModel.promptForJamfProInstances, initial: false) {
                     settingsViewModel.saveSettings()
                     DataModel.shared.updateListViewModels()
                 }
                 .toggleStyle(SwitchToggleStyle())
-                .padding()
-            Spacer()
+                .padding([.leading, .trailing, .bottom])
         }
-        .frame(height: 60)
+        .padding()
+        .frame(width: 500)
     }
 }
 

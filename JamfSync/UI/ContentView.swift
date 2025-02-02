@@ -42,6 +42,20 @@ struct ContentView: View {
             }
 
             Button {
+                dataModel.shouldPresentServerSelectionSheet = true
+            } label: {
+                Image(systemName: "server.rack")
+            }
+            .help("Choose active Jamf Pro instances")
+            .sheet(isPresented: $dataModel.shouldPresentServerSelectionSheet) {
+                if changesMade || dataModel.firstLoad {
+                    dataModel.load(dataPersistence: dataPersistence)
+                }
+            } content: {
+                JamfProServerPicker(dataPersistence: dataPersistence, savableItems: dataModel.savableItems, changesMade: $changesMade)
+            }
+
+            Button {
                 dataModel.updateListViewModels(reload: .sourceAndDestination)
             } label: {
                 Image(systemName: "arrow.clockwise")

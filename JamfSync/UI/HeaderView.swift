@@ -10,6 +10,7 @@ struct HeaderView: View {
     @State var changesMade = false
     @State var promptForSynchronizationOptions = false
     @State var canceled = false
+    @State var showInfoPopover = false
 
     var body: some View {
         HStack {
@@ -38,31 +39,61 @@ struct HeaderView: View {
             .padding([.trailing])
             .disabled(dataModel.synchronizationDisabled())
 
-            Toggle(isOn: $dataModel.forceSync) {
-                Text("Force Sync")
-            }
-            .toggleStyle(.checkbox)
-            .onChange(of: dataModel.forceSync) {
-                dataModel.updateListViewModels()
+            VStack(alignment: .leading) {
+                Toggle(isOn: $dataModel.forceSync) {
+                    Text("Force Sync")
+                }
+                .toggleStyle(.checkbox)
+                .onChange(of: dataModel.forceSync) {
+                    dataModel.updateListViewModels()
+                }
+
+                HStack {
+                    Toggle(isOn: $dataModel.dryRun) {
+                        Text("Dry Run")
+                    }
+                    .toggleStyle(.checkbox)
+                    
+                    Button {
+                        showInfoPopover = true
+                    } label: {
+                        Image(systemName: "info.circle")
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .background(Color.clear)
+                    .help("Info about Dry Run")
+                    .popover(isPresented: $showInfoPopover) {
+                        Text("Goes through the motions when you click Synchronize and shows actions in the log that would normally happen, prefaced by \"[Dry Run]\", but doesn't actually transfer or remove anything.")
+                            .multilineTextAlignment(.leading)
+                            .padding()
+                            .frame(maxWidth: 400, idealHeight: 100)
+                    }
+                }
+                .padding(.top, 5)
             }
         }
         .alert(deletionMessage(), isPresented: $promptForSynchronizationOptions) {
             HStack {
-                if dataModel.findDp(id: dataModel.selectedDstDpId)?.jamfProInstanceId == nil {
+                let dp = dataModel.findDp(id: dataModel.selectedDstDpId)
+                if dp?.jamfProInstanceId == nil {
                     Button("Yes", role: .destructive) {
                         Task {
                             await startSynchronize(deleteFiles: true, deletePackages: false)
                         }
                     }
                 } else {
-                    Button("Files and associated package records", role: .destructive) {
-                        Task {
-                            await startSynchronize(deleteFiles: true, deletePackages: true)
+                    if includeFilesAndAssociatedPackagesOption(dp: dp) {
+                        Button("Files and associated package records", role: .destructive) {
+                            Task {
+                                await startSynchronize(deleteFiles: true, deletePackages: true)
+                            }
                         }
                     }
-                    Button("Files only", role: .destructive) {
-                        Task {
-                            await startSynchronize(deleteFiles: true, deletePackages: false)
+                    if includeFilesOnlyOption(dp: dp) {
+                        Button("Files only", role: .destructive) {
+                            Task {
+                                await startSynchronize(deleteFiles: true, deletePackages: false)
+                            }
                         }
                     }
                 }
@@ -77,6 +108,20 @@ struct HeaderView: View {
         }
     }
 
+    func includeFilesAndAssociatedPackagesOption(dp: DistributionPoint?) -> Bool {
+        if let dp, dp.deleteByRemovingPackage {
+            return dataModel.settingsViewModel.allowDeletionsAfterSynchronization != .none
+        }
+        return dataModel.settingsViewModel.allowDeletionsAfterSynchronization == .filesAndAssociatedPackages
+    }
+
+    func includeFilesOnlyOption(dp: DistributionPoint?) -> Bool {
+        if let dp, dp.deleteByRemovingPackage {
+            return false
+        }
+        return dataModel.settingsViewModel.allowDeletionsAfterSynchronization != .none
+    }
+
     func deletionMessage() -> String {
         var message = "Do you want to delete items from the destination that are not on the source?"
         var warning = " WARNING: Deletions cannot be undone!"
@@ -86,6 +131,7 @@ struct HeaderView: View {
             if filesToRemove.count == dstDp.dpFiles.files.count {
                 warning = " WARNING: This is all of the files on the destination! Deletions cannot be undone!"
             }
+            warning += packageDeletionWarning(dp: dstDp)
             if let jamfProInstance = DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId) {
                 let packagesToRemove = jamfProInstance.packagesToRemove(srcDp: srcDp)
                 message += "and \(packagesToRemove.count) package records "
@@ -96,17 +142,24 @@ struct HeaderView: View {
         return message
     }
 
+    func packageDeletionWarning(dp: DistributionPoint?) -> String {
+        if let dp, dp.deleteByRemovingPackage, dataModel.settingsViewModel.allowDeletionsAfterSynchronization == .filesOnly {
+            return "\n\nNOTE: \"Allow deletions after synchronization\" in Settings is set to \"Files Only\", however, for the \"\(dp.selectionName())\" distribution point, files cannot be deleted without also deleting the associated package records."
+        }
+        return ""
+    }
+
     func startSynchronize(deleteFiles: Bool, deletePackages: Bool) async {
         if let srcDp = dataModel.findDp(id: dataModel.selectedSrcDpId), let dstDp = dataModel.findDp(id: dataModel.selectedDstDpId) {
             SynchronizeProgressView(srcDp: srcDp, dstDp: dstDp, deleteFiles: deleteFiles, deletePackages: deletePackages, processToExecute: { (synchronizeTask, deleteFiles, deletePackages, progress, synchronizationProgressView) in
-                    synchronize(srcDp: srcDp, dstDp: dstDp, synchronizeTask: synchronizeTask, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, synchronizeProgressView: synchronizationProgressView) })
+                synchronize(srcDp: srcDp, dstDp: dstDp, synchronizeTask: synchronizeTask, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, synchronizeProgressView: synchronizationProgressView, dryRun: DataModel.shared.dryRun) })
                 .openInNewWindow { window in
                 window.title = "Synchronization Progress"
             }
         }
     }
 
-    func synchronize(srcDp: DistributionPoint?, dstDp: DistributionPoint, synchronizeTask: SynchronizeTask, deleteFiles: Bool, deletePackages: Bool, progress: SynchronizationProgress, synchronizeProgressView: SynchronizeProgressView) {
+    func synchronize(srcDp: DistributionPoint?, dstDp: DistributionPoint, synchronizeTask: SynchronizeTask, deleteFiles: Bool, deletePackages: Bool, progress: SynchronizationProgress, synchronizeProgressView: SynchronizeProgressView, dryRun: Bool) {
         Task {
             var reloadFiles = false
             DataModel.shared.cancelUpdateListViewModels()
@@ -114,7 +167,7 @@ struct HeaderView: View {
             do {
                 guard let srcDp else { throw DistributionPointError.programError }
                 
-                reloadFiles = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: DataModel.shared.selectedDpFilesFromSelectionIds(packageListViewModel: DataModel.shared.srcPackageListViewModel), jamfProInstance: DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId), forceSync: DataModel.shared.forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress)
+                reloadFiles = try await synchronizeTask.synchronize(srcDp: srcDp, dstDp: dstDp, selectedItems: DataModel.shared.selectedDpFilesFromSelectionIds(packageListViewModel: DataModel.shared.srcPackageListViewModel), jamfProInstance: DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId), forceSync: DataModel.shared.forceSync, deleteFiles: deleteFiles, deletePackages: deletePackages, progress: progress, dryRun: dryRun)
             } catch {
                 LogManager.shared.logMessage(message: "Failed to synchronize \(srcDp?.name ?? "nil") to \(dstDp.name): \(error)", level: .error)
             }
@@ -134,7 +187,7 @@ struct HeaderView: View {
     }
 
     func promptForDeletion() -> Bool {
-        if !dataModel.settingsViewModel.allowDeletionsAfterSynchronization {
+        if dataModel.settingsViewModel.allowDeletionsAfterSynchronization == .none {
             return false
         }
         if dataModel.srcPackageListViewModel.selectedDpFiles.count == 0 {
@@ -142,7 +195,7 @@ struct HeaderView: View {
                 // If there are any packages on the destination Jamf Pro server that would be removed, then prompt
                 if let jamfProInstance = DataModel.shared.findJamfProInstance(id: dstDp.jamfProInstanceId) {
                     if jamfProInstance.packagesToRemove(srcDp: srcDp).count > 0 {
-                        return true
+                        return dataModel.settingsViewModel.allowDeletionsAfterSynchronization != .none
                     }
                 }
 
