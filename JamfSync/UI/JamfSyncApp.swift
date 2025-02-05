@@ -83,7 +83,9 @@ struct JamfSyncApp: App {
 
         if argumentParser.someArgumentsPassed {
             let commandLineProcessing = CommandLineProcessing(dataModel: DataModel.shared, dataPersistence: dataPersistence)
-            if commandLineProcessing.process(argumentParser: argumentParser) {
+            let succeeded = commandLineProcessing.process(argumentParser: argumentParser)
+            appDelegate.cleanup()
+            if succeeded {
                 exit(0)
             } else {
                 exit(1)

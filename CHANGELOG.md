@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added the option in settings to restrict deletions after synchronization and manual deletions either entirely or to allow only deleting files or allowing deletion of both files and packages.
 - Added a --dryRun command line flag so you can see what will be copied and deleted without actually doing anything, and also added a dry run checkbox to the main view.
 - Added a view where Jamf Pro servers can be activated or deactivated, and added a setting to have it display at startup before it reads any data from the servers. By limiting the number of active servers, startup time can be greatly reduced.
+- Made it so you can upload zip files when clicking the + button for a distribution point.
+### Bug fixes
+- Made it unmount file shares after command line processing is completed.
 
 ## [1.4.0] - 2024-10-25
 ### Features

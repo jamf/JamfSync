@@ -21,7 +21,7 @@ class CommandLineProcessing {
 
         print("Loading distribution points")
         dataModel.loadingInProgressGroup = DispatchGroup()
-        dataModel.load(dataPersistence: dataPersistence)
+        dataModel.load(dataPersistence: dataPersistence, isProcessingCommandLine: true)
         dataModel.loadingInProgressGroup?.wait()
 
         guard let srcDp = dataModel.findDpByCombinedName(name: srcDpName) else {
