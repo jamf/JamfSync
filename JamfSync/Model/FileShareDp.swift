@@ -130,7 +130,6 @@ class FileShareDp: DistributionPoint {
             }
         } catch {
             let serviceName = keychainHelper.fileShareServiceName(username: readWriteUsername, urlString: address)
-            try await keychainHelper.deleteKeychainItem(serviceName: serviceName, key: readWriteUsername)
             Task { @MainActor in
                 DataModel.shared.dpToPromptForPassword = self
                 DataModel.shared.shouldPromptForDpPassword = true
