@@ -79,11 +79,15 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "&quot;Demo Folder 2&quot;"
+            argument = "&quot;Demo folder 1&quot;"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-d"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "StrandlandM1:HarryTest"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument

@@ -48,9 +48,9 @@ class DataModel: ObservableObject {
     private var updateListViewModelsTask: Task<Void, Error>?
     private var updateChecksumsTask: Task<Void, Error>?
 
-    func load(dataPersistence: DataPersistence) {
+    func load(dataPersistence: DataPersistence, isProcessingCommandLine: Bool = false) {
         savableItems = dataPersistence.loadSavableItems()
-        if firstLoad && !promptedForJamfProInstances && settingsViewModel.promptForJamfProInstances {
+        if firstLoad && !promptedForJamfProInstances && settingsViewModel.promptForJamfProInstances && !isProcessingCommandLine {
             shouldPresentServerSelectionSheet = true
             promptedForJamfProInstances = true
         } else {
