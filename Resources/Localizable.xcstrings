@@ -1,0 +1,230 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "%@" : {
+
+    },
+    "%@:" : {
+
+    },
+    "About Jamf Sync" : {
+
+    },
+    "Active" : {
+
+    },
+    "Active Jamf Pro Servers" : {
+
+    },
+    "Add File Folder" : {
+
+    },
+    "Add file(s)" : {
+
+    },
+    "Add Jamf Pro Server" : {
+
+    },
+    "Allow deletions after synchronization:" : {
+
+    },
+    "Allow manual deletions:" : {
+
+    },
+    "Are you sure you want to cancel the syncrhonization?" : {
+
+    },
+    "Calculate Checksums" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Checksum" : {
+
+    },
+    "Choose active Jamf Pro instances" : {
+
+    },
+    "Choose..." : {
+
+    },
+    "Close" : {
+
+    },
+    "Copy selected log messages to the clipboard" : {
+
+    },
+    "Date & Time" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Destination:" : {
+
+    },
+    "Dry Run" : {
+
+    },
+    "Edit" : {
+
+    },
+    "Enter the credentials for %@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Enter the credentials for %1$@: %2$@"
+          }
+        }
+      }
+    },
+    "Enter the password for %@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Enter the password for %1$@ (%2$@)"
+          }
+        }
+      }
+    },
+    "File Folder" : {
+
+    },
+    "File Share Credentials" : {
+
+    },
+    "Files and associated package records" : {
+
+    },
+    "Files only" : {
+
+    },
+    "Force Sync" : {
+
+    },
+    "Goes through the motions when you click Synchronize and shows actions in the log that would normally happen, prefaced by \"[Dry Run]\", but doesn't actually transfer or remove anything." : {
+
+    },
+    "https://jamfproserver.com" : {
+
+    },
+    "Info about Dry Run" : {
+
+    },
+    "Jamf Pro Password" : {
+
+    },
+    "Jamf Pro Server" : {
+
+    },
+    "Jamf Sync" : {
+
+    },
+    "Jamf Sync helps synchronize content to Jamf Pro distribution points.\n\nCopyright 2024, Jamf" : {
+
+    },
+    "Jamf Sync User Guide" : {
+
+    },
+    "Message" : {
+
+    },
+    "Name" : {
+
+    },
+    "Name:" : {
+
+    },
+    "No" : {
+
+    },
+    "OK" : {
+
+    },
+    "Only Add or Update" : {
+
+    },
+    "Overall Progress: " : {
+
+    },
+    "Password" : {
+
+    },
+    "Password:" : {
+
+    },
+    "Path" : {
+
+    },
+    "Path:" : {
+
+    },
+    "Prompt for Jamf Pro instances on startup" : {
+
+    },
+    "Recommended privileges: %@" : {
+
+    },
+    "Refresh" : {
+
+    },
+    "Remove all messages" : {
+
+    },
+    "Remove selected file(s)" : {
+
+    },
+    "Save in Keychain" : {
+
+    },
+    "Setup" : {
+
+    },
+    "Show Log" : {
+
+    },
+    "Size" : {
+
+    },
+    "Source:" : {
+
+    },
+    "Sync" : {
+
+    },
+    "Synchronize" : {
+
+    },
+    "Test" : {
+
+    },
+    "Title" : {
+
+    },
+    "Type" : {
+
+    },
+    "URL or Folder" : {
+
+    },
+    "URL:" : {
+
+    },
+    "Use Client API" : {
+
+    },
+    "Username:" : {
+
+    },
+    "Yes" : {
+
+    }
+  },
+  "version" : "1.0"
+}

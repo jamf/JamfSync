@@ -43,6 +43,7 @@
 		849809DB2CB8575B001F94C9 /* UploadTimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849809DA2CB8575B001F94C9 /* UploadTimeTests.swift */; };
 		849FC3412BD06A43008BAC02 /* VersionInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849FC3402BD06A43008BAC02 /* VersionInfo.swift */; };
 		84AB59C52B20D569007333AD /* CloudSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84AB59C42B20D569007333AD /* CloudSessionDelegate.swift */; };
+		84B21DEB2D67983B003690A2 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 84B21DEA2D67983B003690A2 /* Localizable.xcstrings */; };
 		84B967642B74157C00D73F75 /* HelpMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B967632B74157C00D73F75 /* HelpMenu.swift */; };
 		84BA65E32AD057E10058D291 /* SavableItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BA65E22AD057E10058D291 /* SavableItems.swift */; };
 		84BC6DF42AC3122100CF6D39 /* JamfSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6DF32AC3122100CF6D39 /* JamfSyncApp.swift */; };
@@ -160,6 +161,7 @@
 		849809DA2CB8575B001F94C9 /* UploadTimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadTimeTests.swift; sourceTree = "<group>"; };
 		849FC3402BD06A43008BAC02 /* VersionInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionInfo.swift; sourceTree = "<group>"; };
 		84AB59C42B20D569007333AD /* CloudSessionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSessionDelegate.swift; sourceTree = "<group>"; };
+		84B21DEA2D67983B003690A2 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		84B967632B74157C00D73F75 /* HelpMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpMenu.swift; sourceTree = "<group>"; };
 		84BA65E22AD057E10058D291 /* SavableItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavableItems.swift; sourceTree = "<group>"; };
 		84BC6DF02AC3122100CF6D39 /* Jamf Sync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Jamf Sync.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -261,9 +263,18 @@
 			path = Mocks;
 			sourceTree = "<group>";
 		};
+		84B21DE92D679802003690A2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				84B21DEA2D67983B003690A2 /* Localizable.xcstrings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		84BC6DE72AC3122100CF6D39 = {
 			isa = PBXGroup;
 			children = (
+				84B21DE92D679802003690A2 /* Resources */,
 				841DE9DA2BA395F00092DBE7 /* User Guide */,
 				84F258B62B76E09F00B8F401 /* CHANGELOG.md */,
 				84F258B22B76BF7E00B8F401 /* LICENSE */,
@@ -584,6 +595,7 @@
 				84F258B72B76E09F00B8F401 /* CHANGELOG.md in Resources */,
 				84BC6E552AC4933500CF6D39 /* README.md in Resources */,
 				84F258B32B76BF7E00B8F401 /* LICENSE in Resources */,
+				84B21DEB2D67983B003690A2 /* Localizable.xcstrings in Resources */,
 				843BE0F62AEFE6350053431B /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -789,6 +801,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -846,6 +859,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 			};
 			name = Release;
 		};
