@@ -21,6 +21,7 @@ class MockFileManager: FileManager {
     var fileExistsResponseProvider: ((String, UnsafeMutablePointer<ObjCBool>?) -> Bool)?
     var directoryCreated: URL?
     var createDirectoryError: Error?
+    var attributesSet: [String: [FileAttributeKey: Any]] = [:]
 
     override func contentsOfDirectory(at url: URL, includingPropertiesForKeys keys: [URLResourceKey]?, options mask: FileManager.DirectoryEnumerationOptions = []) throws -> [URL] {
         if let contentsOfDirectoryError {
@@ -87,5 +88,9 @@ class MockFileManager: FileManager {
             throw createDirectoryError
         }
         directoryCreated = url
+    }
+
+    override func setAttributes(_ attributes: [FileAttributeKey : Any], ofItemAtPath path: String) throws {
+        attributesSet[path] = attributes
     }
 }

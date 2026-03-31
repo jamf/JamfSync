@@ -34,6 +34,7 @@
 		846499D32B64165E00A8EA7B /* TestErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499D22B64165E00A8EA7B /* TestErrors.swift */; };
 		63F41799AC5DE918435399D1 /* ChecksumsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89812BAC4405E98A15D1CCB /* ChecksumsTests.swift */; };
 		2AD32CC765B804C67356E7F4 /* GeneralCloudDpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20024D5A84FE240AE8C05324 /* GeneralCloudDpTests.swift */; };
+		1FE12F34F420D4E74BE3E1B9 /* Jcds2DpAdditionalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0BB8F2E75BB97315FCFFDE /* Jcds2DpAdditionalTests.swift */; };
 		846499D52B64268A00A8EA7B /* DistributionPointTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499D42B64268A00A8EA7B /* DistributionPointTests.swift */; };
 		846499DE2B699F8E00A8EA7B /* MockDistributionPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499DD2B699F8E00A8EA7B /* MockDistributionPoint.swift */; };
 		846499E02B699FB500A8EA7B /* MockJamfProInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846499DF2B699FB500A8EA7B /* MockJamfProInstance.swift */; };
@@ -158,6 +159,7 @@
 		846499D22B64165E00A8EA7B /* TestErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestErrors.swift; sourceTree = "<group>"; };
 		D89812BAC4405E98A15D1CCB /* ChecksumsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecksumsTests.swift; sourceTree = "<group>"; };
 		20024D5A84FE240AE8C05324 /* GeneralCloudDpTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralCloudDpTests.swift; sourceTree = "<group>"; };
+		7B0BB8F2E75BB97315FCFFDE /* Jcds2DpAdditionalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Jcds2DpAdditionalTests.swift; sourceTree = "<group>"; };
 		846499D42B64268A00A8EA7B /* DistributionPointTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributionPointTests.swift; sourceTree = "<group>"; };
 		846499DD2B699F8E00A8EA7B /* MockDistributionPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDistributionPoint.swift; sourceTree = "<group>"; };
 		846499DF2B699FB500A8EA7B /* MockJamfProInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockJamfProInstance.swift; sourceTree = "<group>"; };
@@ -276,6 +278,7 @@
 				846499E12B6AA7C300A8EA7B /* FileShareDpTests.swift */,
 				846499CE2B630D7700A8EA7B /* FolderDpTests.swift */,
 				20024D5A84FE240AE8C05324 /* GeneralCloudDpTests.swift */,
+				7B0BB8F2E75BB97315FCFFDE /* Jcds2DpAdditionalTests.swift */,
 				846499E72B6BFCA900A8EA7B /* Jcds2DpTests.swift */,
 				846499E32B6B080B00A8EA7B /* SynchronizeTaskTests.swift */,
 			);
@@ -752,6 +755,7 @@
 				8422B1212F6494FD0019C2DE /* CommandLineProcessingTests.swift in Sources */,
 				846499D52B64268A00A8EA7B /* DistributionPointTests.swift in Sources */,
 				2AD32CC765B804C67356E7F4 /* GeneralCloudDpTests.swift in Sources */,
+				1FE12F34F420D4E74BE3E1B9 /* Jcds2DpAdditionalTests.swift in Sources */,
 				846499E42B6B080B00A8EA7B /* SynchronizeTaskTests.swift in Sources */,
 				846499E82B6BFCA900A8EA7B /* Jcds2DpTests.swift in Sources */,
 				846499E22B6AA7C300A8EA7B /* FileShareDpTests.swift in Sources */,
