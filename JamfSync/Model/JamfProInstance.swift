@@ -232,6 +232,9 @@ class JamfProInstance: SavableItem {
 
     /// Loads data from the keychain
     func loadKeychainData() async {
+        // Skip keychain access during tests
+        guard !TestingUtility.isRunningTests else { return }
+
         guard let urlHost = url?.host(), !usernameOrClientId.isEmpty else { return }
         let keychainHelper = KeychainHelper()
         let serviceName = keychainHelper.jamfProServiceName(urlString: urlHost)

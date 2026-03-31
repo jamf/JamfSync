@@ -165,6 +165,9 @@ class FileShareDp: DistributionPoint {
     }
 
     private func loadKeychainData() {
+        // Skip keychain access during tests
+        guard !TestingUtility.isRunningTests else { return }
+
         guard let address, let readWriteUsername else { return }
         let keychainHelper = KeychainHelper()
         var serviceName = keychainHelper.fileShareServiceName(username: readWriteUsername, urlString: address)

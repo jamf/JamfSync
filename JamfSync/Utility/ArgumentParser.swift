@@ -21,7 +21,7 @@ class ArgumentParser: NSObject {
     
     fileprivate func processStringArg(_ i: inout Int) -> String? {
         var stringArg: String?
-        if i < CommandLine.arguments.count - 1 {
+        if i < arguments.count - 1 {
             stringArg = arguments[i + 1]
             i = i + 1
         }
@@ -119,7 +119,17 @@ class ArgumentParser: NSObject {
 
     func validateArgs() -> Bool {
         // Either none or both, but not one or the other
-        if (srcDp == nil && dstDp == nil) || (srcDp != nil && dstDp != nil) {
+        if srcDp == nil && dstDp == nil {
+            // If both are nil but arguments were passed, that's an error
+            // (e.g., -s without a value)
+            if someArgumentsPassed {
+                print("Both the source and the destination arguments are required.")
+                print("")
+                displayHelp()
+                return false
+            }
+            return true
+        } else if srcDp != nil && dstDp != nil {
             return true
         } else {
             print("Both the source and the destination arguments are required.")
