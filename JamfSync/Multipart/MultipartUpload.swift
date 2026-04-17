@@ -9,6 +9,13 @@ protocol RenewTokenProtocol {
     func renewUploadToken() async throws
 }
 
+protocol URLSessionProtocol {
+    func data(for request: URLRequest) async throws -> (Data, URLResponse)
+    func upload(for request: URLRequest, from bodyData: Data) async throws -> (Data, URLResponse)
+}
+
+extension URLSession: URLSessionProtocol {}
+
 class MultipartUpload {
     var initiateUploadData: JsonInitiateUpload
     let renewTokenObject: RenewTokenProtocol
@@ -22,11 +29,13 @@ class MultipartUpload {
 
     let operationQueue = OperationQueue()
     var urlSession: URLSession?
-    
-    init(initiateUploadData: JsonInitiateUpload, renewTokenObject: RenewTokenProtocol, progress: SynchronizationProgress) {
+    var sharedSession: URLSessionProtocol
+
+    init(initiateUploadData: JsonInitiateUpload, renewTokenObject: RenewTokenProtocol, progress: SynchronizationProgress, sharedSession: URLSessionProtocol = URLSession.shared) {
         self.initiateUploadData = initiateUploadData
         self.renewTokenObject = renewTokenObject
         self.progress = progress
+        self.sharedSession = sharedSession
     }
     
     func createUrlSession(sessionDelegate: CloudSessionDelegate) -> URLSession {
@@ -52,7 +61,7 @@ class MultipartUpload {
         URLCache.shared.removeAllCachedResponses()
 
         uploadTime.start = Date().timeIntervalSince1970
-        let (responseData, response) = try await URLSession.shared.data(for: request)
+        let (responseData, response) = try await sharedSession.data(for: request)
         let responseDataString = String(data: responseData, encoding: .utf8) ?? ""
         if let httpResponse = response as? HTTPURLResponse {
             if !(200...299).contains(httpResponse.statusCode) {
@@ -76,7 +85,7 @@ class MultipartUpload {
         }
     }
 
-    private func tagValue(xmlString:String, startTag:String, endTag:String) -> String {
+    func tagValue(xmlString:String, startTag:String, endTag:String) -> String {
         var rawValue = ""
         if let start = xmlString.range(of: startTag),
             let end  = xmlString.range(of: endTag, range: start.upperBound..<xmlString.endIndex) {
@@ -85,7 +94,7 @@ class MultipartUpload {
         return rawValue
     }
 
-    private func createMultipartUploadRequest(fileUrl: URL, httpMethod: String, urlQuery: String? = nil, start: Bool = false, contentType: String? = nil) throws -> URLRequest {
+    func createMultipartUploadRequest(fileUrl: URL, httpMethod: String, urlQuery: String? = nil, start: Bool = false, contentType: String? = nil) throws -> URLRequest {
         let filename = fileUrl.lastPathComponent
         var urlHostAllowedPlus = CharacterSet.urlHostAllowed
         urlHostAllowedPlus.remove(charactersIn: "+")
@@ -178,7 +187,7 @@ class MultipartUpload {
         urlSession = nil
     }
 
-    private func uploadChunk(whichChunk: Int, uploadId: String, fileUrl: URL, progress: SynchronizationProgress) async throws {
+    func uploadChunk(whichChunk: Int, uploadId: String, fileUrl: URL, progress: SynchronizationProgress) async throws {
         LogManager.shared.logMessage(message: "Start processing part \(whichChunk)", level: .debug)
 
         let chunkData = try getChunkData(fileUrl: fileUrl, part: whichChunk)
@@ -220,7 +229,7 @@ class MultipartUpload {
 
         URLCache.shared.removeAllCachedResponses()
         
-        let (responseData, response) = try await URLSession.shared.data(for: request)
+        let (responseData, response) = try await sharedSession.data(for: request)
         if let httpResponse = response as? HTTPURLResponse {
             if !(200...299).contains(httpResponse.statusCode) {
                LogManager.shared.logMessage(message: "Failed to complete upload for \(packageToUpload). Status code: \(httpResponse.statusCode)", level: .error)
@@ -234,7 +243,7 @@ class MultipartUpload {
         LogManager.shared.logMessage(message: "Upload of \(packageToUpload) completed in \(uploadTime.total())", level: .info)
     }
 
-    private func createCompletedPartsXml() -> String {
+    func createCompletedPartsXml() -> String {
         var completionArray = ""
         for thePart in partNumberEtagList.sorted(by: {$0.partNumber < $1.partNumber}) {
             let currentPart = """
@@ -252,7 +261,7 @@ class MultipartUpload {
             """
     }
 
-    private func getChunkData(fileUrl: URL, part: Int) throws -> Data {
+    func getChunkData(fileUrl: URL, part: Int) throws -> Data {
         let fileHandle = try FileHandle(forReadingFrom: fileUrl)
 
         fileHandle.seek(toFileOffset: UInt64((part - 1) * chunkSize))
@@ -263,7 +272,7 @@ class MultipartUpload {
         return data
     }
 
-    private func awsSignature256(for resource: String, httpMethod: String, date: String, accessKeyId: String, secretKey: String, bucket: String, key: String, queryParameters: String = "", region: String/*, fileUrl: URL, contentType: String*/, currentDate: String) -> String {
+    func awsSignature256(for resource: String, httpMethod: String, date: String, accessKeyId: String, secretKey: String, bucket: String, key: String, queryParameters: String = "", region: String, currentDate: String) -> String {
 
         var requestHeaders = [String:String]()
         requestHeaders["date"] = currentDate
@@ -316,7 +325,7 @@ class MultipartUpload {
         return hexOfFinalSignature
     }
 
-    private func contentType(filename: String) -> String? {
+    func contentType(filename: String) -> String? {
         let ext = URL(fileURLWithPath: filename).pathExtension
         switch ext {
         case "pkg", "mpkg":
@@ -330,7 +339,7 @@ class MultipartUpload {
         }
     }
 
-    private func hmac_sha256(date: String, secretKey: String, key: String, region: String, stringToSign: String) -> String {
+    func hmac_sha256(date: String, secretKey: String, key: String, region: String, stringToSign: String) -> String {
         let aws4SecretKey = Data("AWS4\(secretKey)".utf8)
         let dateStampData = Data(date.utf8)
         let regionNameData = Data(region.utf8)

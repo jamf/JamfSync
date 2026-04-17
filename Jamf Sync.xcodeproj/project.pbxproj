@@ -53,6 +53,8 @@
 		84AB59C52B20D569007333AD /* CloudSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84AB59C42B20D569007333AD /* CloudSessionDelegate.swift */; };
 		84B084F82F92C83D000713CC /* DpFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B084F72F92C83D000713CC /* DpFileTests.swift */; };
 		84B084F92F92C83D000713CC /* DpFilesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B084F62F92C83D000713CC /* DpFilesTests.swift */; };
+		84C0A1012FA100000000AA01 /* MultipartUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C0A1002FA100000000AA01 /* MultipartUploadTests.swift */; };
+		84C0A1032FA100000000AA03 /* MockURLSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C0A1022FA100000000AA02 /* MockURLSession.swift */; };
 		84B967642B74157C00D73F75 /* HelpMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B967632B74157C00D73F75 /* HelpMenu.swift */; };
 		84BA65E32AD057E10058D291 /* SavableItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BA65E22AD057E10058D291 /* SavableItems.swift */; };
 		84BC6DF42AC3122100CF6D39 /* JamfSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6DF32AC3122100CF6D39 /* JamfSyncApp.swift */; };
@@ -181,6 +183,8 @@
 		84AB59C42B20D569007333AD /* CloudSessionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSessionDelegate.swift; sourceTree = "<group>"; };
 		84B084F62F92C83D000713CC /* DpFilesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DpFilesTests.swift; sourceTree = "<group>"; };
 		84B084F72F92C83D000713CC /* DpFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DpFileTests.swift; sourceTree = "<group>"; };
+		84C0A1002FA100000000AA01 /* MultipartUploadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartUploadTests.swift; sourceTree = "<group>"; };
+		84C0A1022FA100000000AA02 /* MockURLSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLSession.swift; sourceTree = "<group>"; };
 		84B967632B74157C00D73F75 /* HelpMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpMenu.swift; sourceTree = "<group>"; };
 		84BA65E22AD057E10058D291 /* SavableItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavableItems.swift; sourceTree = "<group>"; };
 		84BC6DF02AC3122100CF6D39 /* Jamf Sync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Jamf Sync.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -311,6 +315,7 @@
 			isa = PBXGroup;
 			children = (
 				849809DA2CB8575B001F94C9 /* UploadTimeTests.swift */,
+				84C0A1002FA100000000AA01 /* MultipartUploadTests.swift */,
 			);
 			path = Multipart;
 			sourceTree = "<group>";
@@ -322,6 +327,7 @@
 				846499E52B6B089200A8EA7B /* MockDistributionPointSync.swift */,
 				846499D02B631B6A00A8EA7B /* MockFileManager.swift */,
 				846499DF2B699FB500A8EA7B /* MockJamfProInstance.swift */,
+				84C0A1022FA100000000AA02 /* MockURLSession.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -778,6 +784,8 @@
 				8422B1222F649B8B0019C2DE /* TemporaryFileManagerTests.swift in Sources */,
 				846499CF2B630D7700A8EA7B /* FolderDpTests.swift in Sources */,
 				846499E62B6B089200A8EA7B /* MockDistributionPointSync.swift in Sources */,
+				84C0A1012FA100000000AA01 /* MultipartUploadTests.swift in Sources */,
+				84C0A1032FA100000000AA03 /* MockURLSession.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
