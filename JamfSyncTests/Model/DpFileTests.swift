@@ -66,7 +66,7 @@ final class DpFileTests: XCTestCase {
         checksums2.updateChecksum(Checksum(type: .MD5, value: "sameHash"))
         let file2 = DpFile(name: "b.pkg", size: 200, checksums: checksums2)
 
-        XCTAssertTrue(DpFile == (file1, file2), "Files with matching checksums should be equal regardless of size or name")
+        XCTAssertTrue(file1 == file2, "Files with matching checksums should be equal regardless of size or name")
     }
 
     func test_equality_checksumMismatchMeansNotEqual() {
@@ -78,7 +78,7 @@ final class DpFileTests: XCTestCase {
         checksums2.updateChecksum(Checksum(type: .MD5, value: "hash2"))
         let file2 = DpFile(name: "a.pkg", size: 100, checksums: checksums2)
 
-        XCTAssertFalse(DpFile == (file1, file2), "Files with differing checksums should not be equal")
+        XCTAssertFalse(file1 == file2, "Files with differing checksums should not be equal")
     }
 
     func test_equality_fallsBackToSizeWhenNoMatchingChecksumType() {
@@ -90,7 +90,7 @@ final class DpFileTests: XCTestCase {
         checksums2.updateChecksum(Checksum(type: .SHA_512, value: "sha512Hash"))
         let file2 = DpFile(name: "a.pkg", size: 500, checksums: checksums2)
 
-        XCTAssertTrue(DpFile == (file1, file2), "When checksum types don't match, equal sizes should mean equal files")
+        XCTAssertTrue(file1 == file2, "When checksum types don't match, equal sizes should mean equal files")
     }
 
     func test_equality_sizeNotEqualWhenNoMatchingChecksumType() {
@@ -102,21 +102,21 @@ final class DpFileTests: XCTestCase {
         checksums2.updateChecksum(Checksum(type: .SHA_512, value: "sha512Hash"))
         let file2 = DpFile(name: "a.pkg", size: 200, checksums: checksums2)
 
-        XCTAssertFalse(DpFile == (file1, file2), "When checksum types don't match, differing sizes should mean not equal")
+        XCTAssertFalse(file1 == file2, "When checksum types don't match, differing sizes should mean not equal")
     }
 
     func test_equality_noChecksumsComparesSize() {
         let file1 = DpFile(name: "a.pkg", size: 1024)
         let file2 = DpFile(name: "b.pkg", size: 1024)
 
-        XCTAssertTrue(DpFile == (file1, file2), "Files with no checksums and equal sizes should be equal")
+        XCTAssertTrue(file1 == file2, "Files with no checksums and equal sizes should be equal")
     }
 
     func test_equality_noChecksumsNilSizesAreEqual() {
         let file1 = DpFile(name: "a.pkg", size: nil)
         let file2 = DpFile(name: "b.pkg", size: nil)
 
-        XCTAssertTrue(DpFile == (file1, file2), "Files with no checksums and both nil sizes should be equal")
+        XCTAssertTrue(file1 == file2, "Files with no checksums and both nil sizes should be equal")
     }
 
     func test_equality_sha512TakesPrecedenceOverSize() {
@@ -128,6 +128,6 @@ final class DpFileTests: XCTestCase {
         checksums2.updateChecksum(Checksum(type: .SHA_512, value: "matchingSha512"))
         let file2 = DpFile(name: "b.pkg", size: 999, checksums: checksums2)
 
-        XCTAssertTrue(DpFile == (file1, file2), "Matching SHA_512 should make files equal regardless of size")
+        XCTAssertTrue(file1 == file2, "Matching SHA_512 should make files equal regardless of size")
     }
 }
