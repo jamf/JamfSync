@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.3] - 2026-4-17
+### Bug fixes
+- Fixed a crash that could happen during file uploads.
+
 ## [1.5.2] - 2025-9-5
 ### Bug fixes
 - Added an API call that tells Jamf Pro to update the inventory after uploading to a Cloud DP (GitHub issue #16 "Packages uploaded through Jamf Sync sometimes do not install from a policy", #41 "Packages failing on install when syncing with 1.3.3+", #63 "The packages uploaded to S3 cloud DP via Jamf Sync couldn't be downloaded", #66 "Where does JamfSync store calculated Checksums for destination?").

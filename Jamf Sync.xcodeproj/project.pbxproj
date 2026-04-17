@@ -53,8 +53,6 @@
 		84AB59C52B20D569007333AD /* CloudSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84AB59C42B20D569007333AD /* CloudSessionDelegate.swift */; };
 		84B084F82F92C83D000713CC /* DpFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B084F72F92C83D000713CC /* DpFileTests.swift */; };
 		84B084F92F92C83D000713CC /* DpFilesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B084F62F92C83D000713CC /* DpFilesTests.swift */; };
-		84C0A1012FA100000000AA01 /* MultipartUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C0A1002FA100000000AA01 /* MultipartUploadTests.swift */; };
-		84C0A1032FA100000000AA03 /* MockURLSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C0A1022FA100000000AA02 /* MockURLSession.swift */; };
 		84B967642B74157C00D73F75 /* HelpMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B967632B74157C00D73F75 /* HelpMenu.swift */; };
 		84BA65E32AD057E10058D291 /* SavableItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BA65E22AD057E10058D291 /* SavableItems.swift */; };
 		84BC6DF42AC3122100CF6D39 /* JamfSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BC6DF32AC3122100CF6D39 /* JamfSyncApp.swift */; };
@@ -79,6 +77,8 @@
 		84BF5E3A2CC15FD3008B07A1 /* TemporaryFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BF5E392CC15FB4008B07A1 /* TemporaryFileManager.swift */; };
 		84BF61A92CC93DFB008B07A1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BF61A82CC93DFB008B07A1 /* SettingsView.swift */; };
 		84BF61AB2CC94DD5008B07A1 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BF61AA2CC94DD5008B07A1 /* SettingsViewModel.swift */; };
+		84C0A1012FA100000000AA01 /* MultipartUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C0A1002FA100000000AA01 /* MultipartUploadTests.swift */; };
+		84C0A1032FA100000000AA03 /* MockURLSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C0A1022FA100000000AA02 /* MockURLSession.swift */; };
 		84CAB0E52C25C47400582D59 /* FileManager+moveRetainingPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CAB0E42C25C47400582D59 /* FileManager+moveRetainingPermissions.swift */; };
 		84CCB5D22B4C852F00328291 /* SetupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CCB5D12B4C852F00328291 /* SetupViewModel.swift */; };
 		84CCB5D42B4C946200328291 /* LogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CCB5D32B4C946200328291 /* LogViewModel.swift */; };
@@ -183,8 +183,6 @@
 		84AB59C42B20D569007333AD /* CloudSessionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSessionDelegate.swift; sourceTree = "<group>"; };
 		84B084F62F92C83D000713CC /* DpFilesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DpFilesTests.swift; sourceTree = "<group>"; };
 		84B084F72F92C83D000713CC /* DpFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DpFileTests.swift; sourceTree = "<group>"; };
-		84C0A1002FA100000000AA01 /* MultipartUploadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartUploadTests.swift; sourceTree = "<group>"; };
-		84C0A1022FA100000000AA02 /* MockURLSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLSession.swift; sourceTree = "<group>"; };
 		84B967632B74157C00D73F75 /* HelpMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpMenu.swift; sourceTree = "<group>"; };
 		84BA65E22AD057E10058D291 /* SavableItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavableItems.swift; sourceTree = "<group>"; };
 		84BC6DF02AC3122100CF6D39 /* Jamf Sync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Jamf Sync.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -213,6 +211,8 @@
 		84BF5E392CC15FB4008B07A1 /* TemporaryFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryFileManager.swift; sourceTree = "<group>"; };
 		84BF61A82CC93DFB008B07A1 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		84BF61AA2CC94DD5008B07A1 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		84C0A1002FA100000000AA01 /* MultipartUploadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartUploadTests.swift; sourceTree = "<group>"; };
+		84C0A1022FA100000000AA02 /* MockURLSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLSession.swift; sourceTree = "<group>"; };
 		84CAB0E42C25C47400582D59 /* FileManager+moveRetainingPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+moveRetainingPermissions.swift"; sourceTree = "<group>"; };
 		84CCB5D12B4C852F00328291 /* SetupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupViewModel.swift; sourceTree = "<group>"; };
 		84CCB5D32B4C946200328291 /* LogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewModel.swift; sourceTree = "<group>"; };
@@ -946,6 +946,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"JamfSync/Resources/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -958,7 +959,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.5.2;
+				MARKETING_VERSION = 1.5.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.jamfsync;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -977,6 +978,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"JamfSync/Resources/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -989,7 +991,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.5.2;
+				MARKETING_VERSION = 1.5.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jamf.jamfsync;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
