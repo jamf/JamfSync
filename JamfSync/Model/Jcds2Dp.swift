@@ -25,9 +25,8 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
         guard let jamfProInstanceId, let jamfProInstance = findJamfProInstance(id: jamfProInstanceId), let url = jamfProInstance.url else { throw ServerCommunicationError.noJamfProUrl }
         let cloudFilesUrl = url.appendingPathComponent("/api/v1/jcds/files")
 
-        dpFiles.files.removeAll()
-
         let response = try await jamfProInstance.dataRequest(url: cloudFilesUrl, httpMethod: "GET")
+        var newFiles: [DpFile] = []
         if let data = response.data {
             let dataString = String(data: data, encoding: .utf8)
             let decoder = JSONDecoder()
@@ -52,12 +51,13 @@ class Jcds2Dp: DistributionPoint, RenewTokenProtocol {
                         if let md5 = cloudFile.md5 {
                             checksums.updateChecksum(Checksum(type: .MD5, value: md5))
                         }
-                        let dpFile = DpFile(name: filename, size: cloudFile.length ?? 0, checksums: checksums)
-
-                        dpFiles.files.append(dpFile)
+                        newFiles.append(DpFile(name: filename, size: cloudFile.length ?? 0, checksums: checksums))
                     }
                 }
             }
+        }
+        await MainActor.run {
+            dpFiles.files = newFiles
         }
 
         filesLoaded = true

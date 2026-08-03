@@ -239,7 +239,9 @@ class DistributionPoint: Identifiable {
             LogManager.shared.logMessage(message: "Deleting \(file.name) from \(selectionName())", level: .verbose, dryRun: dryRun)
             if !dryRun {
                 try await deleteFile(file: file, progress: progress)
-                dpFiles.files.removeAll(where: { $0.name == file.name } ) // Update the list of files so it accurately reflects the change
+                await MainActor.run {
+                    dpFiles.files.removeAll(where: { $0.name == file.name }) // Update the list of files so it accurately reflects the change
+                }
             }
         }
     }
@@ -254,12 +256,14 @@ class DistributionPoint: Identifiable {
         let directoryContents = try fileManager.contentsOfDirectory(at: URL(fileURLWithPath: localPath), includingPropertiesForKeys: nil
         )
 
-        dpFiles.files.removeAll()
+        var newFiles: [DpFile] = []
         for url in directoryContents {
             if !limitFileTypes || isAcceptableForDp(url: url) {
-                let dpFile = DpFile(name: url.lastPathComponent, fileUrl: url, size: sizeOfFile(fileUrl: url))
-                dpFiles.files.append(dpFile)
+                newFiles.append(DpFile(name: url.lastPathComponent, fileUrl: url, size: sizeOfFile(fileUrl: url)))
             }
+        }
+        await MainActor.run {
+            dpFiles.files = newFiles
         }
 
         filesLoaded = true
@@ -387,7 +391,7 @@ class DistributionPoint: Identifiable {
                 someFileSucceeded = true
 
                 if !dryRun {
-                    addOrUpdateInDstList(dpFile: dpFile, dstDp: dstDp)
+                    await addOrUpdateInDstList(dpFile: dpFile, dstDp: dstDp)
                 }
                 if !dstDp.updatePackageInfoBeforeTransfer {
                     try await addOrUpdatePackageInJamfPro(dpFile: dpFile, jamfProInstance: jamfProInstance, dryRun: dryRun)
@@ -488,11 +492,11 @@ class DistributionPoint: Identifiable {
         return filesToSync
     }
 
-    private func addOrUpdateInDstList(dpFile: DpFile, dstDp: DistributionPoint) {
-        if dstDp.dpFiles.files.contains(where: { $0.name == dpFile.name }) {
+    private func addOrUpdateInDstList(dpFile: DpFile, dstDp: DistributionPoint) async {
+        await MainActor.run {
             dstDp.dpFiles.files.removeAll(where: { $0.name == dpFile.name })
+            dstDp.dpFiles.files.append(dpFile)
         }
-        dstDp.dpFiles.files.append(dpFile)
     }
 
     private func addOrUpdatePackageInJamfPro(dpFile: DpFile, jamfProInstance: JamfProInstance?, dryRun: Bool) async throws {

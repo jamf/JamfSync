@@ -28,11 +28,14 @@ class GeneralCloudDp: DistributionPoint {
         guard let jamfProInstanceId, let jamfProInstance = findJamfProInstance(id: jamfProInstanceId) else { throw ServerCommunicationError.noJamfProUrl }
 
         // Can't currently read the file list in non JCDS2 cloud instances, so we have to assume that the packages in Jamf Pro are present
-        dpFiles.removeAll()
+        var newFiles: [DpFile] = []
         for package in jamfProInstance.packages {
             if !limitFileTypes || isAcceptableForDp(url: URL(fileURLWithPath: package.fileName)) {
-                dpFiles.files.append(DpFile(name: package.fileName, size: package.size, checksums: package.checksums))
+                newFiles.append(DpFile(name: package.fileName, size: package.size, checksums: package.checksums))
             }
+        }
+        await MainActor.run {
+            dpFiles.files = newFiles
         }
 
         filesLoaded = true
